@@ -50,10 +50,45 @@ const OrderScreen = () => {
         setSelectedOrderType(previousOrderType); // Revert to the previous order type
     };
 
+    const [errors, setErrors] = useState({});
+
     const handleSave = () => {
-        setPreviousOrderType(selectedOrderType); // Update previous order type with the currently selected one
-        console.log("Saved data:", formData); // Implement your save logic here
-        setShowCustomerPopup(false); // Close the popup
+        const newErrors = {};
+    
+        // Conditionally check required fields based on the selected order type
+        if (selectedOrderType === 'collection' || selectedOrderType === 'delivery') {
+            if (!formData.name) newErrors.name = 'Name is required';
+            if (!formData.phone) newErrors.phone = 'Phone number is required';
+        }
+    
+        if (selectedOrderType === 'delivery') {
+            if (!formData.postcode) newErrors.postcode = 'Postcode is required';
+            if (!formData.address) newErrors.address = 'Address is required';
+        }
+    
+        // Check if there are any errors
+        if (Object.keys(newErrors).length === 0) {
+            setPreviousOrderType(selectedOrderType); // Update previous order type with the currently selected one
+            console.log("Saved data:", formData); // Implement your save logic here
+            setShowCustomerPopup(false); // Close the popup if the form is valid
+            setErrors({}); // Reset any previous errors
+        } else {
+            // If errors, display them
+            setErrors(newErrors);
+        }
+    };
+    
+    
+
+    const isFormValid = () => {
+        switch (selectedOrderType) {
+            case "collection":
+                return formData.name && formData.phone;
+            case "delivery":
+                return formData.name && formData.phone && formData.postcode && formData.address;
+            default:
+                return true; // For takeaway, no mandatory fields
+        }
     };
 
     useEffect(() => {
@@ -92,6 +127,22 @@ const OrderScreen = () => {
         const minutes = totalMinutes % 60;
         return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
     };
+
+    const getPlaceholder = (field) => {
+        const requiredIndicator = ' **';
+        switch (selectedOrderType) {
+            case 'collection':
+                if (field === 'name' || field === 'phone') return `${field.charAt(0).toUpperCase() + field.slice(1)}${requiredIndicator}`;
+                break;
+            case 'delivery':
+                if (field === 'name' || field === 'phone' || field === 'postcode' || field === 'address') 
+                    return `${field.charAt(0).toUpperCase() + field.slice(1)}${requiredIndicator}`;
+                break;
+            default:
+                return `${field.charAt(0).toUpperCase() + field.slice(1)}`; // Takeaway has no required fields
+        }
+        return `${field.charAt(0).toUpperCase() + field.slice(1)}`; // Default placeholder
+    };    
 
     return (
         <div className="bg-wrapper">
@@ -172,9 +223,6 @@ const OrderScreen = () => {
                 {showCustomerPopup && (
                     <div className="fullscreen-overlay" onClick={handleClose}>
                         <div className="customer-info-popup" onClick={(e) => e.stopPropagation()}>
-                            {/* close button */}
-                            <img className="close-icon" src={closeIcon} alt="Close Icon" onClick={handleClose} />
-
                             <div className="orderTypeContainer" ref={popupRef}>
                                 <div
                                     className={`orderType takeaway ${selectedOrderType === 'takeaway' ? 'selected' : ''}`}
@@ -198,19 +246,65 @@ const OrderScreen = () => {
                                 </div>
                             </div>
 
-                            {/* Form Fields */}
+                            {/* Error Message at the top of the form */}
+                            {Object.keys(errors).length > 0 && (
+                                <div className="error-message">
+                                    Please fill in the required fields.
+                                </div>
+                            )}
+
+                            {/* Form Field Inputs */}
                             <div className="form-fields">
-                                {Object.keys(formData).map((key) => (
-                                    <div key={key} className="form-field">
-                                        <input
+                                <div className={`form-field name-field ${errors.name ? 'error' : ''}`}>
+                                    <input
+                                        type="text"
+                                        value={formData.name}
+                                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                        placeholder={getPlaceholder('name')}
+                                    />
+                                    {errors.name && <span className="error-text">{errors.name}</span>}
+                                    
+                                </div>
+                                <div className={`form-field phone-field ${errors.phone ? 'error' : ''}`}>
+                                    <input
                                             type="text"
-                                            value={formData[key]}
-                                            onChange={(e) => setFormData({ ...formData, [key]: e.target.value })}
-                                            placeholder={key.charAt(0).toUpperCase() + key.slice(1)}
+                                            value={formData.phone}
+                                            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                            placeholder={getPlaceholder('phone')}
                                         />
-                                    </div>
-                                ))}
+                                        {errors.phone && <span className="error-text">{errors.phone}</span>}
+                                </div>
+                                <div className={`form-field postcode-field ${errors.postcode ? 'error' : ''}`}>
+                                    <input
+                                        type="text"
+                                        value={formData.postcode}
+                                        onChange={(e) => setFormData({ ...formData, postcode: e.target.value })}
+                                        placeholder={getPlaceholder('postcode')}
+                                    />
+                                    {errors.postcode && <span className="error-text">{errors.postcode}</span>}
+                                    
+                                </div>
+                                <div className={`form-field address-field ${errors.address ? 'error' : ''}`}>
+                                    <input
+                                        type="text"
+                                        value={formData.address}
+                                        onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                                        placeholder={getPlaceholder('address')}
+                                    />
+                                    {errors.address && <span className="error-text">{errors.address}</span>}
+                                </div>
+
+                                {/* Notes Field */}
+                                <div className="form-field notes-field">
+                                    <textarea
+                                        value={formData.notes}
+                                        onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                                        placeholder={getPlaceholder('notes')}
+                                        className="notes-input"
+                                    />
+                                </div>
                             </div>
+
 
                             {/* Save and Cancel Buttons */}
                             <button className="save-button" onClick={handleSave}>Save</button>

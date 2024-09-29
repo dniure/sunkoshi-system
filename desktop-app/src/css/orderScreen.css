@@ -329,7 +329,7 @@
 
 .orderTypeContainer {
     position: absolute;
-    right: 90px;
+    right: 50px;
     top: 30px;
     width: 100px;
     height: 70%;
@@ -414,13 +414,13 @@
 }
 
 .save-button {
-    right: 87px; 
+    right: 40px; 
     background: #28a745; 
     border-color: #148700; 
 }
 
 .cancel-button {
-    left: 50px; 
+    left: 40px; 
     background: #dc3545; 
     border-color: #870000; 
 }
@@ -442,53 +442,100 @@
 
 /* Styles for the form fields container */
 .form-fields {
+    width: 70%; /* Adjust as necessary */
+    padding-left: 10px;
     display: grid;
     grid-template-columns: 1fr 1fr; /* Two equal-width columns */
-    grid-row-gap: 15px; /* Gap between fields */
-    grid-column-gap: 0px; /* Smaller gap between columns */
-    margin-top: 20px; /* Space above the form fields */
+    grid-gap: 15px; /* Unified gap for both rows and columns */
+    margin-top: 15px; /* Space above the form fields */
+    box-sizing: border-box; /* Ensure padding and border are included in the total width */
 }
 
 /* Individual form field styles */
 .form-field {
-    margin-bottom: 0; /* No additional bottom margin as grid-gap handles spacing */
+    width: 100%; /* Ensure form fields take full width */
 }
 
-.form-field input {
-    width: 180px; /* Full width of its container */
-    padding: 10px; /* Inner padding for the input */
+/* Input styles */
+.form-field input,
+.notes-input {
+    width: 100%; /* Full width of its container */
+    padding: 10px; /* Inner padding for text */
     border: 1px solid #ccc; /* Light gray border */
     border-radius: 5px; /* Rounded corners */
     font-size: 14px; /* Font size */
     transition: border-color 0.3s; /* Smooth transition for focus */
     font-family: 'Anybody', sans-serif; /* Use 'Anybody' font */
-    text-transform: lowercase; /* Converts text to lowercase */
+    box-sizing: border-box; /* Ensure padding and border don't cause overflow */
 }
 
 /* Focus effect for inputs */
-.form-field input:focus {
+.form-field input:focus,
+.notes-input:focus {
     border-color: #007BFF; /* Change border color on focus */
     outline: none; /* Remove default outline */
     box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Light blue shadow */
 }
 
 /* Ensure name and postcode are the same size */
-.name-field, .postcode-field {
+.name-field,
+.phone-field,
+.postcode-field {
     grid-column: span 1; /* Each takes one column */
 }
 
-/* Phone goes beside name */
-.phone-field {
-    grid-column: span 1; /* Align next to name */
-}
-
-/* Address takes full width */
+/* Address takes full width and starts on a new row */
 .address-field {
     grid-column: span 2; /* Spans both columns */
+    grid-row-start: auto; /* Address starts on the next row automatically */
 }
 
-/* Notes take full width and 3x the height */
+/* Notes field takes full width and is 4x the height of other fields */
 .notes-field {
     grid-column: span 2; /* Spans both columns */
-    height: calc(3 * 50px); /* 3x the height of other fields */
+    height: 130px; /* Set the height to be larger than other fields */
+}
+
+/* Style for the textarea input */
+.notes-input {
+    width: 100%; /* Full width of its container */
+    height: 100%; /* Full height of the container */
+    padding: 10px; /* Inner padding for text */
+    border: 1px solid #ccc; /* Light gray border */
+    border-radius: 5px; /* Rounded corners */
+    font-size: 14px; /* Font size */
+    box-sizing: border-box; /* Ensure padding and border don't cause overflow */
+    overflow-y: auto; /* Enable vertical scrolling */
+    resize: none; /* Disable manual resizing */
+    text-align: left; /* Align text to the left */
+    white-space: pre-wrap; /* Allows text to wrap onto new lines */
+    line-height: 1.5; /* Optional: Improve readability */
+}
+
+/* Optional: To style the placeholder */
+.notes-input::placeholder {
+    color: #999; /* Placeholder color */
+    font-style: italic; /* Placeholder font style */
+}
+
+
+/* Error message at the top */
+.error-message {
+    color: red;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+/* Add red border for invalid fields */
+.form-field.error input,
+.form-field.error textarea {
+    border-color: red;
+    box-shadow: 0 0 5px rgba(255, 0, 0, 0.5); /* Optional: red shadow */
+}
+
+/* Error text below the input */
+.error-text {
+    color: red;
+    font-size: 12px;
+    margin-top: 5px;
 }
