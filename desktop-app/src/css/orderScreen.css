@@ -1,0 +1,310 @@
+/* ############################################################################################ */
+/* ####### Main Container ##################################################################### */
+.main-container {
+    position: absolute; /* Enable positioning */
+    
+    top: 3vw;; /* Position from the top */
+    left: 2%; /* Position from the left */
+
+    height: 56.5vw;
+    width: 96%;
+
+    background-color: rgba(234, 238, 5, 0); /* Background color with some transparency */
+    
+    display: flex; /* Enable Flexbox for layout control */
+    flex-direction: row; /* Arrange children horizontally */
+    justify-content: space-between; /* Space out children */
+    align-items: flex-start; /* Align children at the start of the container */
+    
+    overflow: hidden; /* Hide overflow */
+    box-sizing: border-box; /* Include padding and border in element's width and height */
+    padding: 10px; /* Add padding if necessary */
+}
+
+
+/* ########################################################################################## */
+/* ####### Left Section ##################################################################### */
+
+.left-section {
+    position: absolute; /* Enable positioning */
+    background-color: rgba(120, 120, 120, 0.23); /* Background with 23% opacity */
+    border: 4px solid rgba(150, 137, 137, 0.15); /* Stroke with 15% opacity */
+    border-radius: 20px; /* Round corners */
+
+    width: 680px; /* Set your desired width */
+    height: 515px; /* Set your desired height */
+
+    top: 0px; /* Position from the top */
+    left: 0px; /* Position from the left */
+}
+
+.menu-items {
+    position: absolute;
+    background-color: #FFFFFF;
+    border-radius: 20px; /* Round corners */
+
+    width: 675px;
+    height: 500px;
+
+    top: 8px;
+    left: 2.5px;
+}
+
+/* ########################################################################################## */
+/* ####### Right Section #################################################################### */
+/*  */
+.right-section {
+    position: absolute; /* Enable positioning */
+    background-color: rgba(120, 120, 120, 0.23); /* Background with 23% opacity */
+    border: 4px solid rgba(150, 137, 137, 0.15); /* Stroke with 15% opacity */
+    border-radius: 20px; /* Round corners */
+
+    width: 190px; /* Set your desired width */
+    height: 515px; /* Set your desired height */
+
+    top: 0px; /* Position from the top */
+    right: 0px; /* Position from the left */
+}
+
+/* ############# Order Info ########################### */
+/* bg layer */
+.order-info {
+    position: absolute;
+    background-color: #FFFFFF;
+    border-radius: 20px; /* Round corners */
+    width: 185px;
+    height: 95px;
+    top: 415px;
+    left: 2.5px;
+    display: flex;
+    flex-direction: column; /* Stack items vertically */
+    align-items: center; /* Center items horizontally */
+    justify-content: center; /* Align to the start vertically */
+    overflow: visible; /* Prevent overflow */
+    transition: background-color 0.3s; /* Smooth transition for background color */
+}
+
+/* "Takeaway"/"Collection"/"Delivery"/"Table" */
+.order-text {
+    color: black; /* Text color */
+    font-family: 'Anybody', sans-serif; /* Use 'Anybody' font */
+    font-weight: bold; /* Bold text */
+    font-size: 2.5vw;; /* Adjust font size as needed */
+    margin-bottom: 5px;;
+}
+
+/* ASAP Button */
+.modify-time-button {
+    color: #000000; /* Text color */
+    font-size: 1rem; /* Font size */
+
+    background-color: #A8B9FF; /* Light transparent blue */
+    border: 1.25px solid #000000; /* Remove default button border */
+    border-radius: 8px; /* Rounded corners */
+
+    width: 100px;
+
+    align-items: center; /* Center items vertically */
+    cursor: pointer; /* Pointer cursor on hover */
+    
+    position: relative;
+    z-index: 3;
+}
+
+/* ############# Modify Time ########################### */
+/* Dark overlay */
+.order-info-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(167, 167, 167, 0.914);
+    z-index: 1;
+    border-radius: 20px; /* Match the order-info's shape */
+}
+
+/* Pop-up bg layer */
+.modify-time-layer {
+    position: absolute;
+    bottom: 45px;
+    width: 150px;
+    height: 120px;
+    background-color: rgba(255, 255, 255, 1); /* White with full opacity */
+
+    border: 2px solid #000000; /* Border with width, style, and color */
+    border-radius: 20px; /* Rounded edges */
+    z-index: 3; /* Above dark overlay, below the ASAP button */
+
+    display: flex;
+    flex-direction: column;
+
+    overflow: hidden; /* Ensure that content stays within bounds */
+}
+
+/* Sections */
+
+/* ASAP */
+.asap-section {
+    flex: 1; /* Each section takes up an equal portion of the height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+/* Section 2 & 3 */
+.section {
+    flex: 1; /* Each section takes up an equal portion of the height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.section:not(:last-child), .asap-section:not(:last-child){
+    border-bottom: 1px solid #000000; /* Thin black line separating sections */
+}
+
+/* Style for the ASAP button */
+.asap-button {
+    width: 100%;
+    height: 100%;
+    background-color: #007BFF; /* Blue background */
+    color: white;
+    border: none;
+    border-radius: 18px 18px 0 0; /* Rounded top corners */
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.asap-button.selected {
+    background-color: #007BFF; /* Blue when selected */
+}
+
+.asap-button:not(.selected) {
+    background-color: #FFFFFF; /* White when not selected */
+    color: #000000;
+}
+
+/* Style for the time toggle (Section 2 & 3) */
+.time-toggle, .exact-time {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.time-toggle button, .exact-time button {
+    flex: 1; /* Buttons take equal space */
+    height: 100%; /* Make buttons cover the entire height of the section */
+    background-color: #f0f0f0; /* Background color for the buttons */
+    border: none; /* Remove default button borders */
+    cursor: pointer; /* Change cursor to pointer */
+}
+
+.time-toggle span, .exact-time span {
+    flex: 3; /* Time text takes up twice the space of the buttons */
+    text-align: center; /* Center the text */
+    font-weight: bold;
+}
+
+/* ############# Ordered Items ######################## */
+
+/* bg layer */
+.ordered-items {
+    position: absolute;
+    background-color: #FFFFFF;
+    border-radius: 20px; /* Round corners */
+
+    width: 185px;
+    height: 78%;
+
+    top: 8px;
+    left: 2.5px;
+
+    display: flex;
+    flex-direction: column; /* Stack items vertically */
+    align-items: center; /* Center items horizontally */
+}
+
+.vertical-line {
+    width: 1px; /* Thickness of the line */
+    height: 80%; /* Full height of the parent container */
+    background-color: #D9D9D9; /* Color of the line */
+    position: absolute; /* Position absolute to align it */
+    top: 10px;
+    left: 25px; /* 10px from the left margin */
+}
+
+.labels {
+    position: relative; /* Keep this to allow absolute positioning of child elements */
+    width: 100%; /* Ensure this matches your desired width */
+    top: 13px; /* Adjust the top value as needed */
+
+    color: black; /* Text color */
+    font-family: 'Anybody', sans-serif; /* Use 'Anybody' font */
+    font-size: 12px; /* Adjust font size as needed */
+}
+
+.item-label {
+    position: absolute; /* Positioning relative to the .ordered-items container */
+    left: 32px; /* 10px from the left */
+    color: grey; /* Grey text color */
+}
+
+.price-label {
+    position: absolute; /* Positioning relative to the .ordered-items container */
+    left: 140px; /* 60px from the left */
+    color: grey; /* Grey text color */
+}
+
+.total {
+    position: absolute; /* Positioning relative to the .ordered-items container */
+    left: 12px; /* 60px from the left */
+    color: rgb(0, 0, 0); /* Grey text color */
+    top: 360px;
+    font-size: 15px;
+}
+
+.price-sum {
+    position: absolute; /* Positioning relative to the .ordered-items container */
+    left: 140px; /* 60px from the left */
+    color: rgb(0, 0, 0); /* Grey text color */
+    top: 320px;
+    font-size: 15px;
+}
+
+.final-price {
+    position: absolute; /* Positioning relative to the .ordered-items container */
+    left: 140px; /* 60px from the left */
+    color: rgb(0, 0, 0); /* Grey text color */
+    top: 360px;
+    font-size: 15px;
+}
+
+/* Full-screen popup overlay */
+.fullscreen-overlay {
+    position: fixed; /* Fixed position to cover the entire viewport */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(167, 167, 167, 0.914); /* Semi-transparent background */
+    z-index: 10; /* Higher than other elements */
+}
+
+/* Central white rectangle for customer info */
+.customer-info-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Center the popup */
+    width: 80%; /* Adjust the width as needed */
+    height: 70%; /* Adjust the height as needed */
+    background-color: white; /* White background */
+    border-radius: 20px; /* Rounded corners */
+    padding: 20px; /* Padding inside the popup */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add shadow for depth */
+    z-index: 11; /* Ensure it's above the overlay */
+}

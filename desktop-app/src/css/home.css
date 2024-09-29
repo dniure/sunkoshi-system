@@ -1,0 +1,73 @@
+@import url('https://fonts.googleapis.com/css2?family=Braah+One&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Beiruti:wght@700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Anybody:wght@700&display=swap');
+
+/* ################################################################# */
+/* ############## Text & Logo ############################### */
+.sunkoshi-text {
+    z-index: 3; /* Ensures the text is on top */
+    position: absolute; /* Ensure absolute positioning */
+    top: 0; /* Place at the top */
+    left: 3vw; /* Move the text to the right */
+    font-family: 'Braah One', sans-serif;
+    font-size: 7.8vw;
+    color: #A74600;
+    -webkit-text-stroke: 0.01px #E08385;
+    margin: 0; /* Reset margin */
+}
+
+.restaurant-logo {
+    position: absolute;
+    right: 17vw; /* Adjust as needed */
+    top: 53%; /* Center vertically */
+    transform: translateY(-50%); /* Corrects the vertical alignment */
+    width: 25vw; /* Adjust size as needed */
+    opacity: 0.2; /* 20% opacity */
+}
+
+
+/* ################################################################# */
+/* ############## DateTime Container ############################### */
+
+.datetime-container {
+    position: absolute;
+    top: 10vw; /* Adjust as needed */
+    right: 15.8vw; /* Adjust as needed */
+    display: flex;
+    flex-direction: column; /* Stack date and time vertically */
+    align-items: center; /* Center them horizontally */
+    transform: scale(1.7); /* Default scale */
+    transform-origin: top right; /* Scale from the top-right corner */
+    gap: 0px;
+}
+
+/* Style for Time */
+.live-time {
+    font-family: 'Anybody', sans-serif;
+    font-size: 40px; /* Default font size */
+    font-weight: bold;
+    color: #333;
+}
+
+/* Style for Date */
+.live-date {
+    font-family: 'Anybody', sans-serif;
+    font-size: 20px; /* Default font size */
+    color: #555;
+    font-weight: normal;
+}
+
+/* Power Button Styling */
+.power-button {
+    background: none; /* Remove default button styling */
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    margin-top: 59.5vw;
+    margin-left: 1.8vw;
+}
+
+.power-button img {
+    width: 5vw; /* Adjust size as needed */
+    object-fit: contain;
+}

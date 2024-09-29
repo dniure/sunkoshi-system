@@ -1,0 +1,22 @@
+body, html, #root {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+.bg-container {
+    z-index: 1;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(to bottom, #BC7E7E 0%, #242DAA 100%);
+    opacity: 20%;
+}
+
+.content-container {
+    z-index: 2; /* Foreground layer, above background */
+    position: relative;
+    padding: 0; /* Optional padding */
+}
