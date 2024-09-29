@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import '../css/main.css';
 import '../css/buttons.css';
 import '../css/orderScreen.css';
+
 import closeIcon from '../images/close-icon.png';
 
 const OrderScreen = () => {
@@ -18,6 +19,15 @@ const OrderScreen = () => {
 
     const [selectedOrderType, setSelectedOrderType] = useState("takeaway");
     const [previousOrderType, setPreviousOrderType] = useState("takeaway"); // Store the previous order type
+
+    // State for form fields
+    const [formData, setFormData] = useState({
+        name: '',
+        phone: '',
+        postcode: '',
+        address: '',
+        notes: '',
+    });
 
     useEffect(() => {
         const timer = setInterval(() => setCurrentTime(new Date()), 60000);
@@ -42,8 +52,8 @@ const OrderScreen = () => {
 
     const handleSave = () => {
         setPreviousOrderType(selectedOrderType); // Update previous order type with the currently selected one
+        console.log("Saved data:", formData); // Implement your save logic here
         setShowCustomerPopup(false); // Close the popup
-        // You can also add any other save logic here if needed
     };
 
     useEffect(() => {
@@ -58,7 +68,7 @@ const OrderScreen = () => {
         if (!modifyingTime && !toggleButtonRef.current.contains(event.target)) {
             setShowCustomerPopup(true); // Show the customer info popup
         }
-    };  
+    };
 
     const resetOrderTimeToAsap = () => setOrderTime(25);
     const increaseOrderTime = () => setOrderTime(prev => prev + 5);
@@ -160,7 +170,7 @@ const OrderScreen = () => {
 
                 {/* ############# Customer Info Full-Screen Popup ##############*/}
                 {showCustomerPopup && (
-                    <div className="fullscreen-overlay" onClick={handleClose}> {/* Use handleClose here */}
+                    <div className="fullscreen-overlay" onClick={handleClose}>
                         <div className="customer-info-popup" onClick={(e) => e.stopPropagation()}>
                             {/* close button */}
                             <img className="close-icon" src={closeIcon} alt="Close Icon" onClick={handleClose} />
@@ -188,14 +198,26 @@ const OrderScreen = () => {
                                 </div>
                             </div>
 
-                            {/* Save Button */}
-                            <button className="save-button" onClick={handleSave}>Save</button>
+                            {/* Form Fields */}
+                            <div className="form-fields">
+                                {Object.keys(formData).map((key) => (
+                                    <div key={key} className="form-field">
+                                        <input
+                                            type="text"
+                                            value={formData[key]}
+                                            onChange={(e) => setFormData({ ...formData, [key]: e.target.value })}
+                                            placeholder={key.charAt(0).toUpperCase() + key.slice(1)}
+                                        />
+                                    </div>
+                                ))}
+                            </div>
 
+                            {/* Save and Cancel Buttons */}
+                            <button className="save-button" onClick={handleSave}>Save</button>
                             <button className="cancel-button" onClick={handleClose}>Cancel</button>
                         </div>
                     </div>
                 )}
-
 
                 {/* ############# Bottom Section ##############*/}
                 <div className="cancel-container">

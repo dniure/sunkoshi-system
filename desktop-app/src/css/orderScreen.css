@@ -397,37 +397,98 @@
     border-top: none;
 }
 
+/* Button styles */
+.save-button, .cancel-button {
+    position: absolute; 
+    font-family: 'Anybody', sans-serif;
+    font-size: 2vw; 
+    width: 12vw; 
+    height: 4vw; 
+    cursor: pointer; 
+    color: white; 
+    border-radius: 20px; 
+    padding: 10px 15px; 
+    border: 0.2vw solid;
+    margin-top: 20px; 
+    bottom: 20px; 
+}
 
 .save-button {
-    position: absolute;
-    font-family: 'Anybody', sans-serif;
-    font-size: 2vw;
-    width: 12vw; /* Set width of button */
-    height: 4vw; /* Set height of button */
-    cursor: pointer;
-    color: white;
-
-    background: #61A61B;
-    border: 0.2vw solid #148700;
-    border-radius: 20px; /* Round corners */
-
-    right: 87px;
-    bottom: 20px;
+    right: 87px; 
+    background: #28a745; 
+    border-color: #148700; 
 }
 
 .cancel-button {
-    position: absolute;
-    font-family: 'Anybody', sans-serif;
-    font-size: 2vw;
-    width: 12vw; /* Set width of button */
-    height: 4vw; /* Set height of button */
-    cursor: pointer;
-    color: white;
+    left: 50px; 
+    background: #dc3545; 
+    border-color: #870000; 
+}
 
-    background: #d11d1d;
-    border: 0.2vw solid #870000;
-    border-radius: 20px; /* Round corners */
+/* Styles for the customer info popup */
+.customer-info-popup {
+    position: relative;
+    width: 80%; /* Set width as desired */
+    max-width: 600px; /* Maximum width for larger screens */
+    background-color: #EFEFEF;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 100; /* Ensure it's on top of other elements */
+}
 
-    left: 50px;
-    bottom: 20px;
+/* ############ */
+/* FORM FIELDS */
+
+/* Styles for the form fields container */
+.form-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Two equal-width columns */
+    grid-row-gap: 15px; /* Gap between fields */
+    grid-column-gap: 0px; /* Smaller gap between columns */
+    margin-top: 20px; /* Space above the form fields */
+}
+
+/* Individual form field styles */
+.form-field {
+    margin-bottom: 0; /* No additional bottom margin as grid-gap handles spacing */
+}
+
+.form-field input {
+    width: 180px; /* Full width of its container */
+    padding: 10px; /* Inner padding for the input */
+    border: 1px solid #ccc; /* Light gray border */
+    border-radius: 5px; /* Rounded corners */
+    font-size: 14px; /* Font size */
+    transition: border-color 0.3s; /* Smooth transition for focus */
+    font-family: 'Anybody', sans-serif; /* Use 'Anybody' font */
+    text-transform: lowercase; /* Converts text to lowercase */
+}
+
+/* Focus effect for inputs */
+.form-field input:focus {
+    border-color: #007BFF; /* Change border color on focus */
+    outline: none; /* Remove default outline */
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Light blue shadow */
+}
+
+/* Ensure name and postcode are the same size */
+.name-field, .postcode-field {
+    grid-column: span 1; /* Each takes one column */
+}
+
+/* Phone goes beside name */
+.phone-field {
+    grid-column: span 1; /* Align next to name */
+}
+
+/* Address takes full width */
+.address-field {
+    grid-column: span 2; /* Spans both columns */
+}
+
+/* Notes take full width and 3x the height */
+.notes-field {
+    grid-column: span 2; /* Spans both columns */
+    height: calc(3 * 50px); /* 3x the height of other fields */
 }
