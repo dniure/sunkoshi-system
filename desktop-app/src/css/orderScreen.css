@@ -90,7 +90,8 @@
     font-family: 'Anybody', sans-serif; /* Use 'Anybody' font */
     font-weight: bold; /* Bold text */
     font-size: 2.5vw;; /* Adjust font size as needed */
-    margin-bottom: 5px;;
+    margin-bottom: 5px;
+    text-transform: uppercase; /* Converts text to uppercase */
 }
 
 /* ASAP Button */
@@ -291,20 +292,142 @@
     width: 100%;
     height: 100%;
     background-color: rgba(167, 167, 167, 0.914); /* Semi-transparent background */
-    z-index: 10; /* Higher than other elements */
+    z-index: 4; /* Higher than other elements */
 }
 
 /* Central white rectangle for customer info */
 .customer-info-popup {
-    position: fixed;
+    position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%); /* Center the popup */
-    width: 80%; /* Adjust the width as needed */
-    height: 70%; /* Adjust the height as needed */
-    background-color: white; /* White background */
+    width: 70%; /* Adjust the width as needed */
+    height: 60%; /* Adjust the height as needed */
+    background-color: #EFEFEF; /* White background */
+    
+    border: 2px solid hsl(234, 100%, 51%, 10%);
     border-radius: 20px; /* Rounded corners */
-    padding: 20px; /* Padding inside the popup */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add shadow for depth */
-    z-index: 11; /* Ensure it's above the overlay */
+    z-index: 4; /* Ensure it's above the overlay */
+}
+
+.close-icon {
+    position: absolute;
+    height: 30px;
+    width: 30px;
+
+    right: 15px;
+    top: 15px;
+
+    cursor: pointer;
+
+
+}
+
+/* ################################# */
+/* ### Order Type Selection ### */
+
+.orderTypeContainer {
+    position: absolute;
+    right: 90px;
+    top: 30px;
+    width: 100px;
+    height: 70%;
+
+    border: 1px solid #6775F2; /* Outer border with width, style, and color */
+    border-radius: 20px; /* Rounded edges */
+    box-shadow: none; /* Optional: Remove any box-shadow if present */
+
+    display: flex;
+    flex-direction: column;
+    margin: 0 auto;             /* Center the container horizontally */
+    overflow: hidden; /* Ensure that content stays within bounds */
+
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Add a drop shadow */
+}
+
+.orderType {
+    width: 100px;                 /* Use full width of the container */
+    height: 100px;               /* Set the height as needed */
+    background-color: #D7EDFF;  /* Background color */
+    
+    flex: 1;
+    display: flex;               /* Optional: for centering content */
+    align-items: center;         /* Optional: for centering content vertically */
+    justify-content: center;     /* Optional: for centering content horizontally */
+    color: rgb(0, 0, 0);                /* Text color for visibility */
+    
+    font-family: 'Anybody', sans-serif; /* Use 'Anybody' font */
+    font-size: 15px;             /* Text size */
+    font-weight: bold;
+    box-sizing: border-box;       /* Include padding and border in element's total width and height */
+
+    cursor: pointer; /* Change cursor to pointer for better UX */
+    position: relative;
+
+}
+
+
+/* Specific styles for takeaway and delivery sections */
+.orderType.takeaway {
+    border-top-left-radius: 10px; /* Rounded corners for the top */
+    border-top-right-radius: 10px; /* Rounded corners for the top */
+    border-bottom: none;
+}
+
+.orderType.collection {
+    border-top: 1px solid #6775F2; /* Divider between sections */
+    border-bottom: none;
+}
+
+.orderType.delivery {
+    border-top: 1px solid #6775F2; /* Divider between sections */
+
+    border-bottom-left-radius: 10px; /* Rounded corners for the bottom */
+    border-bottom-right-radius: 10px; /* Rounded corners for the bottom */
+}
+
+.orderType.selected {
+    background-color: #3844AF; /* Bright blue for selected button */
+    color: white; /* Text color for visibility */
+    border-top: 1px solid #6775F2;    
+}
+
+.orderType.takeaway.selected {
+    border-top: none;
+}
+
+
+.save-button {
+    position: absolute;
+    font-family: 'Anybody', sans-serif;
+    font-size: 2vw;
+    width: 12vw; /* Set width of button */
+    height: 4vw; /* Set height of button */
+    cursor: pointer;
+    color: white;
+
+    background: #61A61B;
+    border: 0.2vw solid #148700;
+    border-radius: 20px; /* Round corners */
+
+    right: 87px;
+    bottom: 20px;
+}
+
+.cancel-button {
+    position: absolute;
+    font-family: 'Anybody', sans-serif;
+    font-size: 2vw;
+    width: 12vw; /* Set width of button */
+    height: 4vw; /* Set height of button */
+    cursor: pointer;
+    color: white;
+
+    background: #d11d1d;
+    border: 0.2vw solid #870000;
+    border-radius: 20px; /* Round corners */
+
+    left: 50px;
+    bottom: 20px;
 }

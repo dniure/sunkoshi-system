@@ -3,20 +3,25 @@ import { useNavigate } from 'react-router-dom';
 import '../css/main.css';
 import '../css/buttons.css';
 import '../css/orderScreen.css';
+import closeIcon from '../images/close-icon.png';
 
 const OrderScreen = () => {
     const navigate = useNavigate();
-    const popupRef = useRef(null); // Reference to the popup layer
+    const popupRef = useRef(null); // Reference to the modify time popup
     const toggleButtonRef = useRef(null); // Reference to the toggle button
+
     const [modifyingTime, setModifyingTime] = useState(false);
+    const [showCustomerPopup, setShowCustomerPopup] = useState(false);
     const [orderTime, setOrderTime] = useState(25);
     const [currentTime, setCurrentTime] = useState(new Date());
     const [adjustedExactTime, setAdjustedExactTime] = useState(false);
-    const [showOrderInfoPopup, setShowOrderInfoPopup] = useState(false); // New state for the order-info popup
 
-    useEffect(() => { 
-        const timer = setInterval(() => setCurrentTime(new Date()), 60000); 
-        return () => clearInterval(timer); 
+    const [selectedOrderType, setSelectedOrderType] = useState("takeaway");
+    const [previousOrderType, setPreviousOrderType] = useState("takeaway"); // Store the previous order type
+
+    useEffect(() => {
+        const timer = setInterval(() => setCurrentTime(new Date()), 60000);
+        return () => clearInterval(timer);
     }, []);
 
     const handleClickOutside = (event) => {
@@ -27,8 +32,18 @@ const OrderScreen = () => {
             !toggleButtonRef.current.contains(event.target)
         ) {
             setModifyingTime(false);
-            setShowOrderInfoPopup(false); // Close order-info popup when clicking outside
         }
+    };
+
+    const handleClose = () => {
+        setShowCustomerPopup(false);
+        setSelectedOrderType(previousOrderType); // Revert to the previous order type
+    };
+
+    const handleSave = () => {
+        setPreviousOrderType(selectedOrderType); // Update previous order type with the currently selected one
+        setShowCustomerPopup(false); // Close the popup
+        // You can also add any other save logic here if needed
     };
 
     useEffect(() => {
@@ -38,11 +53,12 @@ const OrderScreen = () => {
         };
     }, []);
 
+    // Order Info click handler
     const handleOrderInfoClick = (event) => {
-        if (!toggleButtonRef.current.contains(event.target)) {
-            setShowOrderInfoPopup(true);
+        if (!modifyingTime && !toggleButtonRef.current.contains(event.target)) {
+            setShowCustomerPopup(true); // Show the customer info popup
         }
-    };
+    };  
 
     const resetOrderTimeToAsap = () => setOrderTime(25);
     const increaseOrderTime = () => setOrderTime(prev => prev + 5);
@@ -55,7 +71,7 @@ const OrderScreen = () => {
         setAdjustedExactTime(true);
     };
 
-    const decreaseExactTime = () => { 
+    const decreaseExactTime = () => {
         setAdjustedExactTime(false);
         decreaseOrderTime();
     };
@@ -97,7 +113,7 @@ const OrderScreen = () => {
                         {/* Order Info */}
                         <div className="order-info" onClick={handleOrderInfoClick}>
                             {/* Dark Overlay */}
-                            {(modifyingTime || showOrderInfoPopup) && <div className="overlay"></div>}
+                            {modifyingTime && <div className="order-info-overlay"></div>}
 
                             {/* Modify Time Popup */}
                             {modifyingTime && (
@@ -120,22 +136,12 @@ const OrderScreen = () => {
                                 </div>
                             )}
 
-                            {/* Order Info Popup */}
-                            {showOrderInfoPopup && !modifyingTime && (
-                                <div className="order-info-popup">
-                                    <div className="popup-content">
-                                        {/* Content for the order info popup goes here */}
-                                        <p>Order Information</p>
-                                    </div>
-                                </div>
-                            )}
-
                             {/* Takeaway Text */}
                             <div className="order-text">
-                                <span>TAKEAWAY</span>
+                                <span>{selectedOrderType}</span>
                             </div>
 
-                            {/* Toggle Time Change Button */}
+                            {/* Modify Time Button */}
                             <button
                                 className="modify-time-button"
                                 ref={toggleButtonRef}
@@ -151,6 +157,45 @@ const OrderScreen = () => {
                         </div>
                     </div>
                 </div>
+
+                {/* ############# Customer Info Full-Screen Popup ##############*/}
+                {showCustomerPopup && (
+                    <div className="fullscreen-overlay" onClick={handleClose}> {/* Use handleClose here */}
+                        <div className="customer-info-popup" onClick={(e) => e.stopPropagation()}>
+                            {/* close button */}
+                            <img className="close-icon" src={closeIcon} alt="Close Icon" onClick={handleClose} />
+
+                            <div className="orderTypeContainer" ref={popupRef}>
+                                <div
+                                    className={`orderType takeaway ${selectedOrderType === 'takeaway' ? 'selected' : ''}`}
+                                    onClick={() => setSelectedOrderType('takeaway')}
+                                >
+                                    <span>T/A</span>
+                                </div>
+
+                                <div
+                                    className={`orderType collection ${selectedOrderType === 'collection' ? 'selected' : ''}`}
+                                    onClick={() => setSelectedOrderType('collection')}
+                                >
+                                    <span>Collect</span>
+                                </div>
+
+                                <div
+                                    className={`orderType delivery ${selectedOrderType === 'delivery' ? 'selected' : ''}`}
+                                    onClick={() => setSelectedOrderType('delivery')}
+                                >
+                                    <span>Delivery</span>
+                                </div>
+                            </div>
+
+                            {/* Save Button */}
+                            <button className="save-button" onClick={handleSave}>Save</button>
+
+                            <button className="cancel-button" onClick={handleClose}>Cancel</button>
+                        </div>
+                    </div>
+                )}
+
 
                 {/* ############# Bottom Section ##############*/}
                 <div className="cancel-container">
