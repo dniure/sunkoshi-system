@@ -1,0 +1,189 @@
+/* ################################# */
+/* ### Basic Setup ### */
+
+/* Translucent BG */
+.fullscreen-overlay {
+    position: fixed; /* Fixed position to cover the entire viewport */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(167, 167, 167, 0.914); /* Semi-transparent background */
+    z-index: 4; /* Higher than other elements */
+}
+
+/* Content Body*/
+.customer-info-popup {
+    position: absolute;
+    box-sizing: border-box;
+
+    transform: translate(-50%, -50%); /* Center the popup */
+    top: 50%;
+    left: 50%;
+
+    width: 75%; /* Adjust the width as needed */
+    height: 65%; /* Adjust the height as needed */
+    
+    background-color: #EFEFEF;
+    border: 2px solid hsl(234, 100%, 51%, 10%);
+    border-radius: 8px;
+
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+
+}
+/* ################################# */
+/* ### Order Type Selection ### */
+.orderTypeContainer {
+    position: absolute;
+    right: 50px;
+    top: 30px;
+    width: 100px;
+    height: 290px;
+
+    border: 1px solid #6775F2; /* Outer border with width, style, and color */
+    border-radius: 20px; /* Rounded edges */
+    
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Add a drop shadow */
+}
+
+.orderType {
+    width: 100px;                 /* Use full width of the container */
+    background-color: #D7EDFF;  /* Background color */
+    
+    flex: 1;
+    display: flex;               /* Optional: for centering content */
+    align-items: center;         /* Optional: for centering content vertically */
+    justify-content: center;     /* Optional: for centering content horizontally */
+    color: rgb(0, 0, 0);                /* Text color for visibility */
+    
+    font-family: 'Anybody', sans-serif; /* Use 'Anybody' font */
+    font-size: 15px;             /* Text size */
+    font-weight: bold;
+
+    cursor: pointer; /* Change cursor to pointer for better UX */
+}
+
+.orderType.collection, .orderType.delivery {
+    border-top: 1px solid #6775F2; /* Divider between sections */
+}
+
+.orderType.selected {
+    background-color: #3844AF; /* Bright blue for selected button */
+    color: white; /* Text color for visibility */
+}
+
+/* ///////////////////////////////////////////////// */
+/* Buttons */
+
+.save-button, .cancel-button {
+    position: absolute; 
+    font-family: 'Anybody', sans-serif;
+    font-size: 18px; 
+    color: white; 
+
+    display: flex;               /* Optional: for centering content */
+    align-items: center;         /* Optional: for centering content vertically */
+    justify-content: center;     /* Optional: for centering content horizontally */        
+    cursor: pointer; 
+
+    width: 100px; 
+    height: 30px; 
+    
+    border-radius: 20px; 
+    border: 0.2vw solid;
+
+    bottom: 20px;
+}
+
+.save-button {
+    right: 40px; 
+    background: #28a745; 
+    border-color: #22441c; 
+}
+
+.cancel-button {
+    left: 40px; 
+    background: #dc3545; 
+    border-color: #870000; 
+}
+
+/* ///////////////////////////////////////////////// */
+/* FORM FIELDS */
+
+.form-fields {
+    box-sizing: border-box; /* Ensure padding and border are included in the total width */
+    padding: 30px;
+    
+    width: 75%; /* Adjust as necessary */
+    display: grid;
+    grid-gap: 15px; /* Unified gap for both rows and columns */
+    margin-top: 5px;
+    position: relative; /* Make it a reference point for absolutely positioned children */
+}
+
+/* Input styles */
+.form-field input, .notes-input {
+    box-sizing: border-box; /* Ensure padding and border don't cause overflow */
+
+    width: 100%; /* Full width of its container */
+    padding: 10px; /* Inner padding for text */
+
+    border: 1px solid #ccc; /* Light gray border */
+    border-radius: 5px; /* Rounded corners */
+    font-size: 14px; /* Font size */
+    
+    transition: border-color 0.3s; /* Smooth transition for focus */
+    font-family: 'Anybody', sans-serif; /* Use 'Anybody' font */
+}
+
+/* Focus effect for inputs */
+.form-field input:focus, .notes-input:focus {
+    outline: none; /* Remove default outline */
+    border-color: #007BFF; /* Change border color on focus */
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Light blue shadow */
+}
+
+/* Address takes full width and starts on a new row */
+.address-field, .notes-field {
+    grid-column: span 2; /* Spans both columns */
+    grid-row-start: auto; /* Address starts on the next row automatically */
+}
+
+/* Style for the textarea input */
+.notes-input {
+    height: 130px; /* Full height of the container */
+    padding: 10px; /* Inner padding for text */
+    
+    resize: none; /* Disable manual resizing */
+    line-height: 1.5; /* Optional: Improve readability */
+}
+
+/* Optional: To style the placeholder */
+.notes-input::placeholder {
+    color: #999; /* Placeholder color */
+    font-style: italic; /* Placeholder font style */
+}
+
+
+/* ///////////////////////////////////////////////// */
+/* ERROR MESSAGING */
+
+/* Error message at the top */
+.error-message {
+    color: red;
+    font-size: 14px;
+    position: absolute; /* Absolute positioning */
+    top: 10px; /* Position it above the form fields */
+    padding-left: 30px; /* Align with the left side of the container */
+    text-align: center; /* Center the text */
+}
+
+/* Red border for individual fields */
+.form-field.error input, .form-field.error textarea {
+    border-color: red;
+    box-shadow: 0 0 5px rgba(255, 0, 0, 0.5); /* Optional: red shadow */
+}

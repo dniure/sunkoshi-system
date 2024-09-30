@@ -8,10 +8,21 @@ import logo from '../images/logo.png';
 
 
 const Home = () => {
+    //////////////////////////////////////////////////
+    // Navigation
+    const navigate = useNavigate();
 
-    const [currentTime, setCurrentTime] = useState('');
+    const goToOrderScreen = () => {
+    //   navigate('/OrderScreen');
+      navigate('/OrderScreen');
+    };
+
+    //////////////////////////////////////////////////
+    // Date & Time    
     const [currentDate, setCurrentDate] = useState('');
+    const [currentTime, setCurrentTime] = useState('');
 
+    // Automatic Updating of date & time
     useEffect(() => {
         const updateTime = () => {
             const now = new Date();
@@ -34,21 +45,33 @@ const Home = () => {
         return () => clearInterval(intervalId); // Cleanup interval on component unmount
     }, []);
 
-    const navigate = useNavigate();
 
-    const goToOrderScreen = () => {
-      navigate('/order');
-    };
-
+    // ////////////////////////////////////////////////
+    // MAIN HTML
     return (
         <div className="bg-wrapper">
             <div className="bg-container"></div>
-            
             <div className="content-container">
-            {/* ################################################################################## */}
-                <div className="sunkoshi-text">GURKHA SUNKOSHI</div>
+                
+                {/* //////////////////////////////////////////////// */}
+                {/* BackGround */}
 
-                {/* Button Section */}
+                {/* Title */}
+                <div className="sunkoshi-text">GURKHA SUNKOSHI</div>
+                
+                {/* Logo */}
+                <img src={logo} alt="Restaurant Logo" className="restaurant-logo" />
+
+                {/* Date & Time */}
+                <div className="datetime-container">
+                    <div className="live-time">{currentTime}</div>
+                    <div className="live-date">{currentDate}</div>
+                </div>                
+
+                {/* //////////////////////////////////////////////// */}
+                {/* Buttons */}
+                
+                {/* Main Buttons */}
                 <div className="container1">
                     <button className={`styled-button type1`} onClick={goToOrderScreen}>PLACE ORDER</button>
                     <button className={`styled-button type2`}>RESTAURANT</button>
@@ -57,27 +80,20 @@ const Home = () => {
                     <button className={`styled-button type2`}>DELIVERIES</button>
                 </div>
 
+                {/* Button: Management */}
                 <div className="container2">
                     <button className={`styled-button management`}>management</button>
                 </div>
 
+                {/* Button: Bookings */}
                 <div className="container3">
                     <button className={`styled-button bookings`}>BOOKINGS</button>
-                </div>
+                </div>          
           
+                {/* Button: Power Icon */}
                 <button className="power-button">
                     <img src={powerIcon} alt="Power Icon" />
                 </button>         
-            
-                <img src={logo} alt="Restaurant Logo" className="restaurant-logo" />
-
-                {/* Live Time and Date Container */}
-                <div className="datetime-container">
-                    <div className="live-time">{currentTime}</div>
-                    <div className="live-date">{currentDate}</div>
-                </div>
-
-            {/* ################################################################################## */}
             </div>
         </div>
     );
