@@ -85,14 +85,28 @@
 }
 
 /* "Takeaway"/"Collection"/"Delivery"/"Table" */
-.order-text {
+.heading-text {
     color: black; /* Text color */
     font-family: 'Anybody', sans-serif; /* Use 'Anybody' font */
     font-weight: bold; /* Bold text */
     font-size: 2.5vw;; /* Adjust font size as needed */
-    margin-bottom: 5px;
+    margin-bottom: 2px;
     text-transform: uppercase; /* Converts text to uppercase */
 }
+
+.info-text {
+    color: black; /* Text color */
+    font-family: 'Anybody', sans-serif;
+    font-size: 18px; /* Adjust font size as needed */
+    gap: 3px;
+    padding-bottom: 10px;
+
+    display: flex; /* Enable flexbox */
+    flex-direction: column; /* Stack items vertically */
+    align-items: center; /* Center items horizontally */
+    justify-content: center; /* Center items vertically */
+}
+
 
 /* ASAP Button */
 .modify-time-button {

@@ -1,14 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../css/main.css';
 import '../css/buttons.css';
 import '../css/manageOrderDetails.css';
 
-const ManageOrderDetails = ({ formValues, SelectedOrderType, handleSaveFormData, handleOrderTypeChange, handleChangeFormData, onClose }) => {         
+const ManageOrderDetails = ({ formDataInput, orderTypeInput, handleChanges, onClose }) => {         
     
     //////////////////////////////////////////////////    
     // Form Management
-    const [formData] = useState(formValues);
-    const [orderType, setOrderType] = useState(SelectedOrderType);
+    const [formData, setFormData] = useState({ ...formDataInput });
+
+    const [orderType, setOrderType] = useState(orderTypeInput);
     const [errors, setErrors] = useState({});
 
     const getPlaceholder = (field) => {
@@ -21,6 +22,7 @@ const ManageOrderDetails = ({ formValues, SelectedOrderType, handleSaveFormData,
 
     //////////////////////////////////////////////////    
     // Click Handling
+
     const handleSave = () => {
         const newErrors = {};
 
@@ -36,13 +38,10 @@ const ManageOrderDetails = ({ formValues, SelectedOrderType, handleSaveFormData,
         if (Object.keys(newErrors).length) {
             setErrors(newErrors);
         } else {
-            // Update previous order type with the currently selected one
-            console.log("Saved data:", formData);
-            setErrors({});
+            // Save form data and order type
+            handleChanges(formData, orderType); // Pass the updated formData to parent
 
-            // Handle Form data change
-            // handle order type change
-                        
+            setErrors({});
             onClose();
         }
     };
@@ -51,6 +50,24 @@ const ManageOrderDetails = ({ formValues, SelectedOrderType, handleSaveFormData,
         onClose(); // Call the close handler passed from OrderScreen
     };
 
+    // ##########################################
+    const [distance, setDistance] = useState(0); // State to store the distance
+
+    // Function to calculate distance (replace with actual API or calculation logic)
+    const calculateDistance = (postcode) => {
+        // Placeholder logic for distance calculation, replace this with real API call or formula
+        return postcode ? Math.floor(Math.random(0.0, 5.0)) + 1 + ' miles' : null;
+    };
+
+    useEffect(() => {
+        if (orderType === 'delivery' && formData.postcode) {
+            const calculatedDistance = calculateDistance(formData.postcode);
+            setDistance(calculatedDistance);
+        } else {
+            setDistance(0); // Clear the distance if not delivery or postcode is empty
+        }
+    }, [formData.postcode, orderType]);
+        
     // ////////////////////////////////////////////////
     // MAIN HTML
     return (
@@ -58,7 +75,7 @@ const ManageOrderDetails = ({ formValues, SelectedOrderType, handleSaveFormData,
         
         <div className="customer-info-popup" onClick={(e) => e.stopPropagation()}>
             
-            Right Section: Select Order Type
+            {/* Right Section: Select Order Type */}
             <div className="orderTypeContainer">
                 {['takeaway', 'collection', 'delivery'].map(type => (
                     <div key={type}
@@ -85,7 +102,7 @@ const ManageOrderDetails = ({ formValues, SelectedOrderType, handleSaveFormData,
                         <input
                             type="text"
                             value={formData[field]}
-                            onChange={(e) => handleSaveFormData(field, e.target.value )}
+                            onChange={(e) => setFormData({ ...formData, [field]: e.target.value })}
                             placeholder={getPlaceholder(field)}
                         />
                     </div>
@@ -95,11 +112,17 @@ const ManageOrderDetails = ({ formValues, SelectedOrderType, handleSaveFormData,
                 <div className="form-field notes-field">
                     <textarea
                         value={formData.notes}
-                        onChange={(e) => handleSaveFormData('notes', e.target.value )}
+                        onChange={(e) => setFormData({ ...formData, 'notes': e.target.value })}
                         placeholder={getPlaceholder('notes')}
                         className="notes-input"
                     />
                 </div>
+
+                {orderType === 'delivery' && (
+                    <div className="distance-text">
+                        <span>{`Distance: ${distance}`}</span>
+                    </div>
+                )}                
             </div>
 
 

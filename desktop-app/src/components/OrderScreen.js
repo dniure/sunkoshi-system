@@ -61,19 +61,10 @@ const OrderScreen = () => {
         notes: '',
     });
 
-    const handleSaveFormData = (field, data) => {
-        setFormData({ ...formData, field: data })
-
-    };
-
-    const handleChangeFormData = (field, value) => {
-        setFormData(prev => ({ ...prev, [field]: value }));
-    };  
-
-    const handleOrderTypeChange = (field, value) => {
-        setFormData(prev => ({ ...prev, [field]: value }));
+    const handleChanges = (formDataChanges, orderTypeChanges) => {
+        setFormData(formDataChanges);
+        setOrderType(orderTypeChanges)
     };    
-    
 
     // ////////////////////////////////////////////////
     // Adjusting Order Time
@@ -124,7 +115,7 @@ const OrderScreen = () => {
         const minutes = totalMinutes % 60;
         return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
     };
-
+    
     // ////////////////////////////////////////////////
     // MAIN HTML
     return (
@@ -167,8 +158,17 @@ const OrderScreen = () => {
                         <div className="order-info" onClick={handleOrderInfoClick}>
 
                             {/* Heading */}
-                            <div className="order-text">
+                            <div className="heading-text">
                                 <span>{orderType}</span>
+                            </div>
+
+                            <div className="info-text">
+                                {formData.name ? (
+                                    <span>{formData.name}</span>
+                                ) : null}
+                                {formData.phone ? (
+                                    <span>{formData.phone}</span>
+                                ) : null}                                
                             </div>
 
                             {/* Modify Time Button */}
@@ -217,12 +217,10 @@ const OrderScreen = () => {
                 {/* MANAGE ORDER DETAILS */}
                 {isCustomerPopupVisible && (
                     <ManageOrderDetails 
-                        // formData={formData}
-                        // orderType={orderType}
-                        // handleSaveFormData={handleSaveFormData()}
-                        // handleChangeFormData={handleChangeFormData}
-                        // handleOrderTypeChange={handleOrderTypeChange}
-                        // onClose={() => setIsCustomerPopupVisible(false)}
+                        formDataInput={formData}
+                        orderTypeInput={orderType}
+                        handleChanges={handleChanges}
+                        onClose={() => setIsCustomerPopupVisible(false)}
                     />
                 )}
 

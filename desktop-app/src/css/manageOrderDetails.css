@@ -114,15 +114,26 @@
 /* ///////////////////////////////////////////////// */
 /* FORM FIELDS */
 
+/* FORM FIELDS */
 .form-fields {
-    box-sizing: border-box; /* Ensure padding and border are included in the total width */
+    box-sizing: border-box;
     padding: 30px;
+    width: 75%;
     
-    width: 75%; /* Adjust as necessary */
+    /* Define 2 columns: one for inputs and one for distance text */
     display: grid;
-    grid-gap: 15px; /* Unified gap for both rows and columns */
+    grid-template-columns: 1fr 1fr; /* First column flexible, second column auto width */
+    grid-gap: 15px;
     margin-top: 5px;
-    position: relative; /* Make it a reference point for absolutely positioned children */
+    position: relative;
+}
+
+/* Distance text should be placed in column 2, row 2 */
+.distance-text {
+    grid-column: 2; /* Occupy the second column */
+    grid-row: 2; /* Row 2 */
+    align-self: center; /* Vertically align it with the postcode field */
+    color: #000; /* Make the text visible */
 }
 
 /* Input styles */
