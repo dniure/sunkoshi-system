@@ -143,9 +143,13 @@ const OrderScreen = () => {
 
                         <div className="ordered-items">
                             <div className="vertical-line"></div>
-                            <div className="labels">
+                            
+                            <div className="headers">
                                 <span className="item-label">ITEM</span>
                                 <span className="price-label">PRICE</span>
+                            </div>
+
+                            <div className="footers">
                                 <span className="total">TOTAL</span>
                                 <span className="price-sum">£0.00</span>
                                 <span className="final-price">£0.00</span>
@@ -185,6 +189,9 @@ const OrderScreen = () => {
                                 <span className="arrow">▲</span>
                             </button>
 
+                            {/* Dark Overlay */}
+                            {isModifyingTime && <div className="order-info-overlay"></div>} 
+
                             {/* Modify Time Popup */}
                             {isModifyingTime && (
                                 <div className="modify-time-layer" ref={modifyPopupRef}>
@@ -206,8 +213,7 @@ const OrderScreen = () => {
                                 </div>
                             )}
 
-                            {/* Dark Overlay */}
-                            {isModifyingTime && <div className="order-info-overlay"></div>}                            
+                           
 
                         </div>
                     </div>
