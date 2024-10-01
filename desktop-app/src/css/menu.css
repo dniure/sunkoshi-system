@@ -1,0 +1,120 @@
+.menu-container {
+    background-color: #FFFFFF;
+    border-radius: 20px; /* Round corners */
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    overflow: hidden; /* Prevent content from overflowing outside */
+}
+
+.categories {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    right: 10px;
+    top: 58px;
+}
+
+.category-item {
+    width: 60px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    text-align: center;
+    cursor: pointer;
+    font-family: 'Anybody', sans-serif;
+    color: #ffffff;
+    transition: background-color 0.3s ease;
+    font-size: 10px;
+    font-weight: bold;
+}
+
+.heading {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Align items to the start (left) */
+    font-family: 'Anybody', sans-serif;
+    font-weight: bold;
+    font-size: 25px; /* Adjust font size as needed */
+    padding: 20px 0px 0px 20px;
+}
+
+.separator {
+    width: 81%;
+    height: 8px;
+    background-color: #6F3392;
+}
+
+.heading.scroller {
+    padding: 20px 0 5px 0px;
+}
+
+.separator.scroller {
+    width: 100%;
+}
+
+.menu-grid {
+    position: relative;
+
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    row-gap: 10px;
+    column-gap: 10px;
+    margin-top: 10px;
+
+    width: 81%;
+    padding-left: 20px;
+    max-height: calc(100% - 90px); /* Adjust max-height based on layout */
+    overflow-y: auto; /* Allow vertical scrolling */
+    scrollbar-width: thin; /* Customize scrollbar width (for Firefox) */
+}
+
+.menu-item {
+    position: relative;
+    height: 75px;
+    width: 100%;
+    background-color: hsl(217, 67%, 60%, 0.5);
+    font-family: 'Anybody', sans-serif;
+    font-weight: bold;
+    border-radius: 5px;
+
+    display: flex;             /* Enable flexbox for the menu item */
+    flex-direction: column;    /* Stack children vertically */
+    justify-content: center;   /* Center children vertically */
+    align-items: center;       /* Center children horizontally */
+}
+
+.item-number {
+    position: absolute;
+    top: 6px;   /* 2px from the top */
+    left: 6px;  /* 2px from the left */
+    font-size: 12px;
+    font-weight: bold;
+    color: #000000;
+}
+
+.nameAndPrice {
+    text-align: center;      /* Center text alignment */
+    padding: 4px 4px 4px 4px;
+}
+
+.item-name {
+    font-size: 12px;                /* Font size for item name */
+    padding-bottom: 2px;            /* Space below the item name */
+    display: -webkit-box;           /* Use webkit box model */
+    -webkit-line-clamp: 2;          /* Limit to 2 lines */
+    -webkit-box-orient: vertical;   /* Orientation of the box */
+    overflow: hidden;                /* Hide overflow text */
+    line-height: 1.2;               /* Set line height for proper spacing */
+    margin: 0;                      /* Ensure no margin affects height */
+    padding: 0;                     /* Ensure no padding affects height */
+}
+
+.item-price {
+    font-size: 10px;;
+}

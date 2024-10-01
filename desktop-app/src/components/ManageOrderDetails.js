@@ -46,10 +46,6 @@ const ManageOrderDetails = ({ formDataInput, orderTypeInput, handleChanges, onCl
         }
     };
 
-    const handleClose = () => {
-        onClose(); // Call the close handler passed from OrderScreen
-    };
-
     // ##########################################
     const [distance, setDistance] = useState(0); // State to store the distance
 
@@ -71,7 +67,7 @@ const ManageOrderDetails = ({ formDataInput, orderTypeInput, handleChanges, onCl
     // ////////////////////////////////////////////////
     // MAIN HTML
     return (
-    <div className="fullscreen-overlay" onClick={handleClose}>
+    <div className="fullscreen-overlay" >
         
         <div className="customer-info-popup" onClick={(e) => e.stopPropagation()}>
             
@@ -128,7 +124,7 @@ const ManageOrderDetails = ({ formDataInput, orderTypeInput, handleChanges, onCl
 
             {/* Save and Cancel Buttons */}
             <button className="save-button" onClick={handleSave}>Save</button>
-            <button className="cancel-button" onClick={handleClose}>Cancel</button>
+            <button className="cancel-button" onClick={onClose}>Cancel</button>
         </div>
     </div>
     );

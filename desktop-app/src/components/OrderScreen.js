@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ManageOrderDetails from './ManageOrderDetails';
+import Menu from './Menu';
 
 import '../css/main.css';
 import '../css/buttons.css';
@@ -115,6 +116,13 @@ const OrderScreen = () => {
         const minutes = totalMinutes % 60;
         return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
     };
+
+    // On Selecting Items
+
+    const handleSelect = (category) => {
+        console.log('Selected category:', category);
+        // Handle the selected category here
+    };
     
     // ////////////////////////////////////////////////
     // MAIN HTML
@@ -128,9 +136,9 @@ const OrderScreen = () => {
                     {/* LEFT SECTION */}
 
                     <div className="left-section">
-                        <div className="menu-items">
-                            {/* Menu goes here */}
-                        </div>
+                        <Menu 
+                            onSelect={handleSelect}
+                        />
                     </div>
 
                     {/* //////////////////////////////////////////////// */}
@@ -142,18 +150,23 @@ const OrderScreen = () => {
                         {/* ORDERED ITEMS */}
 
                         <div className="ordered-items">
-                            <div className="vertical-line"></div>
-                            
-                            <div className="headers">
-                                <span className="item-label">ITEM</span>
-                                <span className="price-label">PRICE</span>
+
+                            {/* Setup */}
+                            <div>
+                                <div className="vertical-line"></div>
+                                
+                                <div className="headers">
+                                    <span className="item-label">ITEM</span>
+                                    <span className="price-label">PRICE</span>
+                                </div>
+
+                                <div className="footers">
+                                    <span className="total">TOTAL</span>
+                                    <span className="price-sum">£0.00</span>
+                                    <span className="final-price">£0.00</span>
+                                </div>
                             </div>
 
-                            <div className="footers">
-                                <span className="total">TOTAL</span>
-                                <span className="price-sum">£0.00</span>
-                                <span className="final-price">£0.00</span>
-                            </div>
                         </div>
 
                         {/* //////////////////////////////////////////////// */}
@@ -166,14 +179,15 @@ const OrderScreen = () => {
                                 <span>{orderType}</span>
                             </div>
 
-                            <div className="info-text">
-                                {formData.name ? (
-                                    <span>{formData.name}</span>
-                                ) : null}
-                                {formData.phone ? (
-                                    <span>{formData.phone}</span>
-                                ) : null}                                
-                            </div>
+                            {/* Shows Customer Info */}
+                            {(formData.name || formData.phone || formData.postcode || formData.address) ? (
+                                <div className="info-text">
+                                    {formData.name && <span>{formData.name}</span>}
+                                    {formData.phone && <span>{formData.phone}</span>}
+                                    {formData.postcode && <span>{formData.postcode}</span>}
+                                    {formData.address && <span>{formData.address}</span>}
+                                </div>
+                            ) : null}
 
                             {/* Modify Time Button */}
                             <button
@@ -186,7 +200,7 @@ const OrderScreen = () => {
                                 style={{ zIndex: 2 }}
                             >
                                 <span>{orderTimeInMinutes === 25 ? 'ASAP' : getFormattedTime()}</span>
-                                <span className="arrow">▲</span>
+                                <span className="arrow"> ▲</span>
                             </button>
 
                             {/* Dark Overlay */}
@@ -212,9 +226,6 @@ const OrderScreen = () => {
                                     </div>
                                 </div>
                             )}
-
-                           
-
                         </div>
                     </div>
                 </div>
@@ -233,12 +244,13 @@ const OrderScreen = () => {
 
                 {/* //////////////////////////////////////////////// */}
                 {/* BOTTOM SECTION */}
-
-                <div className="cancel-container">
-                    <button className="styled-button cancel" onClick={() => navigate('/')}>cancel</button>
-                </div>
-                <div className="save-container">
-                    <button className="styled-button save" onClick={() => navigate('/')}>save</button>
+                <div>
+                    <div className="cancel-container">
+                        <button className="styled-button cancel" onClick={() => navigate('/')}>cancel</button>
+                    </div>
+                    <div className="save-container">
+                        <button className="styled-button save" onClick={() => navigate('/')}>save</button>
+                    </div>
                 </div>
 
             </div>

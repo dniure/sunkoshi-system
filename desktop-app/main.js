@@ -16,7 +16,7 @@ async function createWindow() {
     // height: 768,
 
     width: 948,
-    height: 710,
+    height: 711,
 
     resizable: false,  // Disable window resizing
     webPreferences: {
