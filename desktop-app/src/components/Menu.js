@@ -5,7 +5,6 @@ import MenuItems from '../data/MenuItems';
 const Menu = () => {
     const [selectedCategory, setSelectedCategory] = useState('most ordered');
     const categoryRefs = useRef([]);
-    const lastItemRefs = useRef([]); // New ref array to track last items
 
     // Define categories and categorized items
     const category_data = [
@@ -48,49 +47,35 @@ const Menu = () => {
         const observer = new IntersectionObserver(
             (entries) => {
                 entries.forEach((entry) => {
-                    // Log entry to check if the last item is detected
-                    console.log('Observing entry:', entry.target.getAttribute('data-category'), entry.isIntersecting);
-    
-                    // Check if the last row of the current category is out of bounds
+                    // Update category when its separator is out of view (scrolled past)
                     if (!entry.isIntersecting && entry.boundingClientRect.top < 0) {
                         const category = entry.target.getAttribute('data-category');
-                        const categoryIndex = category_data.findIndex((cat) => cat.name === category);
-    
-                        // Log the category index for debugging
-                        console.log('Scrolled past category:', category);
-    
-                        // Update to the next category if there is one
-                        const nextCategory = category_data[categoryIndex + 1];
-                        if (nextCategory) {
-                            console.log('Next category is:', nextCategory.name);
-                            setSelectedCategory(nextCategory.name);
-                        }
+                        setSelectedCategory(category);
                     }
                 });
             },
             {
                 root: null,
                 rootMargin: '0px',
-                threshold: 0, // Trigger when the last row is out of view at the top
+                threshold: 0, // Trigger when the separator is completely out of view
             }
         );
     
-        // Observe the last item of each category
-        lastItemRefs.current.forEach((ref) => {
+        categoryRefs.current.forEach((ref) => {
             if (ref) {
-                observer.observe(ref); // Observe the last item of each category
+                observer.observe(ref); // Observe the separator for each category
             }
         });
     
         return () => {
-            lastItemRefs.current.forEach((ref) => {
+            categoryRefs.current.forEach((ref) => {
                 if (ref) {
                     observer.unobserve(ref);
                 }
             });
         };
-    }, [category_data]);
-    
+    }, [category_data]);  
+
     const scrollToCategory = (index) => {
         const categoryRef = categoryRefs.current[index];
         if (categoryRef) {
@@ -131,41 +116,28 @@ const Menu = () => {
             <div className="menu-grid">
                 {category_data.map((category, categoryIndex) => {
                     const items = categorizedItems[category.name];
-                    const isSelected = selectedCategory === category.name;
 
                     return (
                         <React.Fragment key={categoryIndex}>
                             {/* Scroller Header */}
                             <div
-                                style={{ gridColumn: 'span 5', display: isSelected ? 'none' : 'block' }}
+                                ref={el => (categoryRefs.current[categoryIndex] = el)} // Set ref on the separator element
                                 data-category={category.name}
+                                style={{ gridColumn: 'span 5' }}
                             >
                                 <span className="heading scroller">{capitalizeFirstLetter(category.name)}</span>
-                                <div className="separator scroller"></div>
+                                <div className="separator scroller"></div> {/* Ref is here */}
                             </div>
 
-                            {items.map((item, index) => {
-                                const isLastItem = index === items.length - 1; // Check if it's the last item
-
-                                return (
-                                    <div
-                                        key={index}
-                                        className="menu-item"
-                                        ref={el => {
-                                            if (isLastItem) {
-                                                lastItemRefs.current[categoryIndex] = el; // Set ref on last item
-                                            }
-                                        }}
-                                        data-category={category.name} // Make sure this is set for the observer
-                                    >
-                                        <div className="item-number">{index + 1}</div>
-                                        <div className="nameAndPrice">
-                                            <div className="item-name">{item.name}</div>
-                                            <div className="item-price">{item.price}</div>
-                                        </div>
+                            {items.map((item, index) => (
+                                <div key={index} className="menu-item">
+                                    <div className="item-number">{index + 1}</div>
+                                    <div className="nameAndPrice">
+                                        <div className="item-name">{item.name}</div>
+                                        <div className="item-price">{item.price}</div>
                                     </div>
-                                );
-                            })}
+                                </div>
+                            ))}
                         </React.Fragment>
                     );
                 })}
