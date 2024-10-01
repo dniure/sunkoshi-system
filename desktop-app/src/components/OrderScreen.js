@@ -127,7 +127,7 @@ const OrderScreen = () => {
     // ////////////////////////////////////////////////
     // MAIN HTML
     return (
-        <div className="bg-wrapper">
+        <div className="bg-wrapper unselectable">
             <div className="bg-container"></div>
             <div className="content-container">
                 <div className="main-container">

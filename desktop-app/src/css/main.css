@@ -1,3 +1,10 @@
+.unselectable {
+    user-select: none; /* Disable text selection */
+    -webkit-user-select: none; /* For Safari */
+    -moz-user-select: none; /* For Firefox */
+    -ms-user-select: none; /* For older IE */
+}
+
 body, html, #root {
     margin: 0;
     padding: 0;

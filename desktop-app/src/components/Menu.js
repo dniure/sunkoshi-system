@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import '../css/main.css';
 import '../css/menu.css';
 import MenuItems from '../data/MenuItems';
 
@@ -6,6 +7,10 @@ const Menu = () => {
 
     const categoryRefs = useRef([]);
     const menuGridRef = useRef(null); // Reference for the menu-grid
+    const scrollerRef = useRef(null);
+
+    const [scrollPosition, setScrollPosition] = useState(0);
+    const [isDragging, setIsDragging] = useState(false); // Track dragging state
 
     // Define categories and categorized items
     const category_data = [
@@ -19,8 +24,122 @@ const Menu = () => {
         { name: 'drinks', color: 'linear-gradient(to right, #C3C823 , #C29D22)' },
         { name: 'desserts', color: 'linear-gradient(to right, #DA2D2D, #B4A932 100%)' },
     ];
-    const [selectedCategory, setSelectedCategory] = useState(category_data[0].name);
 
+    // Handle mouse movement for dragging
+    const handleMouseMove = (e) => {
+        if (isDragging) {
+            const scrollableHeight = menuGridRef.current.scrollHeight - menuGridRef.current.clientHeight;
+    
+            const scrollerHeight = e.currentTarget.clientHeight;
+            let handlePosition = e.clientY - e.currentTarget.getBoundingClientRect().top;
+    
+            // Ensure the handle position is within the scroller's boundaries
+            handlePosition = Math.max(0, Math.min(handlePosition, scrollerHeight - document.querySelector('.scroller-handle').clientHeight));
+            
+            // Calculate the new scroll position in the menu grid based on the scroller handle's full range
+            const handleMaxPos = scrollerHeight - document.querySelector('.scroller-handle').clientHeight;
+            const newScrollPos = (handlePosition / handleMaxPos) * scrollableHeight;
+    
+            if (newScrollPos >= 0 && newScrollPos <= scrollableHeight) {
+                menuGridRef.current.scrollTop = newScrollPos;
+                setScrollPosition(handlePosition); // Update the handle's position visually
+            }
+        }
+    };    
+  
+    // Event handler to start dragging
+    const handleMouseDown = () => {
+        setIsDragging(true);
+    };
+
+    // Event handler to stop dragging
+    const handleMouseUp = () => {
+        setIsDragging(false);
+    };
+
+    useEffect(() => {
+        const handleScroll = () => {
+            const scrollableHeight = menuGridRef.current.scrollHeight - menuGridRef.current.clientHeight;
+            const scrollerHeight = scrollerRef.current.clientHeight;
+            const handleMaxPos = scrollerHeight - document.querySelector('.scroller-handle').clientHeight;
+    
+            // Calculate the handle's position based on the menu scroll
+            const newHandlePosition = (menuGridRef.current.scrollTop / scrollableHeight) * handleMaxPos;
+            
+            setScrollPosition(newHandlePosition);
+        };
+    
+        const menuGrid = menuGridRef.current;
+        if (menuGrid) {
+            menuGrid.addEventListener('scroll', handleScroll);
+        }
+    
+        return () => {
+            if (menuGrid) {
+                menuGrid.removeEventListener('scroll', handleScroll);
+            }
+        };
+    }, []);
+    
+    useEffect(() => {
+        const handleGlobalMouseUp = () => {
+            setIsDragging(false);
+        };
+    
+        // Add event listener to the entire window to listen for mouseup
+        window.addEventListener('mouseup', handleGlobalMouseUp);
+    
+        // Cleanup the event listener when the component is unmounted
+        return () => {
+            window.removeEventListener('mouseup', handleGlobalMouseUp);
+        };
+    }, []);
+    
+    useEffect(() => {
+        const handleMouseMove = (e) => {
+            if (isDragging) {
+                const scrollableHeight = menuGridRef.current.scrollHeight - menuGridRef.current.clientHeight;
+                const scrollerHeight = scrollerRef.current.clientHeight;
+                let handlePosition = e.clientY - scrollerRef.current.getBoundingClientRect().top;
+    
+                // Ensure the handle position is within the scroller's boundaries
+                handlePosition = Math.max(0, Math.min(handlePosition, scrollerHeight - document.querySelector('.scroller-handle').clientHeight));
+                
+                // Calculate the new scroll position in the menu grid based on the scroller handle's position
+                const handleMaxPos = scrollerHeight - document.querySelector('.scroller-handle').clientHeight;
+                const newScrollPos = (handlePosition / handleMaxPos) * scrollableHeight;
+    
+                if (newScrollPos >= 0 && newScrollPos <= scrollableHeight) {
+                    menuGridRef.current.scrollTop = newScrollPos;
+                    setScrollPosition(handlePosition); // Update the handle's position visually
+                }
+            }
+        };
+    
+        const handleMouseUp = () => {
+            setIsDragging(false);
+        };
+    
+        // Add global mousemove and mouseup listeners when dragging starts
+        if (isDragging) {
+            window.addEventListener('mousemove', handleMouseMove);
+            window.addEventListener('mouseup', handleMouseUp);
+        } else {
+            // Remove listeners when dragging stops
+            window.removeEventListener('mousemove', handleMouseMove);
+            window.removeEventListener('mouseup', handleMouseUp);
+        }
+    
+        return () => {
+            // Clean up in case the component unmounts while dragging
+            window.removeEventListener('mousemove', handleMouseMove);
+            window.removeEventListener('mouseup', handleMouseUp);
+        };
+    }, [isDragging]);
+
+    
+    ///////////////////////////////////////
+    // CATEGORY & HEADING
     const categorizedItems = {
         'most ordered': MenuItems.mostOrdered,
         'veg. starters': MenuItems.starters.veg,
@@ -45,50 +164,7 @@ const Menu = () => {
         'desserts': MenuItems.desserts,
     };
 
-    useEffect(() => {
-        const observer = new IntersectionObserver(
-            (entries) => {
-                entries.forEach((entry) => {
-                    const category = entry.target.getAttribute('data-category');
-    
-                    // Check if the first category is in view
-                    console("category-name: ", category[0].name)
-
-                    if (category === category_data[0].name) {
-                        if (entry.isIntersecting) {
-                            setSelectedCategory(category_data[0].name); // Reset to the first category
-                        }
-                    }
-    
-                    // Update category when its separator is out of view (scrolled past)
-                    if (!entry.isIntersecting && entry.boundingClientRect.top < 0) {
-                        setSelectedCategory(category);
-                    }
-                });
-            },
-            {
-                root: null,
-                rootMargin: '0px',
-                threshold: 0, // Trigger when the separator is completely out of view
-            }
-        );
-    
-        categoryRefs.current.forEach((ref) => {
-            if (ref) {
-                observer.observe(ref); // Observe the separator for each category
-            }
-        });
-    
-        return () => {
-            categoryRefs.current.forEach((ref) => {
-                if (ref) {
-                    observer.unobserve(ref);
-                }
-            });
-        };
-    }, [category_data]);    
-
-    const scrollToCategory = (index) => {
+    const jumpToCategory = (index) => {
         const categoryRef = categoryRefs.current[index];
         if (categoryRef) {
             categoryRef.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -102,14 +178,10 @@ const Menu = () => {
             .join(' ');
     };
 
+
     return (
-        <div className="menu-container">
-            {/* Main Heading */}
-            <div className="heading">
-                <span>{capitalizeFirstLetter(selectedCategory)}</span>
-                <div className="separator top"></div>
-            </div>
-    
+        <div className="menu-container unselectable">
+   
             {/* Category List */}
             <div className="categories">
                 {category_data.map((category, index) => (
@@ -117,7 +189,7 @@ const Menu = () => {
                         key={category.name}
                         className="category-item"
                         style={{ background: category.color }}
-                        onClick={() => scrollToCategory(index)}
+                        onClick={() => jumpToCategory(index)}
                     >
                         {category.name}
                     </div>
@@ -132,7 +204,7 @@ const Menu = () => {
                     return (
                         <React.Fragment key={categoryIndex}>
                             {/* Conditionally render the Scroller Header */}
-                            {categoryIndex !== 0 && ( // Check if it's not the first category
+                            {categoryIndex >= 0 && ( // Check if it's not the first category
                                 <div
                                     ref={el => (categoryRefs.current[categoryIndex] = el)} // Set ref on the separator element
                                     data-category={category.name}
@@ -155,6 +227,19 @@ const Menu = () => {
                         </React.Fragment>
                     );
                 })}
+            </div>
+
+            {/* Custom Scroller */}
+            <div 
+                className="custom-scroller"
+                ref={scrollerRef}  // Add this line
+                onMouseMove={handleMouseMove} 
+            >
+                <div 
+                    className="scroller-handle" 
+                    style={{ top: `${scrollPosition}px` }} 
+                    onMouseDown={handleMouseDown}
+                ></div>
             </div>
 
         </div>

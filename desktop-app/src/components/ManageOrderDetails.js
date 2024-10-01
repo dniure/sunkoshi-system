@@ -67,7 +67,7 @@ const ManageOrderDetails = ({ formDataInput, orderTypeInput, handleChanges, onCl
     // ////////////////////////////////////////////////
     // MAIN HTML
     return (
-    <div className="fullscreen-overlay" >
+    <div className="fullscreen-overlay unselectable" >
         
         <div className="customer-info-popup" onClick={(e) => e.stopPropagation()}>
             
