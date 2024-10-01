@@ -3,8 +3,9 @@ import '../css/menu.css';
 import MenuItems from '../data/MenuItems';
 
 const Menu = () => {
-    const [selectedCategory, setSelectedCategory] = useState('most ordered');
+
     const categoryRefs = useRef([]);
+    const menuGridRef = useRef(null); // Reference for the menu-grid
 
     // Define categories and categorized items
     const category_data = [
@@ -18,6 +19,7 @@ const Menu = () => {
         { name: 'drinks', color: 'linear-gradient(to right, #C3C823 , #C29D22)' },
         { name: 'desserts', color: 'linear-gradient(to right, #DA2D2D, #B4A932 100%)' },
     ];
+    const [selectedCategory, setSelectedCategory] = useState(category_data[0].name);
 
     const categorizedItems = {
         'most ordered': MenuItems.mostOrdered,
@@ -47,9 +49,19 @@ const Menu = () => {
         const observer = new IntersectionObserver(
             (entries) => {
                 entries.forEach((entry) => {
+                    const category = entry.target.getAttribute('data-category');
+    
+                    // Check if the first category is in view
+                    console("category-name: ", category[0].name)
+
+                    if (category === category_data[0].name) {
+                        if (entry.isIntersecting) {
+                            setSelectedCategory(category_data[0].name); // Reset to the first category
+                        }
+                    }
+    
                     // Update category when its separator is out of view (scrolled past)
                     if (!entry.isIntersecting && entry.boundingClientRect.top < 0) {
-                        const category = entry.target.getAttribute('data-category');
                         setSelectedCategory(category);
                     }
                 });
@@ -74,7 +86,7 @@ const Menu = () => {
                 }
             });
         };
-    }, [category_data]);  
+    }, [category_data]);    
 
     const scrollToCategory = (index) => {
         const categoryRef = categoryRefs.current[index];
@@ -97,7 +109,7 @@ const Menu = () => {
                 <span>{capitalizeFirstLetter(selectedCategory)}</span>
                 <div className="separator top"></div>
             </div>
-
+    
             {/* Category List */}
             <div className="categories">
                 {category_data.map((category, index) => (
@@ -111,23 +123,25 @@ const Menu = () => {
                     </div>
                 ))}
             </div>
-
+    
             {/* Menu Grid with Category Sections */}
-            <div className="menu-grid">
+            <div className="menu-grid" ref={menuGridRef}>
                 {category_data.map((category, categoryIndex) => {
                     const items = categorizedItems[category.name];
 
                     return (
                         <React.Fragment key={categoryIndex}>
-                            {/* Scroller Header */}
-                            <div
-                                ref={el => (categoryRefs.current[categoryIndex] = el)} // Set ref on the separator element
-                                data-category={category.name}
-                                style={{ gridColumn: 'span 5' }}
-                            >
-                                <span className="heading scroller">{capitalizeFirstLetter(category.name)}</span>
-                                <div className="separator scroller"></div> {/* Ref is here */}
-                            </div>
+                            {/* Conditionally render the Scroller Header */}
+                            {categoryIndex !== 0 && ( // Check if it's not the first category
+                                <div
+                                    ref={el => (categoryRefs.current[categoryIndex] = el)} // Set ref on the separator element
+                                    data-category={category.name}
+                                    style={{ gridColumn: 'span 5' }}
+                                >
+                                    <span className="heading scroller">{capitalizeFirstLetter(category.name)}</span>
+                                    <div className="separator scroller"></div> {/* Ref is here */}
+                                </div>
+                            )}
 
                             {items.map((item, index) => (
                                 <div key={index} className="menu-item">
@@ -144,7 +158,6 @@ const Menu = () => {
             </div>
 
         </div>
-    );
-};
+    )};
 
 export default Menu;

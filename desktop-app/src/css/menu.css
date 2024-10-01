@@ -5,6 +5,11 @@
     height: 100%;
     position: absolute;
     overflow: hidden; /* Prevent content from overflowing outside */
+    
+}
+
+.menu-container::-webkit-scrollbar {
+    display: none; /* For Chrome, Safari, and Opera */
 }
 
 .categories {
@@ -69,7 +74,7 @@
 
     width: 81%;
     padding-left: 20px;
-    max-height: calc(100% - 90px); /* Adjust max-height based on layout */
+    max-height: 82%; /* Adjust max-height based on layout */
     overflow-y: auto; /* Allow vertical scrolling */
     scrollbar-width: thin; /* Customize scrollbar width (for Firefox) */
 }
