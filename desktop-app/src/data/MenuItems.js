@@ -17,7 +17,15 @@ const MenuItems = {
         { name: "Mutter Mushroom", price: "£5.75", description: "(Green peas with Mushroom)." },
         { name: "Mushroom Bhaji", price: "£5.75", description: "(dry mushroom)." },
         { name: "Bombay Potato", price: "£5.75", description: "(Dry potato)." },
-
+        { name: "Potato Naan", price: "£3.25", description: "(Stuffed with spiced-potato)." },
+        { name: "Keema Naan", price: "£3.95", description: "(Stuffed with minced-lamb)." },
+        { name: "Garlic Naan", price: "£3.25", description: "" },
+        { name: "Lachha Paratha", price: "£3.25", description: "(leavened bread)." },
+        { name: "Pudina Paratha", price: "£2.95", description: "(Leavened bread topped with mint)." },
+        { name: "Tandoori Roti", price: "£2.50", description: "" },
+        { name: "Cheese Naan", price: "£4.25", description: "" },
+        { name: "Cheese & Garlic Naan", price: "£4.25", description: "" },
+        { name: "Chilli & Garlic Naan", price: "£4.25", description: "" },
     ],
 
     "starters": {

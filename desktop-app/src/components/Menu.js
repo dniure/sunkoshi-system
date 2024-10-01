@@ -4,15 +4,13 @@ import '../css/menu.css';
 import MenuItems from '../data/MenuItems';
 
 const Menu = () => {
-
     const categoryRefs = useRef([]);
-    const menuGridRef = useRef(null); // Reference for the menu-grid
+    const menuGridRef = useRef(null);
     const scrollerRef = useRef(null);
 
     const [scrollPosition, setScrollPosition] = useState(0);
-    const [isDragging, setIsDragging] = useState(false); // Track dragging state
+    const [isDragging, setIsDragging] = useState(false);
 
-    // Define categories and categorized items
     const category_data = [
         { name: 'most ordered', color: '#6F3392' },
         { name: 'veg. starters', color: '#20C518' },
@@ -25,48 +23,106 @@ const Menu = () => {
         { name: 'desserts', color: 'linear-gradient(to right, #DA2D2D, #B4A932 100%)' },
     ];
 
-    // Handle mouse movement for dragging
-    const handleMouseMove = (e) => {
-        if (isDragging) {
-            const scrollableHeight = menuGridRef.current.scrollHeight - menuGridRef.current.clientHeight;
-    
-            const scrollerHeight = e.currentTarget.clientHeight;
-            let handlePosition = e.clientY - e.currentTarget.getBoundingClientRect().top;
-    
-            // Ensure the handle position is within the scroller's boundaries
-            handlePosition = Math.max(0, Math.min(handlePosition, scrollerHeight - document.querySelector('.scroller-handle').clientHeight));
-            
-            // Calculate the new scroll position in the menu grid based on the scroller handle's full range
-            const handleMaxPos = scrollerHeight - document.querySelector('.scroller-handle').clientHeight;
-            const newScrollPos = (handlePosition / handleMaxPos) * scrollableHeight;
-    
-            if (newScrollPos >= 0 && newScrollPos <= scrollableHeight) {
-                menuGridRef.current.scrollTop = newScrollPos;
-                setScrollPosition(handlePosition); // Update the handle's position visually
-            }
-        }
-    };    
-  
-    // Event handler to start dragging
-    const handleMouseDown = () => {
-        setIsDragging(true);
+    const categorizedItems = {
+        'most ordered': MenuItems.mostOrdered,
+        'veg. starters': MenuItems.starters.veg,
+        'non-veg. starters': MenuItems.starters.nonVeg,
+        'veg. mains': MenuItems.mains.veg,
+        'non-veg. mains': MenuItems.mains.nonVeg,
+        'sides & extras': [
+        ...MenuItems.sidesAndExtras.vegSides || [],
+        ...MenuItems.sidesAndExtras.kidsItems || [],
+        ...MenuItems.sidesAndExtras.chutneysAndRaita || [],
+        ],
+        'rice & naans': [
+        ...MenuItems.riceAndNaans.rice || [],
+        ...MenuItems.riceAndNaans.naans || [],
+        ],
+        'drinks': [
+        ...MenuItems.drinks.softDrinks || [],
+        ...MenuItems.drinks.beers || [],
+        ...MenuItems.drinks.wines || [],
+        ...MenuItems.drinks.spirits || [],
+        ],
+        'desserts': MenuItems.desserts,
     };
 
-    // Event handler to stop dragging
-    const handleMouseUp = () => {
-        setIsDragging(false);
+    const handleScroll = () => {
+        const scrollableHeight = menuGridRef.current.scrollHeight - menuGridRef.current.clientHeight;
+        const scrollerHeight = scrollerRef.current.clientHeight;
+        const handleMaxPos = scrollerHeight - document.querySelector('.scroller-handle').clientHeight;
+        setScrollPosition((menuGridRef.current.scrollTop / scrollableHeight) * handleMaxPos);
+    };
+
+    const handleMouseMove = (e) => {
+        if (!isDragging) return;
+        const scrollableHeight = menuGridRef.current.scrollHeight - menuGridRef.current.clientHeight;
+        const scrollerHeight = scrollerRef.current.clientHeight;
+        let handlePosition = Math.max(0, Math.min(e.clientY - scrollerRef.current.getBoundingClientRect().top, scrollerHeight - document.querySelector('.scroller-handle').clientHeight));
+        menuGridRef.current.scrollTop = (handlePosition / (scrollerHeight - document.querySelector('.scroller-handle').clientHeight)) * scrollableHeight;
+        setScrollPosition(handlePosition);
     };
 
     useEffect(() => {
+        const menuGrid = menuGridRef.current;
+        if (menuGrid) {
+        menuGrid.addEventListener('scroll', handleScroll);
+        }
+
+        return () => {
+        if (menuGrid) {
+            menuGrid.removeEventListener('scroll', handleScroll);
+        }
+        };
+    }, []);
+
+    useEffect(() => {
+        if (isDragging) {
+        window.addEventListener('mousemove', handleMouseMove);
+        window.addEventListener('mouseup', () => setIsDragging(false));
+        } else {
+        window.removeEventListener('mousemove', handleMouseMove);
+        }
+
+        return () => {
+        // Clean up listeners only if elements still exist
+        if (isDragging) {
+            window.removeEventListener('mousemove', handleMouseMove);
+            window.removeEventListener('mouseup', () => setIsDragging(false));
+        }
+        };
+    }, [isDragging]);
+
+    const [activeCategory, setActiveCategory] = useState(category_data[0].name);
+
+    useEffect(() => {
         const handleScroll = () => {
-            const scrollableHeight = menuGridRef.current.scrollHeight - menuGridRef.current.clientHeight;
-            const scrollerHeight = scrollerRef.current.clientHeight;
-            const handleMaxPos = scrollerHeight - document.querySelector('.scroller-handle').clientHeight;
     
-            // Calculate the handle's position based on the menu scroll
-            const newHandlePosition = (menuGridRef.current.scrollTop / scrollableHeight) * handleMaxPos;
+            const THRESHOLD = 8.8;
+    
+            let currentCategory = activeCategory; // Initialize current category
+            for (let i = 0; i < categoryRefs.current.length; i++) {
+                const categoryRef = categoryRefs.current[i];
+                if (categoryRef) {
+                    const { top, bottom } = categoryRef.getBoundingClientRect();
+                    const categoryHeight = categoryRef.clientHeight;
+                    
+                    console.log("category height: ", categoryHeight)
+                    // Check if the bottom of the category is above the threshold
+                    if (bottom < window.innerHeight - (categoryHeight * THRESHOLD)) {
+                        // Update to the current category only if it's completely scrolled out of view
+                        currentCategory = category_data[i].name; // Update to the current category
+                    } else if (top >= window.innerHeight) {
+                        // If the top of the category is below the viewport, exit loop
+                        break;
+                    }
+                }
+            }
             
-            setScrollPosition(newHandlePosition);
+            // Update the active category state only if it has changed
+            if (currentCategory !== activeCategory) {
+                setActiveCategory(currentCategory);
+            }        
         };
     
         const menuGrid = menuGridRef.current;
@@ -79,97 +135,7 @@ const Menu = () => {
                 menuGrid.removeEventListener('scroll', handleScroll);
             }
         };
-    }, []);
-    
-    useEffect(() => {
-        const handleGlobalMouseUp = () => {
-            setIsDragging(false);
-        };
-    
-        // Add event listener to the entire window to listen for mouseup
-        window.addEventListener('mouseup', handleGlobalMouseUp);
-    
-        // Cleanup the event listener when the component is unmounted
-        return () => {
-            window.removeEventListener('mouseup', handleGlobalMouseUp);
-        };
-    }, []);
-    
-    useEffect(() => {
-        const handleMouseMove = (e) => {
-            if (isDragging) {
-                const scrollableHeight = menuGridRef.current.scrollHeight - menuGridRef.current.clientHeight;
-                const scrollerHeight = scrollerRef.current.clientHeight;
-                let handlePosition = e.clientY - scrollerRef.current.getBoundingClientRect().top;
-    
-                // Ensure the handle position is within the scroller's boundaries
-                handlePosition = Math.max(0, Math.min(handlePosition, scrollerHeight - document.querySelector('.scroller-handle').clientHeight));
-                
-                // Calculate the new scroll position in the menu grid based on the scroller handle's position
-                const handleMaxPos = scrollerHeight - document.querySelector('.scroller-handle').clientHeight;
-                const newScrollPos = (handlePosition / handleMaxPos) * scrollableHeight;
-    
-                if (newScrollPos >= 0 && newScrollPos <= scrollableHeight) {
-                    menuGridRef.current.scrollTop = newScrollPos;
-                    setScrollPosition(handlePosition); // Update the handle's position visually
-                }
-            }
-        };
-    
-        const handleMouseUp = () => {
-            setIsDragging(false);
-        };
-    
-        // Add global mousemove and mouseup listeners when dragging starts
-        if (isDragging) {
-            window.addEventListener('mousemove', handleMouseMove);
-            window.addEventListener('mouseup', handleMouseUp);
-        } else {
-            // Remove listeners when dragging stops
-            window.removeEventListener('mousemove', handleMouseMove);
-            window.removeEventListener('mouseup', handleMouseUp);
-        }
-    
-        return () => {
-            // Clean up in case the component unmounts while dragging
-            window.removeEventListener('mousemove', handleMouseMove);
-            window.removeEventListener('mouseup', handleMouseUp);
-        };
-    }, [isDragging]);
-
-    
-    ///////////////////////////////////////
-    // CATEGORY & HEADING
-    const categorizedItems = {
-        'most ordered': MenuItems.mostOrdered,
-        'veg. starters': MenuItems.starters.veg,
-        'non-veg. starters': MenuItems.starters.nonVeg,
-        'veg. mains': MenuItems.mains.veg,
-        'non-veg. mains': MenuItems.mains.nonVeg,
-        'sides & extras': [
-            ...MenuItems.sidesAndExtras.vegSides || [],
-            ...MenuItems.sidesAndExtras.kidsItems || [],
-            ...MenuItems.sidesAndExtras.chutneysAndRaita || [],
-        ],
-        'rice & naans': [
-            ...MenuItems.riceAndNaans.rice || [],
-            ...MenuItems.riceAndNaans.naans || [],
-        ],
-        'drinks': [
-            ...MenuItems.drinks.softDrinks || [],
-            ...MenuItems.drinks.beers || [],
-            ...MenuItems.drinks.wines || [],
-            ...MenuItems.drinks.spirits || [],
-        ],
-        'desserts': MenuItems.desserts,
-    };
-
-    const jumpToCategory = (index) => {
-        const categoryRef = categoryRefs.current[index];
-        if (categoryRef) {
-            categoryRef.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-    };
+    }, [activeCategory]);
 
     const capitalizeFirstLetter = (str) => {
         return str
@@ -178,71 +144,69 @@ const Menu = () => {
             .join(' ');
     };
 
+  return (
+    <div className="menu-container unselectable">
+        <div className="main-heading">
+            <span className="heading">{capitalizeFirstLetter(activeCategory)}</span>
+            <div className="separator"></div>
+        </div>
+        
+      <div className="categories">
+        {category_data.map((category, index) => (
+          <div  key={category.name}
+                className="category-item"
+                style={{ background: category.color }}
+                onClick={() => {
+                    const categoryRef = categoryRefs.current[index];
+                    if (categoryRef) {
+                        categoryRef.scrollIntoView({ behavior: 'auto', block: 'start' }); // Scroll to the category
+                        if (index !== 0) {
+                            menuGridRef.current.scrollTop += 60; // Adjust scroll position by 20 pixels
+                        }
+                    }
+                }}               
+            >
+            {category.name}
+          </div>
+        ))}
+      </div>
 
-    return (
-        <div className="menu-container unselectable">
-   
-            {/* Category List */}
-            <div className="categories">
-                {category_data.map((category, index) => (
-                    <div
-                        key={category.name}
-                        className="category-item"
-                        style={{ background: category.color }}
-                        onClick={() => jumpToCategory(index)}
-                    >
-                        {category.name}
+    <div className="menu-grid" ref={menuGridRef}>
+        {category_data.map((category, categoryIndex) => (
+            <React.Fragment key={categoryIndex}>
+                {/* SCROLLING HEADER */}
+                <div ref={el => (categoryRefs.current[categoryIndex] = el)}
+                    data-category={category.name}
+                    style={{ gridColumn: 'span 5' }}
+                >
+                    {/* Show heading only if it's not the first category */}
+                    {categoryIndex !== 0 && (
+                        <>
+                            <span className="heading scroller">{capitalizeFirstLetter(category.name)}</span>
+                            <div className="separator scroller"></div>
+                        </>
+                    )}
+                </div>
+
+                {categorizedItems[category.name].map((item, index) => (
+                    <div key={index} className="menu-item">
+                        <div className="item-number">{index + 1}</div>
+                        <div className="nameAndPrice">
+                            <div className="item-name">{item.name}</div>
+                            <div className="item-price">{item.price}</div>
+                        </div>
                     </div>
                 ))}
-            </div>
-    
-            {/* Menu Grid with Category Sections */}
-            <div className="menu-grid" ref={menuGridRef}>
-                {category_data.map((category, categoryIndex) => {
-                    const items = categorizedItems[category.name];
+            </React.Fragment>
+        ))}
+    </div>
 
-                    return (
-                        <React.Fragment key={categoryIndex}>
-                            {/* Conditionally render the Scroller Header */}
-                            {categoryIndex >= 0 && ( // Check if it's not the first category
-                                <div
-                                    ref={el => (categoryRefs.current[categoryIndex] = el)} // Set ref on the separator element
-                                    data-category={category.name}
-                                    style={{ gridColumn: 'span 5' }}
-                                >
-                                    <span className="heading scroller">{capitalizeFirstLetter(category.name)}</span>
-                                    <div className="separator scroller"></div> {/* Ref is here */}
-                                </div>
-                            )}
 
-                            {items.map((item, index) => (
-                                <div key={index} className="menu-item">
-                                    <div className="item-number">{index + 1}</div>
-                                    <div className="nameAndPrice">
-                                        <div className="item-name">{item.name}</div>
-                                        <div className="item-price">{item.price}</div>
-                                    </div>
-                                </div>
-                            ))}
-                        </React.Fragment>
-                    );
-                })}
-            </div>
-
-            {/* Custom Scroller */}
-            <div 
-                className="custom-scroller"
-                ref={scrollerRef}  // Add this line
-                onMouseMove={handleMouseMove} 
-            >
-                <div 
-                    className="scroller-handle" 
-                    style={{ top: `${scrollPosition}px` }} 
-                    onMouseDown={handleMouseDown}
-                ></div>
-            </div>
-
-        </div>
-    )};
+      <div className="custom-scroller" ref={scrollerRef}>
+        <div className="scroller-handle" style={{ top: `${scrollPosition}px` }} onMouseDown={() => setIsDragging(true)}></div>
+      </div>
+    </div>
+  );
+};
 
 export default Menu;

@@ -15,7 +15,8 @@
     align-items: center;
     gap: 5px;
     right: 10px;
-    top: 58px;
+    top: 50%;  /* Position at the vertical center of the container */
+    transform: translateY(-50%);  /* Offset by 50% of its own height to center it exactly */
 }
 
 .category-item {
@@ -34,6 +35,10 @@
     font-weight: bold;
 }
 
+.main-heading {
+    position: relative;
+    padding-left: 20px;
+}
 .heading {
     position: relative;
     display: flex;
@@ -42,7 +47,7 @@
     font-family: 'Anybody', sans-serif;
     font-weight: bold;
     font-size: 25px; /* Adjust font size as needed */
-    padding: 20px 0px 0px 20px;
+    padding-top: 20px;
 }
 
 .separator {
@@ -50,7 +55,6 @@
     height: 8px;
     background-color: #6F3392;
 }
-
 .heading.scroller {
     padding: 20px 0 5px 0px;
 }
