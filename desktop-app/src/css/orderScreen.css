@@ -7,72 +7,50 @@
 .main-container {
     position: absolute; /* Enable positioning */
     
-    top: 3vw;; /* Position from the top */
-    left: 2%; /* Position from the left */
+    top: 25px;; /* Position from the top */
+    left: 29px; /* Position from the left */
 
-    height: 56.5vw;
-    width: 96%;
+    height: 600px;
+    width: 950px;
 
-    background-color: rgba(234, 238, 5, 0); /* Background color with some transparency */
-    
-    display: flex; /* Enable Flexbox for layout control */
-    flex-direction: row; /* Arrange children horizontally */
-    justify-content: space-between; /* Space out children */
-    align-items: flex-start; /* Align children at the start of the container */
-    
-    overflow: hidden; /* Hide overflow */
-    box-sizing: border-box; /* Include padding and border in element's width and height */
-    padding: 10px; /* Add padding if necessary */
+    background-color: rgba(234, 238, 5, 0); /* Background color with some transparency */    
 }
 
 
 /* ########################################################################################## */
-/* ####### Left Section ##################################################################### */
+/* ####### Left & Right Section ##################################################################### */
 
 .left-section {
     position: absolute; /* Enable positioning */
-    background-color: rgba(120, 120, 120, 0.23); /* Background with 23% opacity */
-    border: 4px solid rgba(150, 137, 137, 0.15); /* Stroke with 15% opacity */
+    background-color: #7878784d; /* Background with 23% opacity */
+    border: 8px solid rgba(150, 137, 137, 0.15); /* Stroke with 15% opacity */
     border-radius: 20px; /* Round corners */
 
-    width: 71%; /* Set your desired width */
-    height: 515px; /* Set your desired height */
-
-    top: 0px; /* Position from the top */
-    left: 0px; /* Position from the left */
+    width: 680px; /* Set your desired width */
+    height: 590px; /* Set your desired height */
 }
 
-/* ########################################################################################## */
-/* ####### Right Section #################################################################### */
-/*  */
 .right-section {
     position: absolute; /* Enable positioning to the right */
-    box-sizing: border-box; /* Include padding and border in element's width and height */
 
-    background-color: rgb(120, 120, 120, 0.30); /* Background with 23% opacity */
+    background-color: #7878784d; /* Background with 23% opacity */
     border: 2px solid rgb(231, 226, 226, 0.30); /* Stroke with 15% opacity */
     border-radius: 20px; /* Round corners */
 
-    width: 25%; /* Set your desired width */
-    height: 100%; /* Set your desired height */
+    width: 230px; /* Set your desired width */
+    height: 590px; /* Set your desired height */
 
-    top: 0px; /* Position from the top */
-    right: 0px; /* Position from the right */
+    left: 710px; /* Position from the right */
     
     display: flex; /* Enable flexbox */
     flex-direction: column; /* Stack items vertically */
-    justify-content: center; /* Center items vertically */
-    align-items: center; /* Center items horizontally */
 
     gap: 7px; /* Space between the sections */
-
-    padding-left: 5px;
-    padding-right: 5px;
-
-    padding-top: 7px;
-    padding-bottom: 7px;
+    
+    padding: 7px 5px 7px 5px; /* Top, Right, Bottom, Left */
 }
 
+/* RIGHT SECTION */
 /* ############# Order Info ########################### */
 .order-info {
     position: relative;
@@ -85,7 +63,6 @@
     display: flex;
     flex-direction: column; /* Stack items vertically */
     align-items: center; /* Center items horizontally */
-    transition: background-color 0.3s; /* Smooth transition for background color */
 }
 
 /* "Takeaway"/"Collection"/"Delivery"/"Table" */
@@ -93,18 +70,15 @@
     color: black; /* Text color */
     font-family: 'Anybody', sans-serif; /* Use 'Anybody' font */
     font-weight: bold; /* Bold text */
-    font-size: 2.5vw;; /* Adjust font size as needed */
-    padding-bottom: 0px;
+    font-size: 30px; /* Adjust font size as needed */
     text-transform: uppercase; /* Converts text to uppercase */
-
-    margin-bottom: 5px;
+    padding-bottom: 5px;
 }
 
 .info-text {
     background-color: #FFD0A0;
     width: 90%;
     border-radius: 12px; /* Rounded corners */
-    color: black; /* Text color */
     font-family: 'Anybody', sans-serif;
     font-size: 16px; /* Adjust font size as needed */
     gap: 3px;
@@ -116,9 +90,6 @@
     flex-direction: column; /* Stack items vertically */
     align-items: center; /* Center items horizontally */
     justify-content: center; /* Center items vertically */
-
-    text-align: center; /* Center align text for multi-line */
-
 }
 
 /* ############# Modify Time ########################### */
@@ -126,20 +97,17 @@
 /* ASAP Button */
 .modify-time-button {
     color: #000000; /* Text color */
-    font-size: 1rem; /* Font size */
+    font-size: 18px; /* Font size */
     font-weight: bold;
 
     background-color: #A8B9FF; /* Light transparent blue */
     border: 1.25px solid #000000; /* Remove default button border */
     border-radius: 8px; /* Rounded corners */
 
-    width: 100px;
+    width: 45%;
     margin-top: 7px;
     align-items: center; /* Center items vertically */
     cursor: pointer; /* Pointer cursor on hover */
-    
-    position: relative;
-    z-index: 3;
 }
 
 /* Dark Overlay */
@@ -150,25 +118,22 @@
     width: 100%; /* Full width of the order-info */
     height: 100%; /* Full height of the order-info */
     background-color: rgba(167, 167, 167, 0.914);
-    z-index: 1; /* Ensure it sits above the order-info content */
     border-radius: 20px; /* Match the order-info's shape */
 }
 
 /* Pop-up bg layer */
 .modify-time-layer {
     position: absolute;
-    bottom: 45px;
+    bottom: 47px;
     width: 150px;
     height: 120px;
     background-color: rgba(255, 255, 255, 1); /* White with full opacity */
 
     border: 2px solid #000000; /* Border with width, style, and color */
     border-radius: 20px; /* Rounded edges */
-    z-index: 3; /* Above dark overlay, below the ASAP button */
 
     display: flex;
     flex-direction: column;
-
     overflow: hidden; /* Ensure that content stays within bounds */
 }
 
@@ -177,19 +142,11 @@
 /* ASAP */
 .asap-section {
     flex: 1; /* Each section takes up an equal portion of the height */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
 }
 
 /* Section 2 & 3 */
 .section {
     flex: 1; /* Each section takes up an equal portion of the height */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
 }
 
 .section:not(:last-child), .asap-section:not(:last-child){

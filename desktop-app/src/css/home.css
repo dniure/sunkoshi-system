@@ -1,73 +1,130 @@
 @import url('https://fonts.googleapis.com/css2?family=Braah+One&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Beiruti:wght@700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Anybody:wght@700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Beiruti:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Anybody:wght&display=swap');
 
 /* ################################################################# */
 /* ############## Text & Logo ############################### */
 .sunkoshi-text {
-    z-index: 3; /* Ensures the text is on top */
-    position: absolute; /* Ensure absolute positioning */
-    top: 0; /* Place at the top */
-    left: 3vw; /* Move the text to the right */
+    z-index: 3;
+    position: absolute;
+    top: 0;
+    left: 30px;
     font-family: 'Braah One', sans-serif;
-    font-size: 7.8vw;
+    font-size: 80px;
     color: #A74600;
     -webkit-text-stroke: 0.01px #E08385;
-    margin: 0; /* Reset margin */
+    margin: 0;
 }
 
 .restaurant-logo {
     position: absolute;
-    right: 17vw; /* Adjust as needed */
-    top: 53%; /* Center vertically */
-    transform: translateY(-50%); /* Corrects the vertical alignment */
-    width: 25vw; /* Adjust size as needed */
-    opacity: 0.2; /* 20% opacity */
+    left: 600px;
+    top: 230px;
+    width: 256px;
+    height: auto;
+    opacity: 0.2;
 }
-
 
 /* ################################################################# */
 /* ############## DateTime Container ############################### */
-
 .datetime-container {
     position: absolute;
-    top: 10vw; /* Adjust as needed */
-    right: 15.8vw; /* Adjust as needed */
+    top: 140px;
+    left: 640px;
     display: flex;
-    flex-direction: column; /* Stack date and time vertically */
-    align-items: center; /* Center them horizontally */
-    transform: scale(1.7); /* Default scale */
-    transform-origin: top right; /* Scale from the top-right corner */
+    flex-direction: column;
+    align-items: center;
+    transform: scale(1.65);
     gap: 0px;
 }
 
-/* Style for Time */
-.live-time {
+/* Style for Time and Date */
+.live-time, .live-date {
     font-family: 'Anybody', sans-serif;
-    font-size: 40px; /* Default font size */
-    font-weight: bold;
     color: #333;
 }
 
-/* Style for Date */
+.live-time {
+    font-size: 43px;
+    font-weight: bold;
+}
+
 .live-date {
-    font-family: 'Anybody', sans-serif;
-    font-size: 20px; /* Default font size */
+    font-size: 22px;
     color: #555;
     font-weight: normal;
 }
 
-/* Power Button Styling */
-.power-button {
-    background: none; /* Remove default button styling */
-    border: none;
-    padding: 0;
+/* ################################################################# */
+/* ############## BUTTONS ############################### */
+.btn {
+    font-family: 'Beiruti', sans-serif;
+    font-size: 40px;
+    font-weight: 700;
+    border-radius: 15px;
+    color: white;
     cursor: pointer;
-    margin-top: 59.5vw;
-    margin-left: 1.8vw;
+    width: 318px;
+    height: 70px;
+    background: linear-gradient(to right, #3A48C3, #4E5CD6);
+    border: 2px solid #4E4167;
 }
 
-.power-button img {
-    width: 5vw; /* Adjust size as needed */
-    object-fit: contain;
+.main-btn-group {
+    position: absolute;
+    top: 120px;
+    left: 108px;
+    display: flex;
+    flex-direction: column;
+    gap: 13px;
+
+}
+
+.btn.place-order {
+    background: #3A5AFF;
+    border: 5px solid #0065B7;
+}
+
+/* Button: Management and Bookings */
+.btn.management, .btn.bookings {
+    position: absolute;
+
+    font-size: 38px;
+    width: 227px;
+    height: 59px;
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 15px;
+}
+
+.btn.management {
+    background: #D50000;
+    border: 1px solid #bb0000;
+    top: 545px;
+    left: 151px;
+}
+
+.btn.bookings {
+    position: absolute;
+    background: #387CA5;
+    border: 2px solid #4E4167;
+    top: 610px;
+    left: 740px;
+}
+
+/* Power Button Styling */
+.power-btn {
+    position: absolute;
+    background: none;
+    border: none;
+    cursor: pointer;
+    top: 610px;
+    left: 15px;
+}
+
+.power-btn img {
+    width: 70px;
 }

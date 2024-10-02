@@ -4,7 +4,6 @@ import ManageOrderDetails from './ManageOrderDetails';
 import Menu from './Menu';
 
 import '../css/main.css';
-import '../css/buttons.css';
 import '../css/orderScreen.css';
 
 const OrderScreen = () => {
@@ -127,9 +126,9 @@ const OrderScreen = () => {
     // ////////////////////////////////////////////////
     // MAIN HTML
     return (
-        <div className="bg-wrapper unselectable">
-            <div className="bg-container"></div>
-            <div className="content-container">
+        <div>
+            <div className="gradient-bg"></div>
+            <div className="content-container unselectable">
                 <div className="main-container">
 
                     {/* //////////////////////////////////////////////// */}
@@ -245,12 +244,8 @@ const OrderScreen = () => {
                 {/* //////////////////////////////////////////////// */}
                 {/* BOTTOM SECTION */}
                 <div>
-                    <div className="cancel-container">
-                        <button className="styled-button cancel" onClick={() => navigate('/')}>cancel</button>
-                    </div>
-                    <div className="save-container">
-                        <button className="styled-button save" onClick={() => navigate('/')}>save</button>
-                    </div>
+                    <button className="bottom-btn orderScreen cancel" onClick={() => navigate('/')}>cancel</button>
+                    <button className="bottom-btn orderScreen save" onClick={() => navigate('/')}>save</button>
                 </div>
 
             </div>

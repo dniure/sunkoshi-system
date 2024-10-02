@@ -11,41 +11,9 @@ const Menu = () => {
     const [scrollPosition, setScrollPosition] = useState(0);
     const [isDragging, setIsDragging] = useState(false);
 
-    const category_data = [
-        { name: 'most ordered', color: '#6F3392' },
-        { name: 'veg. starters', color: '#20C518' },
-        { name: 'non-veg. starters', color: '#B21B1B' },
-        { name: 'veg. mains', color: '#20C518' },
-        { name: 'non-veg. mains', color: '#B21B1B' },
-        { name: 'sides & extras', color: '#B2B63B' },
-        { name: 'rice & naans', color: 'linear-gradient(to right, #A06A12 85%, #F20000)' },
-        { name: 'drinks', color: 'linear-gradient(to right, #C3C823 , #C29D22)' },
-        { name: 'desserts', color: 'linear-gradient(to right, #DA2D2D, #B4A932 100%)' },
-    ];
-
-    const categorizedItems = {
-        'most ordered': MenuItems.mostOrdered,
-        'veg. starters': MenuItems.starters.veg,
-        'non-veg. starters': MenuItems.starters.nonVeg,
-        'veg. mains': MenuItems.mains.veg,
-        'non-veg. mains': MenuItems.mains.nonVeg,
-        'sides & extras': [
-        ...MenuItems.sidesAndExtras.vegSides || [],
-        ...MenuItems.sidesAndExtras.kidsItems || [],
-        ...MenuItems.sidesAndExtras.chutneysAndRaita || [],
-        ],
-        'rice & naans': [
-        ...MenuItems.riceAndNaans.rice || [],
-        ...MenuItems.riceAndNaans.naans || [],
-        ],
-        'drinks': [
-        ...MenuItems.drinks.softDrinks || [],
-        ...MenuItems.drinks.beers || [],
-        ...MenuItems.drinks.wines || [],
-        ...MenuItems.drinks.spirits || [],
-        ],
-        'desserts': MenuItems.desserts,
-    };
+    const categoryData = MenuItems.categoryData;
+    const categorizedItems = MenuItems.getCategorizedItems();
+    const [activeCategory, setActiveCategory] = useState(categoryData[0].name);
 
     const handleScroll = () => {
         const scrollableHeight = menuGridRef.current.scrollHeight - menuGridRef.current.clientHeight;
@@ -91,9 +59,7 @@ const Menu = () => {
             window.removeEventListener('mouseup', () => setIsDragging(false));
         }
         };
-    }, [isDragging]);
-
-    const [activeCategory, setActiveCategory] = useState(category_data[0].name);
+    });
 
     useEffect(() => {
         const handleScroll = () => {
@@ -111,7 +77,7 @@ const Menu = () => {
                     // Check if the bottom of the category is above the threshold
                     if (bottom < window.innerHeight - (categoryHeight * THRESHOLD)) {
                         // Update to the current category only if it's completely scrolled out of view
-                        currentCategory = category_data[i].name; // Update to the current category
+                        currentCategory = categoryData[i].name; // Update to the current category
                     } else if (top >= window.innerHeight) {
                         // If the top of the category is below the viewport, exit loop
                         break;
@@ -135,7 +101,7 @@ const Menu = () => {
                 menuGrid.removeEventListener('scroll', handleScroll);
             }
         };
-    }, [activeCategory]);
+    });
 
     const capitalizeFirstLetter = (str) => {
         return str
@@ -152,7 +118,7 @@ const Menu = () => {
         </div>
         
       <div className="categories">
-        {category_data.map((category, index) => (
+        {categoryData.map((category, index) => (
           <div  key={category.name}
                 className="category-item"
                 style={{ background: category.color }}
@@ -172,7 +138,7 @@ const Menu = () => {
       </div>
 
     <div className="menu-grid" ref={menuGridRef}>
-        {category_data.map((category, categoryIndex) => (
+        {categoryData.map((category, categoryIndex) => (
             <React.Fragment key={categoryIndex}>
                 {/* SCROLLING HEADER */}
                 <div ref={el => (categoryRefs.current[categoryIndex] = el)}

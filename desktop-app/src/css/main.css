@@ -1,29 +1,71 @@
 .unselectable {
     user-select: none; /* Disable text selection */
-    -webkit-user-select: none; /* For Safari */
-    -moz-user-select: none; /* For Firefox */
-    -ms-user-select: none; /* For older IE */
 }
 
 body, html, #root {
     margin: 0;
     padding: 0;
     height: 100%;
+    width: 100%;
 }
 
-.bg-container {
+.gradient-bg {
+    position: fixed; /* Changed to fixed to cover the viewport */
+    top: 0; /* Align to the top of the viewport */
+    left: 0; /* Align to the left of the viewport */
     z-index: 1;
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 100%;
+    height: 100%; /* Use viewport height to cover the entire screen */
+    width: 100%; /* Full width */
     background: linear-gradient(to bottom, #BC7E7E 0%, #242DAA 100%);
     opacity: 20%;
 }
 
 .content-container {
-    z-index: 2; /* Foreground layer, above background */
-    position: relative;
-    padding: 0; /* Optional padding */
+    position: relative; /* Positioned above the background */
+    z-index: 2; /* Foreground layer, above gradient-bg */
+    height: auto; /* Adjust height as needed */
+    width: 100%; /* Full width */
+}
+
+/* ###################################################### */
+/* BUTTONS */
+
+.bottom-btn {
+    font-family: 'Anybody', sans-serif;
+    font-size: 19px;
+    font-weight: lighter;
+    color: #ffffff;
+    width: 120px; /* Set width of button */
+    height: 40px; /* Set height of button */
+    border-radius: 20px; /* Round corners */
+    position: absolute; /* Use absolute positioning */
+    cursor: pointer;
+}
+
+.orderScreen.cancel {
+    top: 640px; /* Place where you want it vertically */
+    left: 20px; /* Align with the text */
+    background: #CB0000; /* Background color */
+    border: 3px solid #9c0505; /* Border styles */
+}
+
+.orderScreen.save {
+    top: 640px; /* Place where you want it vertically */
+    left: 800px; /* Align with the text */
+    background: #61A61B; /* Background color */
+    border: 2px solid #148700; /* Specific border */
+}
+
+.orderDetails.cancel {
+    bottom: 20px; /* Place where you want it vertically */
+    left: 50px; /* Align with the text */
+    background: #CB0000; /* Background color */
+    border: 3px solid #9c0505; /* Border styles */
+}
+
+.orderDetails.save {
+    bottom: 20px; /* Place where you want it vertically */
+    right: 50px; /* Align with the text */
+    background: #61A61B; /* Background color */
+    border: 2px solid #148700; /* Specific border */
 }

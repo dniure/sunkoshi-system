@@ -44,6 +44,7 @@
     "cross-env": "^7.0.3",
     "electron": "^32.1.2",
     "electron-is-dev": "^3.0.1",
+    "path-browserify": "^1.0.1",
     "wait-on": "^8.0.1"
   }
 }

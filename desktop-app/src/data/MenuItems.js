@@ -1,4 +1,16 @@
 const MenuItems = {
+    "categoryData": [
+        { name: 'most ordered', color: '#6F3392' },
+        { name: 'veg. starters', color: '#20C518' },
+        { name: 'non-veg. starters', color: '#B21B1B' },
+        { name: 'veg. mains', color: '#20C518' },
+        { name: 'non-veg. mains', color: '#B21B1B' },
+        { name: 'sides & extras', color: '#B2B63B' },
+        { name: 'rice & naans', color: 'linear-gradient(to right, #A06A12 85%, #F20000)' },
+        { name: 'drinks', color: 'linear-gradient(to right, #C3C823 , #C29D22)' },
+        { name: 'desserts', color: 'linear-gradient(to right, #DA2D2D, #B4A932 100%)' },
+    ],
+
     "mostOrdered": [
         { name: "Tandoori Platter", price: "£11.95", description: "Combination of kebabs, tikka, king prawn, served with green salad (for 2)." },
         { name: "Mixed Vegetable Curry", price: "£9.95", description: "Seasonal mixed vegetables cooked with special herbs and spices." },
@@ -222,6 +234,32 @@ const MenuItems = {
         { name: "Ice Cream", price: "£2.50", description: "Classic vanilla or chocolate ice cream." },
         { name: "Fruit Salad", price: "£3.00", description: "Fresh seasonal fruits, served chilled." },
     ],
+
+    getCategorizedItems() {
+        return {
+          'most ordered': this.mostOrdered,
+          'veg. starters': this.starters.veg,
+          'non-veg. starters': this.starters.nonVeg,
+          'veg. mains': this.mains.veg,
+          'non-veg. mains': this.mains.nonVeg,
+          'sides & extras': [
+            ...this.sidesAndExtras.vegSides || [],
+            ...this.sidesAndExtras.kidsItems || [],
+            ...this.sidesAndExtras.chutneysAndRaita || [],
+          ],
+          'rice & naans': [
+            ...this.riceAndNaans.rice || [],
+            ...this.riceAndNaans.naans || [],
+          ],
+          'drinks': [
+            ...this.drinks.softDrinks || [],
+            ...this.drinks.beers || [],
+            ...this.drinks.wines || [],
+            ...this.drinks.spirits || [],
+          ],
+          'desserts': this.desserts,
+        };
+      },    
 };
     
 export default MenuItems;

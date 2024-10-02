@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import '../css/main.css';
-import '../css/buttons.css';
 import '../css/manageOrderDetails.css';
 
 const ManageOrderDetails = ({ formDataInput, orderTypeInput, handleChanges, onClose }) => {         
@@ -123,8 +122,11 @@ const ManageOrderDetails = ({ formDataInput, orderTypeInput, handleChanges, onCl
 
 
             {/* Save and Cancel Buttons */}
-            <button className="save-button" onClick={handleSave}>Save</button>
-            <button className="cancel-button" onClick={onClose}>Cancel</button>
+            <div>
+                <button className="bottom-btn orderDetails cancel" onClick={onClose}>Cancel</button>
+                <button className="bottom-btn orderDetails save" onClick={handleSave}>Save</button>
+            </div>
+
         </div>
     </div>
     );
