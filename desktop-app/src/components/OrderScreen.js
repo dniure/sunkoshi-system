@@ -17,10 +17,54 @@ const OrderScreen = () => {
     const modifyPopupRef = useRef(null); // Reference to the modify time popup
     const modifyTimeButtonRef = useRef(null); // Reference to the modify time button
     const [isCustomerPopupVisible, setIsCustomerPopupVisible] = useState(false);
-
     const [orderedItemSelected, setOrderedItemSelected] = useState(null); // Track the selected row
+
     const orderedItemsRef = useRef(null); // Reference to the entire ordered-items-section
     const menuGridRef = useRef(null);
+    const qtyToggle = useRef(null);
+
+    const increaseQuantity = () => {
+        if (orderedItemSelected !== null) {
+            setSelectedItems(prevItems =>
+                prevItems.map((item, index) =>
+                    index === orderedItemSelected
+                        ? { ...item, quantity: (item.quantity || 1) + 1 }
+                        : item
+                )
+            );
+        }
+    };
+    
+    const decreaseQuantity = () => {
+        if (orderedItemSelected !== null) {
+            setSelectedItems(prevItems => {
+                const updatedItems = prevItems
+                    .map((item, index) => {
+                        // If the selected item is the one being modified
+                        if (index === orderedItemSelected) {
+                            // If the quantity is greater than 1, decrease it
+                            if (item.quantity > 1) {
+                                return { ...item, quantity: item.quantity - 1 }; // Decrease quantity
+                            } else {
+                                // If the quantity is 1, return null to remove it
+                                return null; // Indicate this item should be removed
+                            }
+                        }
+                        return item; // Return unchanged item for other items
+                    })
+                    .filter(item => item !== null); // Remove any null items (those that should be deleted)
+    
+                // Select the last item if there are still items remaining
+                if (updatedItems.length > 0) {
+                    setOrderedItemSelected(updatedItems.length - 1); // Select the last item
+                } else {
+                    setOrderedItemSelected(null); // Deselect if no items are left
+                }
+    
+                return updatedItems; // Return the updated items
+            });
+        }
+    };   
 
     const handleRowClick = (index) => {
         // If clicking the same row again, unselect it
@@ -43,6 +87,7 @@ const OrderScreen = () => {
                 setIsModifyingTime(false); // Close modify time popup
             }
 
+
             // If clicking outside the ordered-items-section
             if (orderedItemsRef.current && !orderedItemsRef.current.contains(event.target)) {
                 // if the click was on a menu item in menu grid
@@ -56,8 +101,8 @@ const OrderScreen = () => {
                 // If clicking inside the ordered-items-section, check if a row was clicked
                 const rowElements = orderedItemsRef.current.getElementsByClassName('ordered-item-row');
                 for (let i = 0; i < rowElements.length; i++) {
-                    if (rowElements[i].contains(event.target)) {
-                        // A row was clicked, do nothing here
+                    if (rowElements[i].contains(event.target) ||
+                        (qtyToggle.current && qtyToggle.current.contains(event.target))) {
                         return;
                     }
                 }
@@ -167,7 +212,7 @@ const OrderScreen = () => {
                     {/* //////////////////////////////////////////////// */}
                     {/* LEFT SECTION */}
 
-                    <div className="left-section">
+                    <div className="left-section" ref={menuGridRef}>
                         <Menu 
                             onSelect={(item) => handleMenuItemSelect(item)}
                         />
@@ -183,12 +228,12 @@ const OrderScreen = () => {
 
                         <div className="ordered-items-section" ref={orderedItemsRef}>
                             {/* Setup */}
-                            <div>
+                            <div className="ordered-items-content">
                                 <div className="vertical-line"></div>
 
                                 {/* Combined headers and ordered items */}
                                 <div className="headers">
-                                    <span className="quantity-label">QTY</span>
+                                    <span className="quantity-label">Q</span>
                                     <span className="item-label">ITEM</span>
                                     <span className="price-label">PRICE</span>
                                 </div>
@@ -205,13 +250,29 @@ const OrderScreen = () => {
                                     <span className="ordered-item price">{item.price}</span>
                                 </div>
                                 ))}
-
-                                <div className="footers">
-                                    <span className="total">TOTAL</span>
-                                    <span className="price-sum">£{selectedItems.reduce((sum, item) => sum + parseFloat(item.price || 0), 0).toFixed(2)}</span>
-                                    <span className="final-price">£0.00</span>
-                                </div>
                             </div>
+
+                            <div className="footer">
+                                <div className="quantity-buttons" ref={qtyToggle}>
+                                    <button
+                                        className={`decrease-btn ${orderedItemSelected !== null ? 'active' : ''}`}
+                                        onClick={decreaseQuantity}
+                                    >
+                                        -
+                                    </button>
+                                    <button
+                                        className={`increase-btn ${orderedItemSelected !== null ? 'active' : ''}`}
+                                        onClick={increaseQuantity}
+                                    >
+                                        +
+                                    </button>                                  
+                                </div>
+
+                                <span className="total">TOTAL</span>
+                                <span className="price-sum">£{selectedItems.reduce((sum, item) => sum + parseFloat(item.price || 0), 0).toFixed(2)}</span>
+                                <span className="final-price">£0.00</span>                                  
+                            </div>
+
                         </div>
 
                         {/* //////////////////////////////////////////////// */}
