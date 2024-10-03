@@ -3,7 +3,7 @@ import '../css/main.css';
 import '../css/menu.css';
 import MenuItems from '../data/MenuItems';
 
-const Menu = () => {
+const Menu = ({ onSelect }) => {
     const categoryRefs = useRef([]);
     const menuGridRef = useRef(null);
     const scrollerRef = useRef(null);
@@ -117,60 +117,65 @@ const Menu = () => {
             <div className="separator"></div>
         </div>
         
-      <div className="categories">
-        {categoryData.map((category, index) => (
-          <div  key={category.name}
-                className="category-item"
-                style={{ background: category.color }}
-                onClick={() => {
-                    const categoryRef = categoryRefs.current[index];
-                    if (categoryRef) {
-                        categoryRef.scrollIntoView({ behavior: 'auto', block: 'start' }); // Scroll to the category
-                        if (index !== 0) {
-                            menuGridRef.current.scrollTop += 60; // Adjust scroll position by 20 pixels
+        <div className="categories">
+            {categoryData.map((category, index) => (
+            <div  key={category.name}
+                    className="category-item"
+                    style={{ background: category.color }}
+                    onClick={() => {
+                        const categoryRef = categoryRefs.current[index];
+                        if (categoryRef) {
+                            categoryRef.scrollIntoView({ behavior: 'auto', block: 'start' }); // Scroll to the category
+                            if (index !== 0) {
+                                menuGridRef.current.scrollTop += 60; // Adjust scroll position by 20 pixels
+                            }
                         }
-                    }
-                }}               
-            >
-            {category.name}
-          </div>
-        ))}
-      </div>
-
-    <div className="menu-grid" ref={menuGridRef}>
-        {categoryData.map((category, categoryIndex) => (
-            <React.Fragment key={categoryIndex}>
-                {/* SCROLLING HEADER */}
-                <div ref={el => (categoryRefs.current[categoryIndex] = el)}
-                    data-category={category.name}
-                    style={{ gridColumn: 'span 5' }}
+                    }}               
                 >
-                    {/* Show heading only if it's not the first category */}
-                    {categoryIndex !== 0 && (
-                        <>
-                            <span className="heading scroller">{capitalizeFirstLetter(category.name)}</span>
-                            <div className="separator scroller"></div>
-                        </>
-                    )}
-                </div>
+                {category.name}
+            </div>
+            ))}
+        </div>
 
-                {categorizedItems[category.name].map((item, index) => (
-                    <div key={index} className="menu-item">
-                        <div className="item-number">{index + 1}</div>
-                        <div className="nameAndPrice">
-                            <div className="item-name">{item.name}</div>
-                            <div className="item-price">{item.price}</div>
-                        </div>
+        <div className="menu-grid" ref={menuGridRef}>
+            {categoryData.map((category, categoryIndex) => (
+                <React.Fragment key={categoryIndex}>
+                    {/* SCROLLING HEADER */}
+                    <div ref={el => (categoryRefs.current[categoryIndex] = el)}
+                        data-category={category.name}
+                        style={{ gridColumn: 'span 5' }}
+                    >
+                        {/* Show heading only if it's not the first category */}
+                        {categoryIndex !== 0 && (
+                            <>
+                                <span className="scrolling heading">{capitalizeFirstLetter(category.name)}</span>
+                                <div className="scrolling separator"></div>
+                            </>
+                        )}
                     </div>
-                ))}
-            </React.Fragment>
-        ))}
-    </div>
+
+                    {categorizedItems[category.name].map((item, index) => (
+                        <div 
+                            key={index} 
+                            className="menu-item" 
+                            onClick={(event) => onSelect(item, event)}
+                        >
+                            <div className="item-number">{index + 1}</div>
+                            <div className="nameAndPrice">
+                                <div className="item-name">{item.name}</div>
+                                <div className="item-price">{item.price}</div>
+                            </div>
+                        </div>
+                        
+                    ))}
+                </React.Fragment>
+            ))}
+        </div>
 
 
-      <div className="custom-scroller" ref={scrollerRef}>
-        <div className="scroller-handle" style={{ top: `${scrollPosition}px` }} onMouseDown={() => setIsDragging(true)}></div>
-      </div>
+        <div className="scroller" ref={scrollerRef}>
+            <div className="scroller-handle" style={{ top: `${scrollPosition}px` }} onMouseDown={() => setIsDragging(true)}></div>
+        </div>
     </div>
   );
 };

@@ -11,30 +11,30 @@ let win;
 async function createWindow() {
   await loadIsDev(); // Ensure isDev is loaded before proceeding
 
-  const width = Math.round(1024);
-  const height = Math.round(768);
+  const initialWidth = 1024;
+  const initialHeight = 768;
+  const aspectRatio = initialWidth / initialHeight;
 
   win = new BrowserWindow({
-    width: width,
-    height: height,
-
+    width: initialWidth,
+    height: initialHeight,
     resizable: true,
-
-    minWidth: 948,
-    minHeight: 711,
-
-    maxWidth: 1200,
-    maxHeight: 900,    
-
+    minWidth: 884,
+    minHeight: 663,
+    maxWidth: 1268,
+    maxHeight: 951,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
     }
   });
 
+  // Set aspect ratio for the window to maintain during resizing
+  win.setAspectRatio(aspectRatio);
+
   // Load the correct URL depending on development or production
   win.loadURL(
-    isDev 
+    isDev
       ? 'http://localhost:3000'  // React development server
       : `file://${path.join(__dirname, 'build/index.html')}`  // Production build
   );
@@ -45,8 +45,8 @@ async function createWindow() {
 
   // Listen for scaling requests from the renderer process
   ipcMain.on('scale-window', (event, newScale) => {
-    const newWidth = Math.round(1024 * newScale);
-    const newHeight = Math.round(768 * newScale);
+    const newWidth = Math.round(initialWidth * newScale);
+    const newHeight = Math.round(initialHeight * newScale);
     win.setSize(newWidth, newHeight);
     win.webContents.setZoomFactor(newScale); // Adjust the zoom factor for content scaling
     win.webContents.send('scale-content', newScale); // Notify renderer process to scale the content
@@ -55,7 +55,7 @@ async function createWindow() {
   // Dynamically adjust zoom when window size changes
   win.on('resize', () => {
     const [currentWidth] = win.getSize();
-    const scaleFactor = currentWidth / 1024; // Scale based on 1024px reference width
+    const scaleFactor = currentWidth / initialWidth; // Scale based on 1024px reference width
     win.webContents.setZoomFactor(scaleFactor); // Apply zoom factor dynamically
     win.webContents.send('scale-content', scaleFactor); // Notify renderer process
   });

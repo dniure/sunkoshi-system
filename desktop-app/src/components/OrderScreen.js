@@ -18,26 +18,59 @@ const OrderScreen = () => {
     const modifyTimeButtonRef = useRef(null); // Reference to the modify time button
     const [isCustomerPopupVisible, setIsCustomerPopupVisible] = useState(false);
 
-    // Initialsie event listener for mouse clicks (mousedown event)
-    useEffect(() => {
-        document.addEventListener('mousedown', handleOutsideClick);
-        return () => {
-            document.removeEventListener('mousedown', handleOutsideClick);
-        };
-    }, []);
+    const [orderedItemSelected, setOrderedItemSelected] = useState(null); // Track the selected row
+    const orderedItemsRef = useRef(null); // Reference to the entire ordered-items-section
+    const menuGridRef = useRef(null);
 
-    // Clicks outside the modify time popup
-    const handleOutsideClick = (event) => {
-        if (
-            // If modifyPopupRef exists and clicked element is outside it
-            modifyPopupRef.current && !modifyPopupRef.current.contains(event.target) &&
-
-            // If modifyTimeButtonRef exists and clicked element is outside it
-            modifyTimeButtonRef.current && !modifyTimeButtonRef.current.contains(event.target)
-        ) {
-            setIsModifyingTime(false);
+    const handleRowClick = (index) => {
+        // If clicking the same row again, unselect it
+        if (orderedItemSelected === index) {
+        setOrderedItemSelected(null);
+        } else {
+        setOrderedItemSelected(index);
         }
     };
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            // If clicking outside the modify time popup and modify button
+            if (
+                modifyPopupRef.current && 
+                !modifyPopupRef.current.contains(event.target) &&
+                modifyTimeButtonRef.current && 
+                !modifyTimeButtonRef.current.contains(event.target)
+            ) {
+                setIsModifyingTime(false); // Close modify time popup
+            }
+
+            // If clicking outside the ordered-items-section
+            if (orderedItemsRef.current && !orderedItemsRef.current.contains(event.target)) {
+                // if the click was on a menu item in menu grid
+                if (menuGridRef.current && menuGridRef.current.contains(event.target)) {
+                    return; // Do nothing, as we're clicking on a menu item
+                } else {
+                    console.log("outside menu grid item")
+                    setOrderedItemSelected(null); // Deselect the selected row
+                }
+            } else {
+                // If clicking inside the ordered-items-section, check if a row was clicked
+                const rowElements = orderedItemsRef.current.getElementsByClassName('ordered-item-row');
+                for (let i = 0; i < rowElements.length; i++) {
+                    if (rowElements[i].contains(event.target)) {
+                        // A row was clicked, do nothing here
+                        return;
+                    }
+                }
+                // Deselect if clicked outside of any row
+                setOrderedItemSelected(null);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);      
 
     // Clicks inside Order Info
     const handleOrderInfoClick = (event) => {
@@ -116,12 +149,12 @@ const OrderScreen = () => {
         return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
     };
 
-    // On Selecting Items
-
-    const handleSelect = (category) => {
-        console.log('Selected category:', category);
-        // Handle the selected category here
-    };
+    const [selectedItems, setSelectedItems] = useState([]);
+    
+    const handleMenuItemSelect = (item) => {
+        setSelectedItems(prevItems => [...prevItems, item]);
+        setOrderedItemSelected(selectedItems.length); // Set the selected item to the last index of the newly added item
+    };    
     
     // ////////////////////////////////////////////////
     // MAIN HTML
@@ -136,7 +169,7 @@ const OrderScreen = () => {
 
                     <div className="left-section">
                         <Menu 
-                            onSelect={handleSelect}
+                            onSelect={(item) => handleMenuItemSelect(item)}
                         />
                     </div>
 
@@ -148,24 +181,37 @@ const OrderScreen = () => {
                         {/* //////////////////////////////////////////////// */}
                         {/* ORDERED ITEMS */}
 
-                        <div className="ordered-items">
-
+                        <div className="ordered-items-section" ref={orderedItemsRef}>
                             {/* Setup */}
                             <div>
                                 <div className="vertical-line"></div>
-                                
+
+                                {/* Combined headers and ordered items */}
                                 <div className="headers">
+                                    <span className="quantity-label">QTY</span>
                                     <span className="item-label">ITEM</span>
                                     <span className="price-label">PRICE</span>
                                 </div>
 
+                                {/* Render selected items */}
+                                {selectedItems.map((item, index) => (
+                                <div
+                                    key={index}
+                                    className={`ordered-item-row ${orderedItemSelected === index ? 'selected' : ''}`}
+                                    onClick={() => handleRowClick(index)} // Handle row click
+                                >
+                                    <span className="ordered-item quantity">{item.quantity || 1}</span>
+                                    <span className="ordered-item name">{item.name}</span>
+                                    <span className="ordered-item price">{item.price}</span>
+                                </div>
+                                ))}
+
                                 <div className="footers">
                                     <span className="total">TOTAL</span>
-                                    <span className="price-sum">£0.00</span>
+                                    <span className="price-sum">£{selectedItems.reduce((sum, item) => sum + parseFloat(item.price || 0), 0).toFixed(2)}</span>
                                     <span className="final-price">£0.00</span>
                                 </div>
                             </div>
-
                         </div>
 
                         {/* //////////////////////////////////////////////// */}
@@ -195,7 +241,7 @@ const OrderScreen = () => {
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     setIsModifyingTime((prev) => !prev);
-                                }}
+                                }}                                
                                 style={{ zIndex: 2 }}
                             >
                                 <span>{orderTimeInMinutes === 25 ? 'ASAP' : getFormattedTime()}</span>

@@ -19,8 +19,8 @@
 }
 
 .category-item {
-    width: 60px;
-    height: 44px;
+    width: 75px;
+    height: 55px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -30,7 +30,7 @@
     font-family: 'Anybody', sans-serif;
     color: #ffffff;
     transition: background-color 0.3s ease;
-    font-size: 10px;
+    font-size: 12px;
     font-weight: bold;
 }
 
@@ -54,11 +54,11 @@
     height: 8px;
     background-color: #6F3392;
 }
-.heading.scroller {
+.scrolling.heading {
     padding: 20px 0 5px 0px;
 }
 
-.separator.scroller {
+.scrolling.separator {
     width: 100%;
 }
 
@@ -71,7 +71,7 @@
     column-gap: 10px;
     margin-top: 10px;
 
-    width: 81%;
+    width: 79%;
     padding-left: 20px;
     max-height: 82%; /* Adjust max-height based on layout */
     overflow-y: scroll; /* Allow vertical scrolling */
@@ -79,13 +79,13 @@
 }
   
 /* Styling for custom scroller */
-.custom-scroller {    
-    height: 400px;
+.scroller {    
+    height: 480px;
     width: 10px;
     background-color: #ddd;
     position: absolute;
-    right: 80px;
-    top: 50px;
+    right: 100px;
+    top: 60px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -93,9 +93,9 @@
   }
   
   .scroller-handle {
-    height: 80px;
+    height: 50px;
     width: 10px;
-    background-color: #6F3392;
+    background-color: #7b7b7b;
     border-radius: 10px;
     cursor: pointer;
     position: absolute;
@@ -114,6 +114,8 @@
     flex-direction: column;    /* Stack children vertically */
     justify-content: center;   /* Center children vertically */
     align-items: center;       /* Center children horizontally */
+
+    cursor: pointer;
 }
 
 
