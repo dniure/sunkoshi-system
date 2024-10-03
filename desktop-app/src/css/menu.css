@@ -77,6 +77,23 @@
     overflow-y: scroll; /* Allow vertical scrolling */
     scrollbar-width: none; /* Customize scrollbar width (for Firefox) */
 }
+
+.menu-item {
+    position: relative;
+    height: 75px;
+    width: 98px;
+    background-color: hsl(217, 67%, 60%, 0.5);
+    font-family: 'Anybody', sans-serif;
+    font-weight: bold;
+    border-radius: 5px;
+    
+    display: flex;             /* Enable flexbox for the menu item */
+    flex-direction: column;    /* Stack children vertically */
+    justify-content: center;   /* Center children vertically */
+    align-items: center;       /* Center children horizontally */
+
+    cursor: pointer;
+}
   
 /* Styling for custom scroller */
 .scroller {    
@@ -100,24 +117,6 @@
     cursor: pointer;
     position: absolute;
   }
-
-.menu-item {
-    position: relative;
-    height: 75px;
-    width: 100%;
-    background-color: hsl(217, 67%, 60%, 0.5);
-    font-family: 'Anybody', sans-serif;
-    font-weight: bold;
-    border-radius: 5px;
-
-    display: flex;             /* Enable flexbox for the menu item */
-    flex-direction: column;    /* Stack children vertically */
-    justify-content: center;   /* Center children vertically */
-    align-items: center;       /* Center children horizontally */
-
-    cursor: pointer;
-}
-
 
 .item-number {
     position: absolute;

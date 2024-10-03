@@ -29,6 +29,7 @@ const OrderScreen = () => {
 
     useEffect(() => {
         const handleClickOutside = (event) => {
+
             // If clicking outside the modify time popup and modify button
             if (
                 modifyPopupRef.current && 
@@ -44,17 +45,23 @@ const OrderScreen = () => {
             if (orderedItemsRef.current && !orderedItemsRef.current.contains(event.target)) {
                 // if the click was on a menu item in menu grid
                 if (menuGridRef.current && menuGridRef.current.contains(event.target)) {
-                    return; // Do nothing, as we're clicking on a menu item
+                    return;
                 } else {
                     console.log("outside menu grid item")
                     setOrderedItemSelected(null); // Deselect the selected row
                 }
-            } else {
-                // If clicking inside the ordered-items-section, check if a row was clicked
+            }
+            
+            // If clicking inside the ordered-items-section
+            // Clicks on toggle qty btn
+            else if (qtyToggle.current && qtyToggle.current.contains(event.target)){
+                    return
+                }
+            // Clicks on ordered items (rows)
+            else {
                 const rowElements = orderedItemsRef.current.getElementsByClassName('ordered-item-row');
                 for (let i = 0; i < rowElements.length; i++) {
-                    if (rowElements[i].contains(event.target) ||
-                        (qtyToggle.current && qtyToggle.current.contains(event.target))) {
+                    if (rowElements[i].contains(event.target)) {
                         return;
                     }
                 }
@@ -67,7 +74,7 @@ const OrderScreen = () => {
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
-    }, []);      
+    }, []);
 
     // Clicks inside Order Info
     const handleOrderInfoClick = (event) => {
@@ -148,7 +155,8 @@ const OrderScreen = () => {
 
     
     const handleMenuItemSelect = (item) => {
-        setOrderedItems(prevItems => [...prevItems, item]);
+        const itemWithDefaultQuantity = { ...item, quantity: 1 }; // Add quantity property set to 1
+        setOrderedItems(prevItems => [...prevItems, itemWithDefaultQuantity]);
         setOrderedItemSelected(orderedItems.length); // Set the selected item to the last index of the newly added item
     };    
     

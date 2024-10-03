@@ -1,0 +1,171 @@
+/* ############# Ordered Items ######################## */
+
+/* bg */
+.ordered-items-section {
+    position: relative;
+    display: flex;
+    flex-direction: column;    
+    box-sizing: border-box;
+    background-color: #FFFFFF;
+    border-radius: 20px; /* Round corners */
+    width: 100%;
+    height: 100%;
+}
+
+/* Content section for ordered items */
+.ordered-items-content {
+    flex: 1; /* Allows this section to grow and take remaining space */
+    overflow-y: auto; /* Enable vertical scrolling */
+    margin: 12px 0px 0px 0px;
+}
+
+.footer {
+    height: 65px; /* Fixed height for the footer */
+    display: flex;
+    justify-content: space-between; /* Space between footer items */
+    align-items: center; /* Center align items vertically */
+    padding: 10px 20px; /* Padding inside footer */
+    position: absolute; bottom: 0; left: 0; right: 0;
+    font-family: 'Anybody', sans-serif;
+    font-size: 12px;
+}
+
+.vertical-line {
+    position: absolute; /* Position absolute to align it */
+    width: 1px; /* Thickness of the line */
+    height: 77%; /* Full height of the parent container */
+    background-color: #D9D9D9; /* Color of the line */
+    left: 12%; /* 10px from the left margin */
+    top: 10px;
+}
+
+/* Headers */
+.headers {
+    display: flex; /* Use flexbox for the column layout */
+    color: grey;
+    font-family: 'Anybody', sans-serif; /* Use 'Anybody' font */
+    font-size: 13px;
+    padding-bottom: 10px;
+}
+
+.quantity-label, .item-label, .price-label {
+    text-align: left; /* Ensure text aligns to the left for quantity and item */
+}
+
+.quantity-label {
+    width: 12%; /* First column: 12% width for quantity */
+    margin-left: 9px;
+}
+
+.item-label {
+    width: 73%; /* Second column: 71% width for item */
+    padding-left: 0px;
+}
+
+.price-label {
+    width: 15%; /* Third column: 15% width for price */
+    padding-right: 5px;
+}
+
+/* ORDERED ITEMS: MIDDLE */
+.ordered-item-row {
+    display: flex; /* Use flexbox for the column layout */
+    justify-content: space-between; /* Space between item components */
+    align-items: center; /* Center align items vertically */
+    font-family: 'Anybody', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    text-transform: lowercase;
+    padding: 2px 0px 2px 0px;
+    cursor: pointer; /* Add a pointer cursor to indicate it's clickable */
+}
+
+.ordered-item-row.selected {
+    background-color: hsl(226, 24%, 49%, 0.44); /* Translucent background when selected */
+  }
+
+.ordered-item.quantity {
+    width: 12%; /* First column for quantity */
+    text-align: center;
+}
+
+.ordered-item.name {
+    flex-grow: 1;
+    text-align: left;
+    padding-left: 6px;
+}
+
+.ordered-item.price {
+    width: 15%; /* Third column for price */
+    text-align: right;
+    padding-right: 8px;
+}
+
+/* ORDERED ITEMS: FOOTER */
+
+
+.total {
+    position: absolute; /* Keep it absolute to position relative to .ordered-items */
+    left: 12px; /* Adjust as needed */
+    bottom: 15px; /* Position it 10px from the bottom of the container */
+
+    color: rgb(0, 0, 0); /* Text color */
+    font-size: 15px; /* Font size */
+}
+
+.price-sum {
+    position: absolute; /* Positioning relative to the .ordered-items container */
+    color: rgb(0, 0, 0); /* Grey text color */
+    bottom: 50px;
+    right: 10px;
+    font-size: 15px;
+}
+
+.final-price {
+    position: absolute; /* Positioning relative to the .ordered-items container */
+    color: rgb(0, 0, 0); /* Grey text color */
+    bottom: 15px;
+    right: 10px;
+    font-size: 15px;
+}
+
+.quantity-buttons {
+    position: absolute;
+    display: flex;
+    flex-direction: row; /* Align buttons vertically */
+    width: 80px;
+    height: 30px; /* Create a square-like container */
+    bottom: 50px;
+    left: 10px;
+    z-index: 0;
+}
+
+.quantity-buttons button {
+    flex: 1;
+    width: 100%;
+    padding: 0;
+    font-size: 25px;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+}
+
+.quantity-buttons .increase-btn {
+    background-color: #00ff3c; /* Bright green for increase */
+}
+
+.quantity-buttons .decrease-btn {
+    background-color: #ff0000; /* Bright red for decrease */
+}
+
+.quantity-buttons button:not(.active)::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.5); /* Translucent black overlay */
+    z-index: 2; /* Place overlay behind the button */
+    cursor: default;
+}

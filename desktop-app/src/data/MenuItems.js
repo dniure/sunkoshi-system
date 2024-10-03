@@ -200,40 +200,105 @@ const MenuItems = {
 
     "drinks": {
         "softDrinks": [
-            { name: "Coca Cola", price: "1.50", description: "Classic fizzy drink." },
-            { name: "Sprite", price: "1.50", description: "Refreshing lemon-lime soda." },
-            { name: "Fanta", price: "1.50", description: "Sweet orange flavored soda." },
-            { name: "Lemonade", price: "1.50", description: "Homemade lemonade with a hint of mint." },
+            { name: "Coke", price: "2.95", description: "Classic fizzy drink." },
+            { name: "Diet Coke", price: "2.95", description: "Sugar-free version of the classic Coke." },
+            { name: "Fanta", price: "2.95", description: "Sweet orange flavored soda." },
+            { name: "Lemonade", price: "2.95", description: "Refreshing lemonade." },
+            { name: "Orange Juice", price: "2.95", description: "Freshly squeezed orange juice." },
+            { name: "Pineapple Juice", price: "2.95", description: "Tropical pineapple juice." },
+            { name: "Apple Juice", price: "2.95", description: "Crisp apple juice." },
+            { name: "Lassi Sweet", price: "3.95", description: "Sweet, refreshing yogurt-based drink." },
+            { name: "Lassi Salt", price: "3.95", description: "Salted yogurt drink." },
+            { name: "Lassi Mango", price: "4.95", description: "Sweet mango-flavored yogurt drink." },
+            { name: "Still Water", price: "3.25", description: "Pure, refreshing still water." },
+            { name: "Sparkling Water", price: "3.25", description: "Lightly carbonated sparkling water." }
         ],
 
         "beers": [
-            { name: "Lager", price: "3.50", description: "Chilled lager, perfect for any occasion." },
-            { name: "Ale", price: "3.50", description: "Craft ale with a rich, malty flavor." },
-            { name: "IPA", price: "4.00", description: "Hoppy and aromatic India Pale Ale." },
-            { name: "Stout", price: "4.00", description: "Rich, dark stout with coffee notes." },
+            { name: "Cobra", price: "5.95", description: "Lager, available in large, pint, or half." },
+            { name: "Gurkha", price: "5.95", description: "Lager, served in a large bottle." },
+            { name: "Kingfisher", price: "5.95", description: "Popular Indian lager." },
+            { name: "Kathmandu Beer", price: "5.50", description: "Local Nepalese beer." },
+            { name: "Doom Bar Ale", price: "5.50", description: "Rich English ale." },
+            { name: "Apple Cider (Magners)", price: "5.50", description: "Refreshing Irish apple cider." },
+            { name: "Mixed Fruit Kopparberg", price: "5.50", description: "Swedish cider with mixed fruit flavors." },
+            { name: "Alcohol Free Small Bottle", price: "4.25", description: "Non-alcoholic beer." }
         ],
 
         "wines": [
-            { name: "Chardonnay", price: "5.00", description: "Crisp white wine with fruity notes." },
-            { name: "Merlot", price: "5.00", description: "Smooth red wine with berry flavors." },
-            { name: "Pinot Grigio", price: "5.00", description: "Light and refreshing white wine." },
-            { name: "Cabernet Sauvignon", price: "5.50", description: "Full-bodied red wine with hints of oak." },
+            { name: "Prosecco", price: "6.95/18.95", description: "Sparkling wine from Italy." },
+            { name: "Ernest Rapeneau Champagne", price: "29.95", description: "Premium French champagne." },
+            
+            { name: "Long Country Sauvignon Blanc", price: "5.95/7.50/20.95", description: "Sauvignon Blanc from Chile." },
+            { name: "Dea del Mare Catarrato/Pinot Grigio", price: "6.15/7.95/21.95", description: "White wine from Italy." },
+            { name: "Muddy Boots Chardonnay", price: "23.95", description: "Chardonnay from South East Australia." },
+            { name: "Cape Sands Chenin Blanc", price: "23.95", description: "Chenin Blanc from South Africa." },
+            { name: "Southern Dawn Sauvignon Blanc", price: "25.95", description: "Sauvignon Blanc from New Zealand." },
+            { name: "Chablis Alain Geoffroy", price: "26.95", description: "Premium Chablis from France." },
+
+            { name: "Discovery Beach Zinfandel Rosé", price: "5.95/7.50/20.95", description: "Zinfandel Rosé from the USA." },
+            { name: "Mateus Rosé", price: "18.95", description: "Rosé wine from Portugal." },
+            { name: "Le Havre de Paix", price: "21.95", description: "Rosé wine from France." },
+
+            { name: "Santiago Merlot", price: "5.95/7.50/20.95", description: "Merlot from Central Valley, Chile." },
+            { name: "Les Vignerons Grenache/Pinot Noir", price: "6.15/7.95/21.95", description: "Red wine from France." },
+            { name: "Dry River Shiraz", price: "22.95", description: "Shiraz from South East Australia." },
+            { name: "Bodega Los Haroldos 'Kaleu' Malbec", price: "23.95", description: "Malbec from Mendoza, Argentina." },
+            { name: "Letargo Tempranillo", price: "26.95", description: "Tempranillo from Rioja, Spain." }
         ],
 
         "spirits": [
-            { name: "Vodka", price: "4.00", description: "Pure distilled spirit, perfect for cocktails." },
-            { name: "Gin", price: "4.00", description: "Flavored with botanicals for a refreshing taste." },
-            { name: "Whiskey", price: "4.50", description: "Rich and smooth, perfect on the rocks." },
-            { name: "Rum", price: "4.00", description: "Sweet and aromatic, great for mixing." },
+            { name: "Chivas", price: "3.25/5.95", description: "Smooth and rich Scotch whisky." },
+            { name: "Jack Daniels", price: "3.25/5.95", description: "Classic American whiskey." },
+            { name: "Black Label", price: "3.25/5.95", description: "Premium Scotch whisky." },
+            { name: "Bells", price: "3.25/5.95", description: "Affordable blended Scotch." },
+            { name: "Glenfiddich", price: "3.50/5.95", description: "Single malt Scotch whisky." },
+
+            { name: "VSOP", price: "2.95/5.50", description: "High-quality French brandy." },
+            { name: "Martell", price: "2.95/5.50", description: "Popular French cognac." },
+            { name: "Bacardi", price: "2.95/5.50", description: "Classic white rum." },
+            { name: "Dark Rum (Captain Morgan)", price: "2.95/5.50", description: "Rich and bold dark rum." },
+            { name: "Vodka", price: "2.95/5.50", description: "Pure distilled spirit." },
+            { name: "London Dry Gin", price: "2.95/5.50", description: "Classic gin with a botanical profile." },
+            { name: "Bombay Dry Gin", price: "2.95/5.50", description: "Premium gin with herbal notes." },
+
+            { name: "Sambuca", price: "1.95/3.25", description: "Anise-flavored liqueur." },
+            { name: "Amaretto", price: "1.95/3.25", description: "Sweet almond liqueur." },
+            { name: "Malibu", price: "1.95/3.25", description: "Coconut-flavored Caribbean rum." },
+            { name: "Cinzano Martini", price: "1.95/3.25", description: "A classic vermouth." },
+            { name: "Baileys", price: "1.95/3.25", description: "Creamy Irish liqueur." },
+            { name: "Tia Maria", price: "1.95/3.25", description: "Coffee-flavored liqueur." },
+            { name: "Drambuie", price: "1.95/3.25", description: "Whisky liqueur with honey and herbs." },
+            { name: "Cointreau", price: "1.95/3.25", description: "Orange-flavored liqueur." },
+            { name: "Sherry", price: "1.95/3.25", description: "Fortified wine from Spain." },
+            { name: "Port", price: "1.95/3.25", description: "Sweet red fortified wine." }
         ],
+
+        "hotDrinks": [
+            { name: "Tea", price: "2.95", description: "Freshly brewed tea." },
+            { name: "Coffee", price: "2.95", description: "Hot brewed coffee." },
+            { name: "Floater Coffee", price: "4.25", description: "Rich coffee with a floating layer of cream." },
+            { name: "Liqueur Coffee", price: "5.50", description: "Coffee with a shot of liqueur." }
+        ]
     },
 
-    "desserts": [
-        { name: "Chocolate Cake", price: "3.50", description: "Rich chocolate cake with creamy frosting." },
-        { name: "Cheesecake", price: "4.00", description: "Creamy cheesecake with a buttery crust." },
-        { name: "Ice Cream", price: "2.50", description: "Classic vanilla or chocolate ice cream." },
-        { name: "Fruit Salad", price: "3.00", description: "Fresh seasonal fruits, served chilled." },
+   "desserts": [
+        { name: "Ferrero Rocher", price: "4.50", description: "World famous rich Ferrero Rocher ice cream combined with thick chocolate sauce topped with Ferrero Rocher." },
+        { name: "Matka Kulfi", price: "4.50", description: "Creamy and luscious dessert made with pistachio kulfi ice cream, containing saffron, topped with almond & pistachio nuts." },
+        { name: "Coconut Supreme", price: "3.95", description: "Cool & delicious coconut ice cream packed into real half coconut shell." },
+        { name: "Midnight Mint", price: "3.95", description: "Luxurious dreamy mint flavoured ice cream in pot, rippled with gorgeous chocolate sauce, topped with curls." },
+        { name: "Lemon Surprise", price: "3.25", description: "Whole lemon scooped & refilled with tangy sorbet." },
+        { name: "Orange Surprise", price: "3.25", description: "Whole orange scooped & refilled with tangy sorbet." },
+        { name: "Strawberry Flute", price: "4.50", description: "Luxury Vanilla & Strawberry ice cream swirled with strawberry sauce. Presented in an unique glass." },
+        { name: "Flute Hazel", price: "4.50", description: "Glass filled with delicious dairy ice cream combined with chocolate sauce, topped with pieces of hazelnut." },
+        { name: "Trufito", price: "3.95", description: "Chocolate coated ice cream with a core of chocolate sauce." },
+        { name: "Fantastica", price: "3.95", description: "Vanilla & Caramel ice cream, with chocolate balls, toffee pieces & caramel sauce." },
+        { name: "Mango Delight", price: "4.50", description: "Half of a real mango skin filled with natural mango ice cream." },
+        { name: "Pistachio Kulfi", price: "2.95", description: "Delicious Indian ice cream made from whole milk, nuts and fruits. Pistachio Flavoured. " },
+        { name: "Mango Kulfi", price: "2.95", description: "Delicious Indian ice cream made from whole milk, nuts and fruits. Mango Flavoured. " },
+        { name: "Motka Kulfi", price: "4.50", description: "Delicious Indian ice cream made from whole milk, nuts and fruits." }
     ],
+
 
     getCategorizedItems() {
         return {
@@ -243,19 +308,20 @@ const MenuItems = {
           'veg. mains': this.mains.veg,
           'non-veg. mains': this.mains.nonVeg,
           'sides & extras': [
-            ...this.sidesAndExtras.vegSides || [],
-            ...this.sidesAndExtras.kidsItems || [],
-            ...this.sidesAndExtras.chutneysAndRaita || [],
+            ...this.sidesAndExtras.vegSides || ["FAILED----------"],
+            ...this.sidesAndExtras.kidsItems || ["FAILED----------"],
+            ...this.sidesAndExtras.chutneysAndRaita || ["FAILED----------"],
           ],
           'rice & naans': [
             ...this.riceAndNaans.rice || [],
             ...this.riceAndNaans.naans || [],
           ],
           'drinks': [
-            ...this.drinks.softDrinks || [],
-            ...this.drinks.beers || [],
-            ...this.drinks.wines || [],
-            ...this.drinks.spirits || [],
+            ...this.drinks.softDrinks || ["FAILED----------"],
+            ...this.drinks.beers || ["FAILED----------"],
+            ...this.drinks.wines || ["FAILED----------"],
+            ...this.drinks.spirits || ["FAILED----------"],
+            ...this.drinks.hotDrinks || ["FAILED----------"],
           ],
           'desserts': this.desserts,
         };
