@@ -1,0 +1,148 @@
+@import url('https://fonts.googleapis.com/css2?family=Braah+One&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Beiruti:wght@700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Anybody:wght@400;500;700&display=swap');
+
+/* ############# Order Info ########################### */
+.order-info {
+    position: relative;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    
+    background-color: #FFFFFF;
+    border-radius: 20px; /* Round corners */
+    width: 100%;
+    display: flex;
+    flex-direction: column; /* Stack items vertically */
+    align-items: center; /* Center items horizontally */
+}
+
+/* "Takeaway"/"Collection"/"Delivery"/"Table" */
+.heading-text {
+    color: black; /* Text color */
+    font-family: 'Anybody', sans-serif; /* Use 'Anybody' font */
+    font-weight: bold; /* Bold text */
+    font-size: 30px; /* Adjust font size as needed */
+    text-transform: uppercase; /* Converts text to uppercase */
+    padding-bottom: 5px;
+}
+
+.info-text {
+    background-color: #FFD0A0;
+    width: 90%;
+    border-radius: 12px; /* Rounded corners */
+    font-family: 'Anybody', sans-serif;
+    font-size: 16px; /* Adjust font size as needed */
+    gap: 3px;
+
+    padding-top: 5px;
+    padding-bottom: 5px;
+
+    display: flex; /* Enable flexbox */
+    flex-direction: column; /* Stack items vertically */
+    align-items: center; /* Center items horizontally */
+    justify-content: center; /* Center items vertically */
+}
+
+/* ############# Modify Time ########################### */
+
+/* ASAP Button */
+.modify-time-button {
+    color: #000000; /* Text color */
+    font-size: 18px; /* Font size */
+    font-weight: bold;
+
+    background-color: #A8B9FF; /* Light transparent blue */
+    border: 1.25px solid #000000; /* Remove default button border */
+    border-radius: 8px; /* Rounded corners */
+
+    width: 45%;
+    margin-top: 7px;
+    align-items: center; /* Center items vertically */
+    cursor: pointer; /* Pointer cursor on hover */
+}
+
+/* Dark Overlay */
+.order-info-overlay {
+    position: absolute; /* Make it absolute */
+    top: 0; /* Align to the top of the order-info */
+    left: 0; /* Align to the left of the order-info */
+    width: 100%; /* Full width of the order-info */
+    height: 100%; /* Full height of the order-info */
+    background-color: rgba(167, 167, 167, 0.914);
+    border-radius: 20px; /* Match the order-info's shape */
+}
+
+/* Pop-up bg layer */
+.modify-time-layer {
+    position: absolute;
+    bottom: 47px;
+    width: 150px;
+    height: 120px;
+    background-color: rgba(255, 255, 255, 1); /* White with full opacity */
+
+    border: 2px solid #000000; /* Border with width, style, and color */
+    border-radius: 20px; /* Rounded edges */
+
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Ensure that content stays within bounds */
+}
+
+/* Sections */
+
+/* ASAP */
+.asap-section {
+    flex: 1; /* Each section takes up an equal portion of the height */
+}
+
+/* Section 2 & 3 */
+.section {
+    flex: 1; /* Each section takes up an equal portion of the height */
+}
+
+.section:not(:last-child), .asap-section:not(:last-child){
+    border-bottom: 1px solid #000000; /* Thin black line separating sections */
+}
+
+/* Style for the ASAP button */
+.asap-button {
+    width: 100%;
+    height: 100%;
+    background-color: #007BFF; /* Blue background */
+    color: white;
+    border: none;
+    border-radius: 18px 18px 0 0; /* Rounded top corners */
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.asap-button.selected {
+    background-color: #007BFF; /* Blue when selected */
+}
+
+.asap-button:not(.selected) {
+    background-color: #FFFFFF; /* White when not selected */
+    color: #000000;
+}
+
+/* Style for the time toggle (Section 2 & 3) */
+.time-toggle, .exact-time {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.time-toggle button, .exact-time button {
+    flex: 1; /* Buttons take equal space */
+    height: 100%; /* Make buttons cover the entire height of the section */
+    background-color: #f0f0f0; /* Background color for the buttons */
+    border: none; /* Remove default button borders */
+    cursor: pointer; /* Change cursor to pointer */
+}
+
+.time-toggle span, .exact-time span {
+    flex: 3; /* Time text takes up twice the space of the buttons */
+    text-align: center; /* Center the text */
+    font-weight: bold;
+}
