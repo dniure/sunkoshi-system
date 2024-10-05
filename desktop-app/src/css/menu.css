@@ -34,11 +34,11 @@
     font-weight: bold;
 }
 
-.main-heading {
+.top-header {
     position: relative;
     padding-left: 20px;
 }
-.heading {
+.header {
     position: relative;
     display: flex;
     flex-direction: column;
@@ -49,16 +49,16 @@
     padding-top: 20px;
 }
 
-.separator {
+.header-separator {
     width: 81%;
     height: 8px;
     background-color: #6F3392;
 }
-.scrolling.heading {
+.scrolling.header {
     padding: 20px 0 5px 0px;
 }
 
-.scrolling.separator {
+.scrolling.header-separator {
     width: 100%;
 }
 

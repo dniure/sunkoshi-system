@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import '../css/main.css';
 import '../css/manageOrderDetails.css';
 
-const ManageOrderDetails = ({ formDataInput, orderTypeInput, handleChanges, onClose }) => {         
+const ManageOrderDetails = ({ formDataInput, orderTypeInput, updateOrderDetails, onClose }) => {         
     
     //////////////////////////////////////////////////    
     // Form Management
@@ -38,7 +38,7 @@ const ManageOrderDetails = ({ formDataInput, orderTypeInput, handleChanges, onCl
             setErrors(newErrors);
         } else {
             // Save form data and order type
-            handleChanges(formData, orderType); // Pass the updated formData to parent
+            updateOrderDetails(formData, orderType); // Pass the updated formData to parent
 
             setErrors({});
             onClose();

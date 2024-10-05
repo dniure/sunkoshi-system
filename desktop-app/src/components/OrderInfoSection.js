@@ -1,62 +1,54 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../css/main.css';
-import '../css/orderScreen.css';
 import '../css/orderInfoSection.css';
 
 
-const OrderInfoSection = ({ orderType, formData, modifyPopupRef, setIsCustomerPopupVisible, isModifyingTime, setIsModifyingTime}) => {
+const OrderInfoSection = ({
+    orderType,
+    formData,
+    modifyTimePopupRef,
+    setIsCustomerPopupVisible,
+    isModifyingTime,
+    setIsModifyingTime,
+    modifyTimeButtonRef
+    }) => {
+
     const [currentTime, setCurrentTime] = useState(new Date());
     const [orderTimeInMinutes, setOrderTimeInMinutes] = useState(25);
-    const [isExactTimeAdjusted, setIsExactTimeAdjusted] = useState(false);
-
-    const modifyTimeButtonRef = useRef(null);
 
     // Sets up a timer to update currentTime every second (for accurate ordering)
     useEffect(() => {
         const timer = setInterval(() => setCurrentTime(new Date()), 1000);
         return () => clearInterval(timer);
     }, []);
-
-    // Methods for adjusting time
-    const resetOrderTimeToAsap = () => setOrderTimeInMinutes(25);
-    const increaseOrderTime = () => setOrderTimeInMinutes(prev => prev + 5);
-    const decreaseOrderTime = () => setOrderTimeInMinutes(prev => Math.max(prev - 5, 0));
-
-    const adjustToNearestFive = (type, minutes) => {
-        if (type === "increase") {
-            return minutes % 5 === 0 ? minutes : Math.ceil(minutes / 5) * 5;
-        } else if (type === "decrease") {
-            return minutes % 5 === 0 ? minutes : Math.floor(minutes / 5) * 5; // Use floor for decrease
+   
+    const adjustOrderTime = (adjustType, modifyOn) => {
+        if (adjustType === "reset") {
+            setOrderTimeInMinutes(25);
+            return;
         }
-        return minutes; // Default return if neither type matches
-    };
-    
-    const increaseExactTime = () => {
-        const minutes = isExactTimeAdjusted
-            ? currentTime.getMinutes() + 5 // Already adjusted: just add 5 minutes
-            : (
-                currentTime.getMinutes() % 5 === 0 // At a 5-minute mark?
-                ? currentTime.getMinutes() + 5      // Add 5 minutes directly
-                : adjustToNearestFive("increase", currentTime.getMinutes()) // Adjust to next 5-minute mark
-            );
         
-        setOrderTimeInMinutes(orderTimeInMinutes + (minutes - currentTime.getMinutes())); // Update order time
-        setIsExactTimeAdjusted(true); // Mark as adjusted
-    };
+        if (modifyOn === "timeFromNow") {
+            if (adjustType === "increase") {
+                setOrderTimeInMinutes(prev => prev + 5);
+            } else if (adjustType === "decrease") {
+                setOrderTimeInMinutes(prev => Math.max(prev - 5, 0));
+            }
+        } else if (modifyOn === "exactTime") {
+            const modifier = adjustType === "increase" ? 1 : -1;
     
-    const decreaseExactTime = () => {
-        const minutes = isExactTimeAdjusted
-            ? currentTime.getMinutes() - 5 // Already adjusted: just subtract 5 minutes
-            : (
-                currentTime.getMinutes() % 5 === 0 // At a 5-minute mark?
-                ? currentTime.getMinutes() - 5      // Subtract 5 minutes directly
-                : adjustToNearestFive("decrease", currentTime.getMinutes()) // Adjust to previous 5-minute mark
-            );
-    
-        // Update the order time in minutes
-        setOrderTimeInMinutes(orderTimeInMinutes + (minutes - currentTime.getMinutes())); // Update order time
-        setIsExactTimeAdjusted(true); // Mark as adjusted
-    };
+            if ((currentTime.getMinutes() + orderTimeInMinutes) % 5 === 0) {
+                setOrderTimeInMinutes(prev => Math.max(prev + (modifier * 5), 0));
+            } else {
+                for (let i = 1; i < 5; i++) {
+                    if ((currentTime.getMinutes() + orderTimeInMinutes + (modifier * i)) % 5 === 0) {
+                        setOrderTimeInMinutes(prev => Math.max(prev + (modifier * i), 0));
+                        return;
+                    }
+                }
+            }
+        }
+    };    
 
     // Returns formatted time in HH:MM
     const getFormattedTime = () => {
@@ -66,27 +58,16 @@ const OrderInfoSection = ({ orderType, formData, modifyPopupRef, setIsCustomerPo
         return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
     };
 
-    // Toggle time modification popup
-    const toggleModifyTime = (e) => {
-        e.stopPropagation();
-        setIsModifyingTime(prev => !prev);
-
-        // If opening the popup, set focus on the popup for accessibility
-        if (!isModifyingTime) {
-            // Check if modifyPopupRef is defined
-            if (modifyPopupRef.current) {
-                modifyPopupRef.current.focus(); // Set focus on the popup
-            }
-        }        
-    };
-
     // Clicks inside Order Info
     const handleOrderInfoClick = (event) => {
-        if (
-            // If not currently modifying time and clicked element is outside the modifyTimeButtonRef
-            !isModifyingTime && !modifyTimeButtonRef.current.contains(event.target)
-        ) {
+        // If not currently modifying time and clicked element is outside the modifyTimeButtonRef        
+        if (!isModifyingTime && !modifyTimeButtonRef.current.contains(event.target)){            
             setIsCustomerPopupVisible(true);
+        }
+
+        // If modifying time and clicking 
+        if (isModifyingTime && !modifyTimePopupRef.current.contains(event.target)){            
+            setIsModifyingTime(false);
         }
     };    
 
@@ -127,21 +108,21 @@ const OrderInfoSection = ({ orderType, formData, modifyPopupRef, setIsCustomerPo
 
             {/* Modify Time Popup */}
             {isModifyingTime && (
-                <div className="modify-time-layer" ref={modifyPopupRef}>
+                <div className="modify-time-layer" ref={modifyTimePopupRef}>
                     <div className="asap-section">
-                        <button className={`asap-button ${orderTimeInMinutes === 25 ? 'selected' : ''}`} onClick={resetOrderTimeToAsap}>
+                        <button className={`asap-button ${orderTimeInMinutes === 25 ? 'selected' : ''}`} onClick={() => adjustOrderTime("reset")}>
                             ASAP
                         </button>
                     </div>
                     <div className="section time-toggle">
-                        <button onClick={decreaseOrderTime}>-</button>
+                        <button onClick={() => adjustOrderTime("decrease", "timeFromNow")}>-</button>
                         <span>{orderTimeInMinutes} mins</span>
-                        <button onClick={increaseOrderTime}>+</button>
+                        <button onClick={() => adjustOrderTime("increase", "timeFromNow")}>+</button>
                     </div>
                     <div className="section exact-time">
-                        <button onClick={decreaseExactTime}>-</button>
+                        <button onClick={() => adjustOrderTime("decrease", "exactTime")}>-</button>
                         <span>{getFormattedTime()}</span>
-                        <button onClick={increaseExactTime}>+</button>
+                        <button onClick={() => adjustOrderTime("increase", "exactTime")}>+</button>
                     </div>
                 </div>
             )}

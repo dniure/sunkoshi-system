@@ -16,74 +16,14 @@ const OrderScreen = () => {
     //////////////////////////////////////////////////    
     // Click Handling
 
-    const modifyPopupRef = useRef(null); // Reference to the modify time popup
-    const modifyTimeButtonRef = useRef(null); // Reference to the modify time button
-    const [isCustomerPopupVisible, setIsCustomerPopupVisible] = useState(false);
-    const [orderedItems, setOrderedItems] = useState([]);
-    const [orderedItemSelected, setOrderedItemSelected] = useState(null); // Track the selected row
-
+    // Section: Order Info
+    const modifyTimePopupRef = useRef(null);
+    const modifyTimeButtonRef = useRef(null);
     const [isModifyingTime, setIsModifyingTime] = useState(false);     
 
-    const orderedItemsRef = useRef(null); // Reference to the entire ordered-items-section
-    const menuGridRef = useRef(null);
-    const qtyToggle = useRef(null);
-
-
-
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-
-            // If clicking outside the modify time popup and modify button
-            if (
-                modifyPopupRef.current && 
-                !modifyPopupRef.current.contains(event.target) &&
-                modifyTimeButtonRef.current && 
-                !modifyTimeButtonRef.current.contains(event.target)
-            ) {
-                setIsModifyingTime(false); // Close modify time popup
-            }
-
-
-            // If clicking outside the ordered-items-section
-            if (orderedItemsRef.current && !orderedItemsRef.current.contains(event.target)) {
-                // if the click was on a menu item in menu grid
-                if (menuGridRef.current && menuGridRef.current.contains(event.target)) {
-                    return;
-                } else {
-                    setOrderedItemSelected(null); // Deselect the selected row
-                }
-            }
-            
-            // If clicking inside the ordered-items-section
-            // Clicks on toggle qty btn
-            else if (qtyToggle.current && qtyToggle.current.contains(event.target)){
-                    return
-                }
-            // Clicks on ordered items (rows)
-            else {
-                const rowElements = orderedItemsRef.current.getElementsByClassName('ordered-item-row');
-                for (let i = 0; i < rowElements.length; i++) {
-                    if (rowElements[i].contains(event.target)) {
-                        return;
-                    }
-                }
-                // Deselect if clicked outside of any row
-                setOrderedItemSelected(null);
-            }
-        };
-
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, []);
-
-
-
-    // ////////////////////////////////////////////////
-    // Order Details
+    // Section: Manage Order Details (popup, when clicking on Order Info Section)
+    const [isCustomerPopupVisible, setIsCustomerPopupVisible] = useState(false);
     const [orderType, setOrderType] = useState("takeaway");
-
     const [formData, setFormData] = useState({
         name: '',
         phone: '',
@@ -91,43 +31,90 @@ const OrderScreen = () => {
         address: '',
         notes: '',
     });
-
-    const handleChanges = (formDataChanges, orderTypeChanges) => {
+    
+    const updateOrderDetails = (formDataChanges, orderTypeChanges) => {
         setFormData(formDataChanges);
-        setOrderType(orderTypeChanges)
+        setOrderType(orderTypeChanges);
+    };
+
+    // Section: Ordered Items
+    const [orderedItems, setOrderedItems] = useState([]);
+    const [orderedItemSelected, setOrderedItemSelected] = useState(null);
+    const orderedItemsRef = useRef(null);
+    const qtyToggle = useRef(null);
+
+    // Section: Menu Grid
+    const menuGridRef = useRef(null);
+
+
+    // Click Handling
+    useEffect(() => {    
+        document.addEventListener('mousedown', handleClick);
+        return () => {
+            document.removeEventListener('mousedown', handleClick);
+        };
+    }, []);
+
+    const handleClick = (event) => {
+        const clickedOutside = (ref) => ref.current && !ref.current.contains(event.target);
+
+        // Close modify time popup if clicked outside the modify popup or button
+        if (clickedOutside(modifyTimePopupRef) && clickedOutside(modifyTimeButtonRef)) {
+            setIsModifyingTime(false);
+        }
+
+        // Deselect row if clicked outside ordered-items-section but not on menu grid
+        if (clickedOutside(orderedItemsRef)) {
+            if (menuGridRef.current && menuGridRef.current.contains(event.target)) {
+                return; // Clicked on a menu item in menu grid, do nothing
+            } else {
+                setOrderedItemSelected(null); // Deselect any selected row
+            }
+        }
+
+        // Handle clicks inside ordered-items-section
+        else if (qtyToggle.current && qtyToggle.current.contains(event.target)) {
+            return; // Clicked on quantity toggle button, do nothing
+        } else {
+            // Get all ordered item rows
+            const rowElements = orderedItemsRef.current?.getElementsByClassName('ordered-item-row') || [];
+
+            // Check if any row was clicked
+            for (let row of rowElements) {
+                if (row.contains(event.target)) {
+                    console.log("Row was clicked");
+                    return;
+                }
+            }
+
+            // If no row was clicked, deselect the selected row
+            setOrderedItemSelected(null);
+        }
     };
 
     const handleMenuItemSelect = (item) => {
-        const itemWithDefaultQuantity = { ...item, quantity: 1 }; // Add quantity property set to 1
-        setOrderedItems(prevItems => [...prevItems, itemWithDefaultQuantity]);
-        setOrderedItemSelected(orderedItems.length); // Set the selected item to the last index of the newly added item
+        // Add new item to the list
+        setOrderedItems(prevItems => [...prevItems, { ...item, quantity: 1 }]);
+        // Select the new item
+        setOrderedItemSelected(orderedItems.length);
     };    
     
     // ////////////////////////////////////////////////
     // MAIN HTML
     return (
         <div>
-            <div className="gradient-bg"></div>
+            <span className="gradient-bg" />
             <div className="content-container unselectable">
                 <div className="main-container">
-
-                    {/* //////////////////////////////////////////////// */}
-                    {/* LEFT SECTION */}
-
+                    
+                    {/* MAIN SCREEN */}
                     <div className="left-section" ref={menuGridRef}>
-                        <Menu 
-                            onSelect={(item) => handleMenuItemSelect(item)}
-                        />
+                        <Menu onSelect={(item) => handleMenuItemSelect(item)} />
                     </div>
 
-                    {/* //////////////////////////////////////////////// */}
-                    {/* RIGHT SECTION */}
+                    <div className="right-section">      
 
-                    <div className="right-section">
-                        
-                        {/* //////////////////////////////////////////////// */}
                         {/* ORDERED ITEMS */}
-
                         <OrderedItemsSection
                             orderedItemsInput={orderedItems}
                             orderedItemSelectedInput={orderedItemSelected}
@@ -137,33 +124,29 @@ const OrderScreen = () => {
                             setOrderedItemSelectedInput={setOrderedItemSelected}
                         />
 
-                        {/* //////////////////////////////////////////////// */}
                         {/* ORDER INFO */}
-
                         <OrderInfoSection
                             orderType={orderType}
                             formData={formData}
-                            modifyPopupRef={modifyPopupRef}
+                            modifyTimePopupRef={modifyTimePopupRef}
                             setIsCustomerPopupVisible={setIsCustomerPopupVisible}
                             isModifyingTime={isModifyingTime}
                             setIsModifyingTime={setIsModifyingTime}
+                            modifyTimeButtonRef={modifyTimeButtonRef}
                         />                        
                     </div>
                 </div>
 
-                {/* //////////////////////////////////////////////// */}
                 {/* MANAGE ORDER DETAILS */}
                 {isCustomerPopupVisible && (
                     <ManageOrderDetails 
                         formDataInput={formData}
                         orderTypeInput={orderType}
-                        handleChanges={handleChanges}
+                        updateOrderDetails={updateOrderDetails}
                         onClose={() => setIsCustomerPopupVisible(false)}
                     />
                 )}
 
-
-                {/* //////////////////////////////////////////////// */}
                 {/* BOTTOM SECTION */}
                 <div>
                     <button className="bottom-btn orderScreen cancel" onClick={() => navigate('/')}>cancel</button>

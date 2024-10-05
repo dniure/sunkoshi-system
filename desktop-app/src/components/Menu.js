@@ -1,183 +1,181 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
+import MenuItems from '../data/MenuItems';
 import '../css/main.css';
 import '../css/menu.css';
-import MenuItems from '../data/MenuItems';
 
 const Menu = ({ onSelect }) => {
+    // Refs
     const categoryRefs = useRef([]);
     const menuGridRef = useRef(null);
     const scrollerRef = useRef(null);
+    
+    // Category Handling
+    const [activeCategory, setActiveCategory] = useState(MenuItems.categoryData[0].name);
+    const categoryData = useMemo(() => MenuItems.categoryData, []);
+    const categorizedItems = useMemo(() => MenuItems.getCategorizedItems(), []);
 
+    // Scroll handling
     const [scrollPosition, setScrollPosition] = useState(0);
     const [isDragging, setIsDragging] = useState(false);
-
-    const categoryData = MenuItems.categoryData;
-    const categorizedItems = MenuItems.getCategorizedItems();
-    const [activeCategory, setActiveCategory] = useState(categoryData[0].name);
-
-    const handleScroll = () => {
-        const scrollableHeight = menuGridRef.current.scrollHeight - menuGridRef.current.clientHeight;
-        const scrollerHeight = scrollerRef.current.clientHeight;
-        const handleMaxPos = scrollerHeight - document.querySelector('.scroller-handle').clientHeight;
-        setScrollPosition((menuGridRef.current.scrollTop / scrollableHeight) * handleMaxPos);
-    };
-
-    const handleMouseMove = (e) => {
+    const [handleDragOffset, setHandleDragOffset] = useState(0);
+    
+    const handleMouseDown = useCallback((e) => {
+        const handleTop = document.querySelector('.scroller-handle').getBoundingClientRect().top;
+        setHandleDragOffset(e.clientY - handleTop);
+        setIsDragging(true);
+    }, []);
+    
+    const handleMouseMove = useCallback((e) => {
         if (!isDragging) return;
-        const scrollableHeight = menuGridRef.current.scrollHeight - menuGridRef.current.clientHeight;
+
         const scrollerHeight = scrollerRef.current.clientHeight;
-        let handlePosition = Math.max(0, Math.min(e.clientY - scrollerRef.current.getBoundingClientRect().top, scrollerHeight - document.querySelector('.scroller-handle').clientHeight));
-        menuGridRef.current.scrollTop = (handlePosition / (scrollerHeight - document.querySelector('.scroller-handle').clientHeight)) * scrollableHeight;
-        setScrollPosition(handlePosition);
-    };
+        const handleHeight = document.querySelector('.scroller-handle').clientHeight;
+        const handleMaxPos = scrollerHeight - handleHeight;
+        const scrollableHeight = menuGridRef.current.scrollHeight - menuGridRef.current.clientHeight;
 
-    useEffect(() => {
-        const menuGrid = menuGridRef.current;
-        if (menuGrid) {
-        menuGrid.addEventListener('scroll', handleScroll);
-        }
+        let newHandlePos = Math.min(
+        Math.max(e.clientY - scrollerRef.current.getBoundingClientRect().top - handleDragOffset, 0),
+        handleMaxPos
+        );
 
-        return () => {
-        if (menuGrid) {
-            menuGrid.removeEventListener('scroll', handleScroll);
-        }
-        };
+        menuGridRef.current.scrollTop = (newHandlePos / handleMaxPos) * scrollableHeight;
+        setScrollPosition(newHandlePos);
+    },[isDragging, handleDragOffset]);    
+
+    const handleMenuScroll = useCallback(() => {
+        const { scrollHeight, clientHeight, scrollTop } = menuGridRef.current;
+        const scrollableHeight = scrollHeight - clientHeight;
+        const handleMaxPos = scrollerRef.current.clientHeight - document.querySelector('.scroller-handle').clientHeight;
+        setScrollPosition((scrollTop / scrollableHeight) * handleMaxPos);
     }, []);
 
-    useEffect(() => {
-        if (isDragging) {
-        window.addEventListener('mousemove', handleMouseMove);
-        window.addEventListener('mouseup', () => setIsDragging(false));
-        } else {
-        window.removeEventListener('mousemove', handleMouseMove);
-        }
+    const handleCategoryScroll = useCallback(() => {
+        const THRESHOLD = 8.8;
+        let currentCategory = activeCategory;
 
-        return () => {
-        // Clean up listeners only if elements still exist
-        if (isDragging) {
-            window.removeEventListener('mousemove', handleMouseMove);
-            window.removeEventListener('mouseup', () => setIsDragging(false));
-        }
-        };
-    });
+        categoryRefs.current.forEach((categoryRef, index) => {
+            if (categoryRef) {
+                const { top, bottom } = categoryRef.getBoundingClientRect();
+                const categoryHeight = categoryRef.clientHeight;
 
-    useEffect(() => {
-        const handleScroll = () => {
-    
-            const THRESHOLD = 8.8;
-    
-            let currentCategory = activeCategory; // Initialize current category
-            for (let i = 0; i < categoryRefs.current.length; i++) {
-                const categoryRef = categoryRefs.current[i];
-                if (categoryRef) {
-                    const { top, bottom } = categoryRef.getBoundingClientRect();
-                    const categoryHeight = categoryRef.clientHeight;
-                    
-                    console.log("category height: ", categoryHeight)
-                    // Check if the bottom of the category is above the threshold
-                    if (bottom < window.innerHeight - (categoryHeight * THRESHOLD)) {
-                        // Update to the current category only if it's completely scrolled out of view
-                        currentCategory = categoryData[i].name; // Update to the current category
-                    } else if (top >= window.innerHeight) {
-                        // If the top of the category is below the viewport, exit loop
-                        break;
-                    }
+                if (bottom < window.innerHeight - categoryHeight * THRESHOLD) {
+                    currentCategory = categoryData[index].name;
+                } else if (top >= window.innerHeight) {
+                    return;
                 }
             }
-            
-            // Update the active category state only if it has changed
-            if (currentCategory !== activeCategory) {
-                setActiveCategory(currentCategory);
-            }        
-        };
-    
-        const menuGrid = menuGridRef.current;
-        if (menuGrid) {
-            menuGrid.addEventListener('scroll', handleScroll);
+        });
+
+        if (currentCategory !== activeCategory) {
+            setActiveCategory(currentCategory);
         }
-    
+    }, [activeCategory, categoryData]);
+
+
+    // Effect to handle scrolling
+    useEffect(() => {
+        const menuGrid = menuGridRef.current;
+
+        if (menuGrid) {
+            menuGrid.addEventListener('scroll', handleMenuScroll);
+            menuGrid.addEventListener('scroll', handleCategoryScroll);
+        }
+
         return () => {
             if (menuGrid) {
-                menuGrid.removeEventListener('scroll', handleScroll);
+            menuGrid.removeEventListener('scroll', handleMenuScroll);
+            menuGrid.removeEventListener('scroll', handleCategoryScroll);
             }
         };
-    });
+    }, [handleMenuScroll, handleCategoryScroll]);
 
-    const capitalizeFirstLetter = (str) => {
-        return str
-            .split(' ')
-            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(' ');
-    };
+    // Effect to handle dragging
+    useEffect(() => {
+        const handleMouseUp = () => setIsDragging(false);
 
-  return (
-    <div className="menu-container unselectable">
-        <div className="main-heading">
-            <span className="heading">{capitalizeFirstLetter(activeCategory)}</span>
-            <div className="separator"></div>
-        </div>
-        
-        <div className="categories">
-            {categoryData.map((category, index) => (
-            <div  key={category.name}
+        if (isDragging) {
+            window.addEventListener('mousemove', handleMouseMove);
+            window.addEventListener('mouseup', handleMouseUp);
+        } else {
+            window.removeEventListener('mousemove', handleMouseMove);
+            window.removeEventListener('mouseup', handleMouseUp);
+        }
+
+        return () => {
+            window.removeEventListener('mousemove', handleMouseMove);
+            window.removeEventListener('mouseup', handleMouseUp);
+        };
+    }, [isDragging, handleMouseMove]);
+
+    // Helper Functions
+    const capitalizeFirstLetter = (str) =>
+    str
+        .split(' ')
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+
+    return (
+        <div className="menu-container unselectable">
+            {/* Top Header */}
+            <div className="top-header">
+                <span className="header">{capitalizeFirstLetter(activeCategory)}</span>
+                <div className="header-separator"></div>
+            </div>
+
+            {/* Categories */}
+            <div className="categories">
+                {categoryData.map((category, index) => (
+                <div
+                    key={category.name}
                     className="category-item"
                     style={{ background: category.color }}
                     onClick={() => {
-                        const categoryRef = categoryRefs.current[index];
-                        if (categoryRef) {
-                            categoryRef.scrollIntoView({ behavior: 'auto', block: 'start' }); // Scroll to the category
-                            if (index !== 0) {
-                                menuGridRef.current.scrollTop += 60; // Adjust scroll position by 20 pixels
-                            }
-                        }
-                    }}               
+                    const categoryRef = categoryRefs.current[index];
+                    if (categoryRef) {
+                        categoryRef.scrollIntoView({ behavior: 'auto', block: 'start' });
+                        menuGridRef.current.scrollTop += index !== 0 ? 60 : 0;
+                    }
+                    }}
                 >
-                {category.name}
+                    {category.name}
+                </div>
+                ))}
             </div>
-            ))}
-        </div>
 
-        <div className="menu-grid" ref={menuGridRef}>
-            {categoryData.map((category, categoryIndex) => (
+            {/* Menu Grid */}
+            <div className="menu-grid" ref={menuGridRef}>
+                {categoryData.map((category, categoryIndex) => (
                 <React.Fragment key={categoryIndex}>
-                    {/* SCROLLING HEADER */}
-                    <div ref={el => (categoryRefs.current[categoryIndex] = el)}
-                        data-category={category.name}
-                        style={{ gridColumn: 'span 5' }}
-                    >
-                        {/* Show heading only if it's not the first category */}
-                        {categoryIndex !== 0 && (
-                            <>
-                                <span className="scrolling heading">{capitalizeFirstLetter(category.name)}</span>
-                                <div className="scrolling separator"></div>
-                            </>
-                        )}
+                    {/* Scrolling Header */}
+                    <div ref={(el) => (categoryRefs.current[categoryIndex] = el)} data-category={category.name} style={{ gridColumn: 'span 5' }}>
+                    {categoryIndex !== 0 && (
+                        <>
+                        <span className="scrolling header">{capitalizeFirstLetter(category.name)}</span>
+                        <div className="scrolling header-separator"></div>
+                        </>
+                    )}
                     </div>
 
+                    {/* Menu Items */}
                     {categorizedItems[category.name].map((item, index) => (
-                        <div 
-                            key={index} 
-                            className="menu-item" 
-                            onClick={(event) => onSelect(item, event)}
-                        >
-                            <div className="item-number">{index + 1}</div>
-                            <div className="nameAndPrice">
-                                <div className="item-name">{item.name}</div>
-                                <div className="item-price">{item.price}</div>
-                            </div>
+                    <div key={index} className="menu-item" onClick={(event) => onSelect(item, event)}>
+                        <div className="item-number">{index + 1}</div>
+                        <div className="nameAndPrice">
+                        <div className="item-name">{item.name}</div>
+                        <div className="item-price">{item.price}</div>
                         </div>
-                        
+                    </div>
                     ))}
                 </React.Fragment>
-            ))}
-        </div>
+                ))}
+            </div>
 
-
-        <div className="scroller" ref={scrollerRef}>
-            <div className="scroller-handle" style={{ top: `${scrollPosition}px` }} onMouseDown={() => setIsDragging(true)}></div>
+            {/* Menu Scroller */}
+            <div className="scroller" ref={scrollerRef}>
+                <span className="scroller-handle" style={{ top: `${scrollPosition}px` }} onMouseDown={handleMouseDown} />
+            </div>
         </div>
-    </div>
-  );
+    );
 };
 
 export default Menu;
