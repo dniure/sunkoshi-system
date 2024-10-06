@@ -41,8 +41,22 @@ const OrderScreen = () => {
     const [orderedItems, setOrderedItems] = useState([]);
     const [orderedItemSelected, setOrderedItemSelected] = useState(null);
     const orderedItemsRef = useRef(null);
+    const amendItemButtonRef = useRef(null);
+    const amendItemBoxRef = useRef(null);
     const qtyToggle = useRef(null);
 
+    const [isAmendingItem, setIsAmendingItem] = useState(false);
+
+    const [selectedOptions, setSelectedOptions] = useState([]);
+
+    const handleSelectOption = (option) => {
+        if (selectedOptions.includes(option)) {
+            setSelectedOptions(selectedOptions.filter(selectedOption => selectedOption !== option));
+        } else {
+            setSelectedOptions([...selectedOptions, option]);
+        }
+    };    
+    
     // Section: Menu Grid
     const menuGridRef = useRef(null);
 
@@ -63,9 +77,12 @@ const OrderScreen = () => {
             setIsModifyingTime(false);
         }
 
-        // Deselect row if clicked outside ordered-items-section but not on menu grid
+        // Deselect row if clicked outside ordered-items-section but not on menu grid, amend item button, or amending item box
         if (clickedOutside(orderedItemsRef)) {
-            if (menuGridRef.current && menuGridRef.current.contains(event.target)) {
+            if ((menuGridRef.current && menuGridRef.current.contains(event.target)) ||
+                (amendItemButtonRef.current && amendItemButtonRef.current.contains(event.target)) ||
+                (amendItemBoxRef.current && amendItemBoxRef.current.contains(event.target))
+                ) {
                 return; // Clicked on a menu item in menu grid, do nothing
             } else {
                 setOrderedItemSelected(null); // Deselect any selected row
@@ -114,6 +131,36 @@ const OrderScreen = () => {
 
                     <div className="right-section">      
 
+                        {isAmendingItem && <div className="right-section-overlay" />}
+
+                        {isAmendingItem && orderedItemSelected !== null && (
+                            <div className="amend-item-box" ref={amendItemBoxRef}>
+                                
+                                {/* Amendments List */}
+                                <div className="amendment-options">
+                                    {['madras hot', 'med hot', 'mild', '0 spicy', 'gluten allergy', 'extra cheese', 'extra gravy', 'nut allergy'].map((option, index) => (
+                                        <div
+                                            key={index}
+                                            className={`amendment-option ${selectedOptions.includes(option) ? 'selected' : ''}`}
+                                            onClick={() => handleSelectOption(option)}
+                                        >
+                                            {option}
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* Separator */}
+                                <div className="separator"></div>
+
+                                {/* Action Buttons */}
+                                <div className="amend-actions">
+                                    <button className="cancel-button">Cancel</button>
+                                    <button className="save-button">Save</button>
+                                </div>
+
+                            </div>
+                        )}
+
                         {/* ORDERED ITEMS */}
                         <OrderedItemsSection
                             orderedItemsInput={orderedItems}
@@ -149,8 +196,16 @@ const OrderScreen = () => {
 
                 {/* BOTTOM SECTION */}
                 <div>
-                    <button className="bottom-btn orderScreen cancel" onClick={() => navigate('/')}>cancel</button>
-                    <button className="bottom-btn orderScreen save" onClick={() => navigate('/')}>save</button>
+                    <button className="bottom-btn orderScreen-amendItem"
+                            onClick={() => setIsAmendingItem(!isAmendingItem)}
+                            ref={amendItemButtonRef}
+                    >
+                        amend item
+                    </button>
+
+                    {/* Save and Cancel */}
+                    <button className="bottom-btn orderScreen-cancel" onClick={() => navigate('/')}>cancel</button>
+                    <button className="bottom-btn orderScreen-save" onClick={() => navigate('/')}>save</button>
                 </div>
 
             </div>

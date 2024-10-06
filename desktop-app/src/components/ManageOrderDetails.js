@@ -18,8 +18,11 @@ const ManageOrderDetails = ({ formDataInput, orderTypeInput, updateOrderDetails,
     const getPlaceholder = (field) => {
         const requiredIndicator = ' **';
         
-        if (orderType === 'collection' && (field === 'name' || field === 'phone') ||
-            orderType === 'delivery' && (field === 'name' || field === 'phone' || field === 'postcode' || field === 'address')) 
+        if (
+            (orderType === 'collection' && (field === 'name' || field === 'phone'))
+            ||
+            (orderType === 'delivery' && (field === 'name' || field === 'phone' || field === 'postcode' || field === 'address'))
+        )
             return `${field.charAt(0).toUpperCase() + field.slice(1)}${requiredIndicator}`;
         
         return `${field.charAt(0).toUpperCase() + field.slice(1)}`;
@@ -136,9 +139,9 @@ const ManageOrderDetails = ({ formDataInput, orderTypeInput, updateOrderDetails,
 
                 {/* Save and Cancel Buttons */}
                 <div>
-                    <button className="bottom-btn orderDetails cancel" onClick={onClose}>Cancel</button>
-                    <button className="bottom-btn orderDetails save" onClick={handleSave}>Save</button>
-                </div>
+                    <button className="bottom-btn orderDetails-cancel" onClick={onClose}>Cancel</button>
+                    <button className="bottom-btn orderDetails-save" onClick={handleSave}>Save</button>
+                </div>                
 
             </div>
         </div>

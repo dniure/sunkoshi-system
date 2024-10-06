@@ -164,3 +164,29 @@
     border-color: red;
     box-shadow: 0 0 5px rgba(255, 0, 0, 0.5); /* Optional: red shadow */
 }
+
+/* BUTTONS */
+.bottom-btn {
+    font-family: 'Anybody', sans-serif;
+    font-size: 19px;
+    font-weight: lighter;
+    color: #ffffff;
+    width: 120px; /* Set width of button */
+    height: 40px; /* Set height of button */
+    border-radius: 20px; /* Round corners */
+    position: absolute; /* Use absolute positioning */
+    cursor: pointer;
+}
+.orderDetails-cancel {
+    bottom: 20px; /* Place where you want it vertically */
+    left: 50px; /* Align with the text */
+    background: #CB0000; /* Background color */
+    border: 3px solid #9c0505; /* Border styles */
+}
+
+.orderDetails-save {
+    bottom: 20px; /* Place where you want it vertically */
+    right: 50px; /* Align with the text */
+    background: #61A61B; /* Background color */
+    border: 2px solid #148700; /* Specific border */
+}
