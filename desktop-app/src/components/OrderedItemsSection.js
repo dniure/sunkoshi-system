@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import '../css/main.css';
 import '../css/orderedItemsSection.css';
+import OrderedItemAmendment from './OrderedItemAmendment';
 
-import plusIcon from '../images/plus-icon.png';
 
 const OrderedItemsSection = ({
     orderedItemsInput = [],  // List of ordered items passed as input, defaults to an empty array
@@ -24,10 +24,7 @@ const OrderedItemsSection = ({
     const [selectedOrderedItem, setSelectedOrderedItem] = useState(orderedItemSelectedInput || null);  // Selected ordered item
     const [priceSum, setPriceSum] = useState(0);  // Total price sum of the ordered items
     const [finalCost, setFinalCost] = useState(0);  // Final calculated cost
-    const [amendments, setAmendments] = useState([
-        'madras hot', 'med hot', 'mild', '0 spicy', 'gluten allergy', 'extra cheese',
-        'extra gravy', 'nut allergy', 'other1', 'other2', 'other3', 'other4'
-    ]);
+
 
     // Main Scroller
     const [scrollPosition, setScrollPosition] = useState(0);  // Scroll position of the list
@@ -36,21 +33,11 @@ const OrderedItemsSection = ({
     const [handleHeight, setHandleHeight] = useState(50);  // Height of the scrollbar handle
     const [dragOffset, setDragOffset] = useState(0);  // Offset for dragging the scrollbar handle
 
-    // Amend Scroller
-    const [amendScrollPosition, setAmendScrollPosition] = useState(0); // Add new state for amend scroll position
-    const [isAmendDragging, setIsAmendDragging] = useState(false); // Track dragging for amend scroller
-    const [isAmendItemScrollerVisible, setIsAmendItemScrollerVisible] = useState(true);
-    const [amendHandleHeight, setAmendHandleHeight] = useState(50); // Handle height for amend scroller
-    const [amendDragOffset, setAmendDragOffset] = useState(0); // Drag offset for amend scroller
-
-
     //////////////////////////////////////////////////    
     // Refs
-
     const contentRef = useRef(null);  // Ref for the ordered-items-content container
     const rowRefs = useRef([])
     const orderedItemsScroller = useRef(null);  // Ref for the scroller handle
-    const amendItemsScrollerRef = useRef(null);
     const previousOrderedItems = useRef(orderedItemsInput);  // Keeps track of previous ordered items for scrolling behavior
 
     //////////////////////////////////////////////////    
@@ -80,7 +67,7 @@ const OrderedItemsSection = ({
         previousOrderedItems.current = orderedItems;
     }, [orderedItems]);
 
-    //////////////////////////////////////////////////    
+    //////////////////////////////////////////////////
     // Click Handling
 
     // Handles row selection when an item is clicked
@@ -127,25 +114,6 @@ const OrderedItemsSection = ({
         setScrollPosition(handlePosition);
     }, [isDragging, dragOffset]);
 
-    // New logic for amend scroller
-    const handleAmendMouseMove = useCallback((e) => {
-        if (!isAmendDragging || !amendItemsScrollerRef.current) return;
-
-        const amendHandle = document.querySelector('.amendItems-customScroller-handle');
-        const amendScrollerHeight = amendItemsScrollerRef.current.clientHeight;
-        const amendScrollableHeight = document.querySelector('.amendment-content').scrollHeight - document.querySelector('.amendment-content').clientHeight;
-
-        const handlePosition = Math.max(0, Math.min(e.clientY - amendItemsScrollerRef.current.getBoundingClientRect().top - amendDragOffset, amendScrollerHeight - amendHandle.clientHeight));
-        document.querySelector('.amendment-content').scrollTop = (handlePosition / (amendScrollerHeight - amendHandle.clientHeight)) * amendScrollableHeight;
-
-        setAmendScrollPosition(handlePosition);
-    }, [isAmendDragging, amendDragOffset]);
-        
-    const handleMouseUp = () => {
-        setIsDragging(false);
-        setIsAmendDragging(false); // Stop dragging for amend scroller
-    };
-
     // Update scrollbar handle visibility and height when ordered items change
     useEffect(() => {
         if (contentRef.current) {
@@ -164,7 +132,7 @@ const OrderedItemsSection = ({
         }
     }, [orderedItems]);
 
-    // ***************************************************888    
+    // ***************************************************  
     // Update ordered items scroller on mouse scroll
     const handleOrderedItemsScroll = useCallback(() => {
         if (contentRef.current && orderedItemsScroller.current) {
@@ -182,59 +150,24 @@ const OrderedItemsSection = ({
         return () => orderedItemsContent?.removeEventListener('scroll', handleOrderedItemsScroll);
     }, [handleOrderedItemsScroll]);
 
-    // ***************************************************888
-    // Amendment Scroll Logic
-    const handleAmendScroll = useCallback(() => {
-        console.log("AMENDING IS SCROLLING");
-        const amendmentContent = amendItemBoxRef.current?.querySelector('.amendment-content');
-        
-        if (amendmentContent && amendItemsScrollerRef.current) {
-            const scrollableHeight = amendmentContent.scrollHeight - amendmentContent.clientHeight;
-            const scrollerHeight = amendItemsScrollerRef.current.clientHeight;
-            const handleMaxPos = scrollerHeight - document.querySelector('.amendItems-customScroller-handle').clientHeight;
-            
-            // Set the scroll position of the handle relative to the scrollable content
-            setAmendScrollPosition((amendmentContent.scrollTop / scrollableHeight) * handleMaxPos);
-        }
-    }, []); 
-
-    useEffect(() => {
-        const amendmentContent = amendItemBoxRef.current?.querySelector('.amendment-content');
-        
-        // Add scroll event listener if amendmentContent exists
-        if (amendmentContent) {
-            amendmentContent.addEventListener('scroll', handleAmendScroll);
-        }
-        
-        // Cleanup function to remove scroll event listener
-        return () => {
-            if (amendmentContent) {
-                amendmentContent.removeEventListener('scroll', handleAmendScroll);
-            }
-        };
-    }, [handleAmendScroll, amendItemBoxRef.current]);  // Adding the ref as a dependency
-    
-
     // Add mousemove and mouseup event listeners when dragging starts
     useEffect(() => {
         const handleMouseMoveWrapper = (e) => {
             if (isDragging) {
                 handleMouseMove(e);
-            } else if (isAmendDragging) {
-                handleAmendMouseMove(e);
             }
         };
 
-        if (isDragging || isAmendDragging) {
+        if (isDragging) {
             window.addEventListener('mousemove', handleMouseMoveWrapper);
-            window.addEventListener('mouseup', handleMouseUp);
+            window.addEventListener('mouseup', setIsDragging(false));
         }
 
         return () => {
             window.removeEventListener('mousemove', handleMouseMoveWrapper);
-            window.removeEventListener('mouseup', handleMouseUp);
+            window.removeEventListener('mouseup', setIsDragging(false));
         };
-    }, [isDragging, isAmendDragging, handleMouseMove, handleAmendMouseMove]);
+    }, [isDragging, handleMouseMove]);
     
     
     // Handles mouse down on the scroller handle for dragging
@@ -243,49 +176,15 @@ const OrderedItemsSection = ({
         const offset = e.clientY - handleElement.getBoundingClientRect().top;
         setDragOffset(offset);
         setIsDragging(true);
-    };
-
-    // Handles mouse down on the amend scroller handle for dragging
-    const handleAmendMouseDown = (e) => {
-        const handleElement = document.querySelector('.amendItems-customScroller-handle');
-        const offset = e.clientY - handleElement.getBoundingClientRect().top;
-        setAmendDragOffset(offset);
-        setIsAmendDragging(true);
-    };
-
-    // Update amend scroller handle height based on amendments
-    useEffect(() => {
-        if (amendItemsScrollerRef.current) {
-            const totalAmendHeight = document.querySelector('.amendment-content').scrollHeight;
-            const containerHeight = document.querySelector('.amendment-content').offsetHeight;
-
-            setIsAmendItemScrollerVisible(totalAmendHeight >= containerHeight);
-            document.querySelector('.amendment-content').style.overflowY = totalAmendHeight >= containerHeight ? 'auto' : 'hidden';
-
-            const calculatedAmendHandleHeight = Math.max(20, (containerHeight - 30) * (containerHeight / totalAmendHeight));
-            setAmendHandleHeight(Math.min(calculatedAmendHandleHeight, containerHeight));
-        }
-    }, [isAmendingItem]); // Recalculate when the amend item state changes    
-    // New addition
-    
-    const [selectedOptions, setSelectedOptions] = useState([]);
-
-    const handleSelectOption = (option) => {
-        // Logic to handle selecting an option
-        if (selectedOptions.includes(option)) {
-            setSelectedOptions(selectedOptions.filter(selectedOption => selectedOption !== option));
-        } else {
-            setSelectedOptions([...selectedOptions, option]);
-        }
-    };       
+    };   
 
     // Function to get the position of the selected row
-    const getSelectedRowPosition = (index) => {
+    const getSelectedRowPosition = () => {
         const normalRowHeight = rowRefs.current[0] ? rowRefs.current[0].offsetHeight : 0;
-        const selectedRowHeight = rowRefs.current[index] ? rowRefs.current[index].offsetHeight : 0;
+        const selectedRowHeight = rowRefs.current[selectedOrderedItem] ? rowRefs.current[selectedOrderedItem].offsetHeight : 0;
         const rowPosition =
             54 + // Container top padding
-            normalRowHeight * (index-1) + // Unselected rows' height
+            normalRowHeight * (selectedOrderedItem-1) + // Unselected rows' height
             selectedRowHeight ; // Selected rows' height
 
         return rowPosition;
@@ -333,46 +232,13 @@ const OrderedItemsSection = ({
             </div>
 
             {/* Amend Item Popup */}
-            {isAmendingItem && selectedOrderedItem !== null && (
-                <div ref={amendItemBoxRef}>
-                    {/* Dynamically positioned Amend Item Popup */}
-                    <div className="amend-item-popup" style={{ top: `${getSelectedRowPosition(selectedOrderedItem)}px` }}
-                    >
-                        {/* Amendments List */}
-                        <div className="amendment-content">
-                            {['madras hot', 'med hot', 'mild', '0 spicy', 'gluten allergy','extra cheese',
-                              'extra gravy', 'nut allergy', 'other1', 'other2', 'other3', 'other4'].map((option, index) =>
-                                (<div key={index}
-                                     className={`amendment-option ${selectedOptions.includes(option) ? 'selected' : ''}`}
-                                     onClick={() => handleSelectOption(option)}>
-                                    
-                                    {option}
-                                </div>)
-                            )}
-                        </div>
-
-                        {isAmendItemScrollerVisible && (
-                            <div className="amendItems-customScroller" ref={amendItemsScrollerRef}>
-                                <div
-                                    className="amendItems-customScroller-handle"
-                                    style={{ top: `${amendScrollPosition}px`, height: `${amendHandleHeight}px` }}
-                                    onMouseDown={handleAmendMouseDown}
-                                ></div>
-                            </div>
-                        )}
-
-                        <button className="plusIconBtn">
-                            <img src={plusIcon} alt="Plus Icon" />
-                        </button>
-
-                        {/* Action Buttons in Footer */}
-                        <div className="amend-item-footer">
-                            <span className="amend-item-separator" />
-                            <button className="cancel-button" onClick={() => setIsAmendingItem(false)}>cancel</button>
-                            <button className="save-button" onClick={() => setIsAmendingItem(false)}>save</button>
-                        </div>
-                    </div>
-                </div>
+            {isAmendingItem && (
+                <OrderedItemAmendment
+                amendItemBoxRef={amendItemBoxRef}
+                getSelectedRowPosition={getSelectedRowPosition}
+                isAmendingItem={isAmendingItem}
+                setIsAmendingItem={setIsAmendingItem}
+                />
             )}
     
             {/* Footer for Quantity Control and Total Price */}

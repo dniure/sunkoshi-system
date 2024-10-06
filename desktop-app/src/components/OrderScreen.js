@@ -44,7 +44,7 @@ const OrderScreen = () => {
     const amendItemButtonRef = useRef(null);
     const amendItemBoxRef = useRef(null);
     const qtyToggle = useRef(null);
-
+    const rightSectionOverlayRef = useRef(null);
     const [isAmendingItem, setIsAmendingItem] = useState(false);
     
     // Section: Menu Grid
@@ -61,6 +61,7 @@ const OrderScreen = () => {
 
     const handleClick = (event) => {
         const clickedOutside = (ref) => ref.current && !ref.current.contains(event.target);
+        console.log("rightSectionOverlayRef: ", rightSectionOverlayRef);
 
         // Close modify time popup if clicked outside the modify popup or button
         if (clickedOutside(modifyTimePopupRef) && clickedOutside(modifyTimeButtonRef)) {
@@ -75,13 +76,13 @@ const OrderScreen = () => {
                 return; // Do nothing
             } else {
                 setOrderedItemSelected(null); // Deselect any selected row
+                setIsAmendingItem(false);
             }
         }
 
         // Handle clicks inside ordered-items-section
         else if ((qtyToggle.current && qtyToggle.current.contains(event.target)) ||
-                (amendItemBoxRef.current && amendItemBoxRef.current.contains(event.target))
-            ) {
+            (amendItemBoxRef.current && amendItemBoxRef.current.contains(event.target))) {
             return; // Clicked on quantity toggle button, do nothing
         } else {
             // Get all ordered item rows
@@ -121,21 +122,25 @@ const OrderScreen = () => {
                     </div>
 
                     <div className="right-section">      
-                        {isAmendingItem && orderedItemSelected !== null && (
-                            <div className="right-section-overlay" />
+                        {isAmendingItem && (
+                            <div className="right-section-overlay" ref={rightSectionOverlayRef} />
                         )}
 
                         {/* ORDERED ITEMS */}
                         <OrderedItemsSection
-                            orderedItemsInput={orderedItems}
-                            orderedItemSelectedInput={orderedItemSelected}
-                            qtyToggle={qtyToggle}
                             orderedItemsSectionRef={orderedItemsSectionRef}
-                            setOrderedItemsInput={setOrderedItems}
+
+                            orderedItemsInput={orderedItems}
+                            setOrderedItemsInput={setOrderedItems} 
+
+                            orderedItemSelectedInput={orderedItemSelected}
                             setOrderedItemSelectedInput={setOrderedItemSelected}
+
+                            qtyToggle={qtyToggle}
+
+                            amendItemBoxRef={amendItemBoxRef}
                             isAmendingItem={isAmendingItem}
                             setIsAmendingItem={setIsAmendingItem}
-                            amendItemBoxRef={amendItemBoxRef}
                         />
 
                         {/* ORDER INFO */}
