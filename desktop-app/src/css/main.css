@@ -22,7 +22,8 @@ body, html, #root {
 
 .content-container {
     position: relative; /* Positioned above the background */
-    z-index: 2; /* Foreground layer, above gradient-bg */
     height: auto; /* Adjust height as needed */
     width: 100%; /* Full width */
+
+    z-index: 1; /* Foreground layer, above gradient-bg */
 }

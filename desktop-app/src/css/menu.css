@@ -5,6 +5,8 @@
     height: 100%;
     position: absolute;
     overflow: hidden; /* Prevent content from overflowing outside */
+
+    z-index: 4;
 }
 
 .categories {

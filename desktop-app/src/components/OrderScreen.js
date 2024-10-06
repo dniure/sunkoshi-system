@@ -40,22 +40,12 @@ const OrderScreen = () => {
     // Section: Ordered Items
     const [orderedItems, setOrderedItems] = useState([]);
     const [orderedItemSelected, setOrderedItemSelected] = useState(null);
-    const orderedItemsRef = useRef(null);
+    const orderedItemsSectionRef = useRef(null);
     const amendItemButtonRef = useRef(null);
     const amendItemBoxRef = useRef(null);
     const qtyToggle = useRef(null);
 
     const [isAmendingItem, setIsAmendingItem] = useState(false);
-
-    const [selectedOptions, setSelectedOptions] = useState([]);
-
-    const handleSelectOption = (option) => {
-        if (selectedOptions.includes(option)) {
-            setSelectedOptions(selectedOptions.filter(selectedOption => selectedOption !== option));
-        } else {
-            setSelectedOptions([...selectedOptions, option]);
-        }
-    };    
     
     // Section: Menu Grid
     const menuGridRef = useRef(null);
@@ -78,23 +68,24 @@ const OrderScreen = () => {
         }
 
         // Deselect row if clicked outside ordered-items-section but not on menu grid, amend item button, or amending item box
-        if (clickedOutside(orderedItemsRef)) {
+        if (clickedOutside(orderedItemsSectionRef)) {
             if ((menuGridRef.current && menuGridRef.current.contains(event.target)) ||
-                (amendItemButtonRef.current && amendItemButtonRef.current.contains(event.target)) ||
-                (amendItemBoxRef.current && amendItemBoxRef.current.contains(event.target))
+                (amendItemButtonRef.current && amendItemButtonRef.current.contains(event.target))
                 ) {
-                return; // Clicked on a menu item in menu grid, do nothing
+                return; // Do nothing
             } else {
                 setOrderedItemSelected(null); // Deselect any selected row
             }
         }
 
         // Handle clicks inside ordered-items-section
-        else if (qtyToggle.current && qtyToggle.current.contains(event.target)) {
+        else if ((qtyToggle.current && qtyToggle.current.contains(event.target)) ||
+                (amendItemBoxRef.current && amendItemBoxRef.current.contains(event.target))
+            ) {
             return; // Clicked on quantity toggle button, do nothing
         } else {
             // Get all ordered item rows
-            const rowElements = orderedItemsRef.current?.getElementsByClassName('ordered-item-row') || [];
+            const rowElements = orderedItemsSectionRef.current?.getElementsByClassName('ordered-item-row') || [];
 
             // Check if any row was clicked
             for (let row of rowElements) {
@@ -115,7 +106,7 @@ const OrderScreen = () => {
         // Select the new item
         setOrderedItemSelected(orderedItems.length);
     };    
-    
+        
     // ////////////////////////////////////////////////
     // MAIN HTML
     return (
@@ -130,35 +121,8 @@ const OrderScreen = () => {
                     </div>
 
                     <div className="right-section">      
-
-                        {isAmendingItem && <div className="right-section-overlay" />}
-
                         {isAmendingItem && orderedItemSelected !== null && (
-                            <div className="amend-item-box" ref={amendItemBoxRef}>
-                                
-                                {/* Amendments List */}
-                                <div className="amendment-options">
-                                    {['madras hot', 'med hot', 'mild', '0 spicy', 'gluten allergy', 'extra cheese', 'extra gravy', 'nut allergy'].map((option, index) => (
-                                        <div
-                                            key={index}
-                                            className={`amendment-option ${selectedOptions.includes(option) ? 'selected' : ''}`}
-                                            onClick={() => handleSelectOption(option)}
-                                        >
-                                            {option}
-                                        </div>
-                                    ))}
-                                </div>
-
-                                {/* Separator */}
-                                <div className="separator"></div>
-
-                                {/* Action Buttons */}
-                                <div className="amend-actions">
-                                    <button className="cancel-button">Cancel</button>
-                                    <button className="save-button">Save</button>
-                                </div>
-
-                            </div>
+                            <div className="right-section-overlay" />
                         )}
 
                         {/* ORDERED ITEMS */}
@@ -166,9 +130,12 @@ const OrderScreen = () => {
                             orderedItemsInput={orderedItems}
                             orderedItemSelectedInput={orderedItemSelected}
                             qtyToggle={qtyToggle}
-                            orderedItemsRef={orderedItemsRef}
+                            orderedItemsSectionRef={orderedItemsSectionRef}
                             setOrderedItemsInput={setOrderedItems}
                             setOrderedItemSelectedInput={setOrderedItemSelected}
+                            isAmendingItem={isAmendingItem}
+                            setIsAmendingItem={setIsAmendingItem}
+                            amendItemBoxRef={amendItemBoxRef}
                         />
 
                         {/* ORDER INFO */}
@@ -196,9 +163,11 @@ const OrderScreen = () => {
 
                 {/* BOTTOM SECTION */}
                 <div>
-                    <button className="bottom-btn orderScreen-amendItem"
-                            onClick={() => setIsAmendingItem(!isAmendingItem)}
-                            ref={amendItemButtonRef}
+                    <button
+                        className="bottom-btn orderScreen-amendItem-btn"
+                        onClick={() => orderedItemSelected !== null && setIsAmendingItem(!isAmendingItem)} // Only trigger if an item is selected
+                        ref={amendItemButtonRef}
+                        disabled={orderedItemSelected === null} // Disable the button if no item is selected
                     >
                         amend item
                     </button>

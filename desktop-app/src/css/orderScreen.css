@@ -7,7 +7,9 @@
     height: 600px;
     width: 950px;
 
-    background-color: rgba(234, 238, 5, 0); /* Background color with some transparency */    
+    background-color: rgba(234, 238, 5, 0); /* Background color with some transparency */
+    
+    z-index: 2;
 }
 
 .left-section {
@@ -18,6 +20,7 @@
 
     width: 680px; /* Set your desired width */
     height: 590px; /* Set your desired height */
+    z-index: 3;
 }
 
 .right-section {
@@ -38,6 +41,8 @@
     gap: 7px; /* Space between the sections */
     
     padding: 7px 5px 7px 5px; /* Top, Right, Bottom, Left */
+
+    z-index: 3;
 }
 
 /* BUTTONS */
@@ -66,7 +71,7 @@
     border: 2px solid #148700; /* Specific border */
 }
 
-.orderScreen-amendItem {
+.orderScreen-amendItem-btn {
     top: 640px; /* Place where you want it vertically */
     left: 300px; /* Align with the text */
     background: #3B75B3; /* Background color */
@@ -75,6 +80,10 @@
     width: 160px;
 }
 
+.bottom-btn:disabled {
+    opacity: 0.5; /* Make the button appear faded when disabled */
+    cursor: default;
+}
 
 /* Overlay to disable interaction with background */
 .right-section-overlay {
@@ -84,86 +93,8 @@
     width: 100%;
     height: 100%;
     border-radius: 20px; /* Round corners */
-    background-color: rgba(0, 0, 0, 0.2); /* Semi-transparent overlay */
-    z-index: 2; /* Ensure it appears above ordered items */
-    pointer-events: none; /* Make it non-interactive */
-}
+    background-color: rgba(0, 0, 0, 0.3); /* Semi-transparent overlay */
+    pointer-events: auto; /* Make it non-interactive */
 
-/* Amend Item Box */
-.amend-item-box {
-    position: absolute;
-    background-color: #F7F7F7;
-    border-radius: 10px;
-    width: 85%;
-    left: 20px;
-    top: 30px;
-    z-index: 3; /* Ensure it appears above the overlay */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add subtle shadow */
-    padding-top: 5px;
-}
-
-/* Amendment Options */
-.amendment-options {
-    display: flex;
-    flex-direction: column;
-    padding: 0px 0px 10px 10px;
-}
-
-.amendment-option {
-    cursor: pointer;
-    border-radius: 5px;
-    margin: 2px 1px 2px 1px;
-    padding: 1.5px 1px 1.5px 03px;
-}
-
-.amendment-option.selected {
-    background-color: #D9D9D9; /* Highlight selected options */
-    width: 70%
-}
-
-.separator {
-    height: 1px;
-    background-color: lightgrey;
-    margin: 20px 0;
-}
-
-.amend-actions {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.cancel-button {
-    background: none;
-    color: #AD0202;
-    border: none;
-    text-decoration: underline;
-    cursor: pointer;
-    font-size: 16px;
-    margin: 0px 0px 10px 10px;
-}
-
-.cancel-button:hover {
-    color: #f10000;
-}
-
-.save-button {
-    background-color: green;
-    color: white;
-    border: none;
-    font-size: 20px;
-    padding: 5px 5px;
-    width: 60px;
-    height: 25px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 20px;
-    cursor: pointer;
-    font-size: 16px;
-    margin: 0px 10px 10px 0px;
-}
-
-.save-button:hover {
-    background-color: rgb(0, 188, 0);
+    z-index: 3; /* Ensure it appears above ordered items */
 }

@@ -18,7 +18,6 @@
 .ordered-items-content {
     flex-grow: 1; /* This allows it to fill the available space */
     overflow-y: scroll; /* Enable scrolling */
-    padding-left: 2px;
     width: 100%; /* Adjust width to make space for the custom scroller */
     scrollbar-width: thin; /* For Firefox */
     scrollbar-color: transparent transparent; /* For Firefox */
@@ -86,6 +85,7 @@
 
 /* ORDERED ITEMS: MIDDLE */
 .ordered-item-row {
+    position: relative;
     display: flex; /* Use flexbox for the column layout */
     justify-content: space-between; /* Space between item components */
     align-items: center; /* Center align items vertically */
@@ -93,14 +93,22 @@
     font-size: 13px;
     font-weight: 500;
     text-transform: lowercase;
-    padding: 2px 0px 2px 0px;
+    padding: 3px 0px 2px 0px;
     cursor: pointer; /* Add a pointer cursor to indicate it's clickable */
 }
 
 .ordered-item-row.selected {
-    background-color: hsl(226, 24%, 49%, 0.44); /* Translucent background when selected */
+    background-color: rgb(175, 194, 246, 0.76); /* Translucent background when selected */
   }
 
+.ordered-item-row.selected.amending {
+    z-index: 4; /* z-index when amending items */
+    background-color: #fbfcff; /* Translucent background when selected */
+    border: 2px solid rgb(0, 20, 235, 0.5);
+    border-left: none;
+    border-right: none;
+    box-sizing: none;
+}
 .ordered-item.quantity {
     width: 12%; /* First column for quantity */
     text-align: center;
@@ -206,6 +214,133 @@
     width: 100%;
     height: 50px; /* Adjust handle height */
     background-color: #7b7b7b;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+
+
+
+
+
+/* AMEND ITEM */
+
+/* Amend Item Box */
+.amend-item-popup {
+    position: absolute;
+    background-color: #ffffff;
+    border-radius: 10px;
+    width: 90%;
+    height: 230px;
+    left: 13px;
+    z-index: 4; /* Ensure it appears above the overlay */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add subtle shadow */
+
+    display: flex;
+    flex-direction: column;
+    overflow: visible; /* Ensure that content stays within bounds */
+    border-radius: 10px;
+}
+
+/* Amendment Content */
+.amendment-content {
+    flex: 1;
+    padding: 10px; /* Adjust as needed for spacing */
+    overflow-y: auto; /* Allow content to scroll if it overflows */
+    scrollbar-width: none;
+}
+
+/* Amendment Option */
+.amendment-option {
+    cursor: pointer;
+    border-radius: 5px;
+    margin: 2px 1px;
+    padding: 1.5px 1px;
+    font-family: 'Anybody', sans-serif;
+    font-size: 14px;
+}
+
+.amendment-option.selected {
+    background-color: #D9D9D9; /* Highlight selected options */
+    width: 70%;
+}
+
+/* Footer */
+.amend-item-footer {
+    padding: 15px 0px 12px 0px;
+    width: calc(100% - 20px); /* Ensure width matches parent with padding compensation */
+    height: 20px; /* Fixed height */
+    display: flex;    
+}
+
+/* Separator at top of footer */
+.amend-item-separator {
+    height: 1px;
+    background-color: lightgrey;
+    width: 95%;
+    left: 5px;
+    position: absolute;
+    bottom: 40px;
+}
+
+/* Cancel Button */
+.cancel-button {
+    background: none;
+    color: #AD0202;
+    border: none;
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 16px;
+    padding-left: 18px;
+}
+
+/* Save Button */
+.save-button {
+    background-color: green;
+    color: white;
+    border: none;
+    font-size: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 16px;
+    right: 18px;
+    padding: 2px 10px;
+    position: absolute;
+}
+
+
+.plusIconBtn {
+    position: absolute;
+    background: none;
+    border: none;
+    cursor: pointer;
+    top: 7px;
+    right: 2px;
+}
+
+.plusIconBtn img{
+    width: 28px;
+}
+
+/* Amend Item Scroller */
+.amendItems-customScroller {
+    position: absolute; /* Positioned within the content */
+    right: 50px; /* Stay on the right side */
+    height: 65%; /* Take 70% height of the parent */
+    width: 6px;
+    background-color: #ddd;
+    border-radius: 5px;
+    top: 8%;
+}
+
+.amendItems-customScroller-handle {
+    position: absolute;
+    width: 100%;
+    height: 50px; /* Adjust handle height */
+    background-color: #000000;
     border-radius: 5px;
     cursor: pointer;
 }

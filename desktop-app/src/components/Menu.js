@@ -75,7 +75,7 @@ const Menu = ({ onSelect }) => {
     // Effect to handle scrolling
     useEffect(() => {
         const menuGrid = menuGridRef.current;
-
+        
         if (menuGrid) {
             menuGrid.addEventListener('scroll', handleMenuScroll);
             menuGrid.addEventListener('scroll', handleCategoryScroll);
