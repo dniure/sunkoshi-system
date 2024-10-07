@@ -26,8 +26,6 @@ const OrderedItemAmendment = ({
         'other2', 'other3', 'other4'
     ]);
 
-
-
     const handleSelectOption = (amendmentOption) => {
         if (amendmentsInPopup.includes(amendmentOption)) {
             setAmendmentsInPopup(amendmentsInPopup.filter(selectedOption => selectedOption !== amendmentOption));
@@ -38,14 +36,10 @@ const OrderedItemAmendment = ({
 
     const handleSave = () => {
         applyAmendmentToSelectedItem(amendmentsInPopup)
-        setAmendmentsInPopup([]);
-        setIsAmendingItem(false); // Close the amendment modal or component
     };
 
     const handleCancel = () => {
         applyAmendmentToSelectedItem(originalAmendments);
-        setAmendmentsInPopup([]);
-        setIsAmendingItem(false); // Close the amendment modal or component
     };
 
     const handleAmendMouseMove = useCallback((e) => {

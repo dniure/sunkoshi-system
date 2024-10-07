@@ -124,3 +124,11 @@
     border-radius: 5px;
     cursor: pointer;
 }
+
+.ordered-item-amendment {
+    font-family: 'Anybody', sans-serif;
+    font-size: 13px;
+    padding-bottom: 1px;
+    padding-left: 40px; /* Adjust as needed for spacing */
+    color: rgb(208, 0, 0);
+}

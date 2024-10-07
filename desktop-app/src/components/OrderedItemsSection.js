@@ -18,7 +18,18 @@ const OrderedItemsSection = ({
     loadAmendments,
     setLoadAmendments,
 }) => {
-
+    const OrderedItemAmendmentsDisplay = ({ amendments }) => {
+        return (
+            <>
+                {amendments && amendments.length > 0 && amendments.map((amendment, aIndex) => (
+                    <div key={aIndex} className="ordered-item-amendment">
+                        <span>&gt; {amendment}</span>
+                    </div>
+                ))}
+            </>
+        );
+    };
+    
     //////////////////////////////////////////////////    
     // State Variables
 
@@ -105,10 +116,11 @@ const OrderedItemsSection = ({
             }
 
             // Apply the new amendments
-            updatedItems[index].amendments.push(...amendmentsToApply);
+            updatedItems[index].amendments = [...amendmentsToApply];
             return updatedItems;
         });
-        
+        setAmendmentsInPopup([]);
+        setIsAmendingItem(false); // Close the amendment modal or component
     };    
 
     //////////////////////////////////////////////////
@@ -247,16 +259,21 @@ const OrderedItemsSection = ({
             {/* Ordered Items Content */}
             <div className="ordered-items-content" ref={contentRef}>
                 <div className="vertical-line"></div>
+
                 {orderedItems.map((item, index) => (
-                    <div
-                        key={index}
-                        ref={(el) => (rowRefs.current[index] = el)}
-                        className={`ordered-item-row ${orderedItemSelected === index ? 'selected' : ''} ${isAmendingItem ? 'amending' : ''}`}
-                        onClick={() => handleRowClick(index)}
-                    >
-                        <span className="ordered-item quantity">{item.quantity || 1}</span>
-                        <span className="ordered-item name">{item.name}</span>
-                        <span className="ordered-item price">{(item.price * (item.quantity || 1)).toFixed(2)}</span>                 
+                    <div key={index}>
+                        <div
+                            ref={(el) => (rowRefs.current[index] = el)}
+                            className={`ordered-item-row ${orderedItemSelected === index ? 'selected' : ''} ${isAmendingItem ? 'amending' : ''}`}
+                            onClick={() => handleRowClick(index)}
+                        >
+                            <span className="ordered-item quantity">{item.quantity || 1}</span>
+                            <span className="ordered-item name">{item.name}</span>
+                            <span className="ordered-item price">{(item.price * (item.quantity || 1)).toFixed(2)}</span>
+                        </div>
+                        
+                        {/* Display amendments using the new component */}
+                        <OrderedItemAmendmentsDisplay amendments={item.amendments} />
                     </div>
                 ))}
 
@@ -270,7 +287,7 @@ const OrderedItemsSection = ({
                         ></div>
                     </div>
                 )}
-            </div>
+            </div>     
 
             {/* Amend Item Popup */}
             {isAmendingItem && (

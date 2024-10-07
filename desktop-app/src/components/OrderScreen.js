@@ -81,36 +81,40 @@ const OrderScreen = () => {
 
         // Deselect row if clicked outside ordered-items-section but not on menu grid, amend item button, or amending item box
         if (clickedOutside(orderedItemsSectionRef)) {
-
             if (menuGridRef.current && menuGridRef.current.contains(event.target)){
                 setIsAmendingItem(false);
             }
             else if (amendItemButtonRef.current && amendItemButtonRef.current.contains(event.target)) {
                 return; // Do nothing
-            }            
-            else {
-                setOrderedItemSelected(null); // Deselect any selected row
+            }
+            else if (rightSectionOverlayRef.current && rightSectionOverlayRef.current.contains(event.target)){
+                console.log("clicking here");
+                setIsAmendingItem(false);
+            } else {
+                setOrderedItemSelected(null);
                 setIsAmendingItem(false);
             }
         }
 
         // Handle clicks inside ordered-items-section
+
+        // If clicked in qty toggle or amendItemBox do nothing
         else if ((qtyToggle.current && qtyToggle.current.contains(event.target)) ||
             (amendItemBoxRef.current && amendItemBoxRef.current.contains(event.target))) {
-            return; // Clicked on quantity toggle button, do nothing
+            return;
         } else {
             // Get all ordered item rows
             const rowElements = orderedItemsSectionRef.current?.getElementsByClassName('ordered-item-row') || [];
 
             // Check if any row was clicked
-            for (let row of rowElements) {
+            for (let row of rowElements) {            
                 if (row.contains(event.target)) {
-                    console.log("Row was clicked");
                     return;
                 }
             }
 
             // If no row was clicked, deselect the selected row
+            setIsAmendingItem(false);
             setOrderedItemSelected(null);
         }
     };
