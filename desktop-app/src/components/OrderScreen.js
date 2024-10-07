@@ -61,7 +61,6 @@ const OrderScreen = () => {
 
     const handleClick = (event) => {
         const clickedOutside = (ref) => ref.current && !ref.current.contains(event.target);
-        console.log("rightSectionOverlayRef: ", rightSectionOverlayRef);
 
         // Close modify time popup if clicked outside the modify popup or button
         if (clickedOutside(modifyTimePopupRef) && clickedOutside(modifyTimeButtonRef)) {
@@ -70,11 +69,14 @@ const OrderScreen = () => {
 
         // Deselect row if clicked outside ordered-items-section but not on menu grid, amend item button, or amending item box
         if (clickedOutside(orderedItemsSectionRef)) {
-            if ((menuGridRef.current && menuGridRef.current.contains(event.target)) ||
-                (amendItemButtonRef.current && amendItemButtonRef.current.contains(event.target))
-                ) {
+
+            if (menuGridRef.current && menuGridRef.current.contains(event.target)){
+                setIsAmendingItem(false);
+            }
+            else if (amendItemButtonRef.current && amendItemButtonRef.current.contains(event.target)) {
                 return; // Do nothing
-            } else {
+            }            
+            else {
                 setOrderedItemSelected(null); // Deselect any selected row
                 setIsAmendingItem(false);
             }
@@ -102,12 +104,10 @@ const OrderScreen = () => {
     };
 
     const handleMenuItemSelect = (item) => {
-        // Add new item to the list
-        setOrderedItems(prevItems => [...prevItems, { ...item, quantity: 1 }]);
-        // Select the new item
+        setOrderedItems(prevItems => [...prevItems, { ...item, quantity: 1, amendments: []}]);
         setOrderedItemSelected(orderedItems.length);
-    };    
-        
+    };
+            
     // ////////////////////////////////////////////////
     // MAIN HTML
     return (

@@ -5,9 +5,18 @@ import plusIcon from '../images/plus-icon.png';
 
 const OrderedItemAmendment = ({
     amendItemBoxRef,
-    getSelectedRowPosition,
+    calculateAmendmentTopPosition,
     isAmendingItem,
     setIsAmendingItem,
+
+    selectedAmendments,
+    setSelectedAmendments,
+
+    previousSelectedAmendments,
+    setPreviousSelectedAmendments,
+    applyAmendmentToItem,
+
+    selectedOrderedItem,
 }) => {
     const amendItemsScrollerRef = useRef(null);
     const [isAmendItemScrollerVisible, setIsAmendItemScrollerVisible] = useState(true);
@@ -15,15 +24,15 @@ const OrderedItemAmendment = ({
     const [isAmendDragging, setIsAmendDragging] = useState(false);
     const [amendHandleHeight, setAmendHandleHeight] = useState(50);
     const [amendDragOffset, setAmendDragOffset] = useState(0);
+    
     const [amendments] = useState([
         'madras hot', 'med hot', 'mild', '0 spicy', 'gluten allergy', 
         'extra cheese', 'extra gravy', 'nut allergy', 'other1', 
         'other2', 'other3', 'other4'
     ]);
-    const [selectedAmendments, setSelectedAmendments] = useState([]);
+
 
     const handleSelectOption = (amendmentOption) => {
-        // Logic to handle selecting an amendmentOption
         if (selectedAmendments.includes(amendmentOption)) {
             setSelectedAmendments(selectedAmendments.filter(selectedOption => selectedOption !== amendmentOption));
         } else {
@@ -32,8 +41,17 @@ const OrderedItemAmendment = ({
     };
 
     const handleSave = () => {
-        return;
-    }
+        applyAmendmentToItem(selectedOrderedItem, selectedAmendments)
+        setSelectedAmendments([]);
+        setIsAmendingItem(false); // Close the amendment modal or component
+    };
+    
+
+    const handleCancel = () => {
+        // Reset to the previous selected amendments when canceling
+        setSelectedAmendments(previousSelectedAmendments);
+        setIsAmendingItem(false); // Close the amendment modal or component
+    };
 
     const handleAmendMouseMove = useCallback((e) => {
         if (!isAmendDragging || !amendItemsScrollerRef.current) return;
@@ -110,9 +128,13 @@ const OrderedItemAmendment = ({
         }
     }, [isAmendDragging, handleAmendMouseMove]);
 
+    useEffect(() => {
+    }, [selectedAmendments])
+
     return (
         <div ref={amendItemBoxRef}>
-            <div className="amend-item-popup" style={{ top: `${getSelectedRowPosition()}px` }}>
+            <div className="amend-item-popup" style={{ top: `${calculateAmendmentTopPosition()}px` }}>
+                {/* Amendment Content */}
                 <div className="amendment-content">
                     {amendments.map((amendmentOption, index) => (
                         <div 
@@ -125,6 +147,7 @@ const OrderedItemAmendment = ({
                     ))}
                 </div>
 
+                {/* Scrolling */}
                 {isAmendItemScrollerVisible && (
                     <div className="amendItems-customScroller" ref={amendItemsScrollerRef}>
                         <div
@@ -135,14 +158,16 @@ const OrderedItemAmendment = ({
                     </div>
                 )}
 
+                {/* Admendment Content Addition */}
                 <button className="plusIconBtn">
                     <img src={plusIcon} alt="Plus Icon" />
                 </button>
 
+                {/* Footer */}
                 <div className="amend-item-footer">
                     <span className="amend-item-separator" />
-                    <button className="cancel-button" onClick={() => setIsAmendingItem(false)}>Cancel</button>
-                    <button className="save-button" onClick={handleSave()}>Save</button>
+                    <button className="cancel-button" onClick={handleCancel}>Cancel</button>
+                    <button className="save-button" onClick={handleSave}>Save</button>
                 </div>
             </div>
         </div>

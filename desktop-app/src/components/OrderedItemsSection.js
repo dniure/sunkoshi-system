@@ -33,6 +33,26 @@ const OrderedItemsSection = ({
     const [handleHeight, setHandleHeight] = useState(50);  // Height of the scrollbar handle
     const [dragOffset, setDragOffset] = useState(0);  // Offset for dragging the scrollbar handle
 
+    // Amendments
+    const [selectedAmendments, setSelectedAmendments] = useState([]);
+    const [previousSelectedAmendments, setPreviousSelectedAmendments] = useState([]);
+
+    const applyAmendmentToItem = (index, amendmentsToApply) => {
+        setOrderedItems(prevItems => {
+            const updatedItems = [...prevItems];
+            if (!updatedItems[index].amendments) {
+                updatedItems[index].amendments = []; // Initialize if it doesn't exist
+            }
+            updatedItems[index].amendments.push(...amendmentsToApply); // Apply the amendments
+            return updatedItems;
+        });
+    };
+    
+    // Log ordered items when they change
+    useEffect(() => {
+        console.log("Updated ordered items: ", orderedItems);
+    }, [orderedItems]);  
+    
     //////////////////////////////////////////////////    
     // Refs
     const contentRef = useRef(null);  // Ref for the ordered-items-content container
@@ -179,18 +199,15 @@ const OrderedItemsSection = ({
     };   
 
     // Function to get the position of the selected row
-    const getSelectedRowPosition = () => {
-        const normalRowHeight = rowRefs.current[0] ? rowRefs.current[0].offsetHeight : 0;
-        const selectedRowHeight = rowRefs.current[selectedOrderedItem] ? rowRefs.current[selectedOrderedItem].offsetHeight : 0;
-        const rowPosition =
-            54 + // Container top padding
-            normalRowHeight * (selectedOrderedItem-1) + // Unselected rows' height
-            selectedRowHeight ; // Selected rows' height
-
-        return rowPosition;
-    };
-    
+    const calculateAmendmentTopPosition = () => {
+        const definedMargin = 23;
+        const normalRowHeight = 19; // Default height
+        const selectedRowHeight = normalRowHeight + 10; // Adjusted height for selected row
         
+        const newPosition = (definedMargin + (normalRowHeight * selectedOrderedItem) + selectedRowHeight);
+        return newPosition
+    };
+            
     //////////////////////////////////////////////////    
     // Main Render
     return (
@@ -215,7 +232,7 @@ const OrderedItemsSection = ({
                     >
                         <span className="ordered-item quantity">{item.quantity || 1}</span>
                         <span className="ordered-item name">{item.name}</span>
-                        <span className="ordered-item price">{(item.price * (item.quantity || 1)).toFixed(2)}</span>
+                        <span className="ordered-item price">{(item.price * (item.quantity || 1)).toFixed(2)}</span>                 
                     </div>
                 ))}
 
@@ -235,9 +252,17 @@ const OrderedItemsSection = ({
             {isAmendingItem && (
                 <OrderedItemAmendment
                 amendItemBoxRef={amendItemBoxRef}
-                getSelectedRowPosition={getSelectedRowPosition}
+                calculateAmendmentTopPosition={calculateAmendmentTopPosition}
                 isAmendingItem={isAmendingItem}
                 setIsAmendingItem={setIsAmendingItem}
+
+                selectedAmendments={selectedAmendments}
+                setSelectedAmendments={setSelectedAmendments}
+                previousSelectedAmendments={previousSelectedAmendments}
+                setPreviousSelectedAmendments={setPreviousSelectedAmendments}
+                applyAmendmentToItem={applyAmendmentToItem}
+
+                selectedOrderedItem={selectedOrderedItem}
                 />
             )}
     
