@@ -5,13 +5,13 @@ import plusIcon from '../images/plus-icon.png';
 
 const OrderedItemAmendment = ({
     amendItemBoxRef,
-    calculateAmendmentTopPosition,
+    getRowPosition,
     isAmendingItem,
-    setIsAmendingItem,
     amendmentsInPopup,
     setAmendmentsInPopup,
     applyAmendmentToSelectedItem,
     originalAmendments,
+    orderedItemSelected,
 }) => {
     const amendItemsScrollerRef = useRef(null);
     const [isAmendItemScrollerVisible, setIsAmendItemScrollerVisible] = useState(true);
@@ -122,7 +122,16 @@ const OrderedItemAmendment = ({
 
     return (
         <div ref={amendItemBoxRef}>
-            <div className="amend-item-popup" style={{ top: `${calculateAmendmentTopPosition()}px` }}>
+            <div
+            className="amend-item-popup"
+            style={{
+                top: `${
+                getRowPosition(orderedItemSelected)?.top > 257
+                    ? getRowPosition(orderedItemSelected)?.top - 230
+                    : getRowPosition(orderedItemSelected)?.top
+                }px`,
+            }}
+            >
                 {/* Amendment Content */}
                 <div className="amendment-content">
                     {amendments.map((amendmentOption, index) => (

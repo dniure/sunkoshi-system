@@ -17,19 +17,7 @@ const OrderedItemsSection = ({
     
     loadAmendments,
     setLoadAmendments,
-}) => {
-    const OrderedItemAmendmentsDisplay = ({ amendments }) => {
-        return (
-            <>
-                {amendments && amendments.length > 0 && amendments.map((amendment, aIndex) => (
-                    <div key={aIndex} className="ordered-item-amendment">
-                        <span>&gt; {amendment}</span>
-                    </div>
-                ))}
-            </>
-        );
-    };
-    
+}) => {  
     //////////////////////////////////////////////////    
     // State Variables
 
@@ -38,7 +26,6 @@ const OrderedItemsSection = ({
     const [orderedItemSelected, setOrderedItemSelected] = useState(orderedItemSelectedInput || null);  // Selected ordered item
     const [priceSum, setPriceSum] = useState(0);  // Total price sum of the ordered items
     const [finalCost, setFinalCost] = useState(0);  // Final calculated cost
-
 
     // Main Scroller
     const [scrollPosition, setScrollPosition] = useState(0);  // Scroll position of the list
@@ -57,6 +44,8 @@ const OrderedItemsSection = ({
     const rowRefs = useRef([])
     const orderedItemsScroller = useRef(null);  // Ref for the scroller handle
     const previousOrderedItems = useRef(orderedItemsInput);  // Keeps track of previous ordered items for scrolling behavior
+
+
 
     //////////////////////////////////////////////////    
     // Effects
@@ -123,6 +112,19 @@ const OrderedItemsSection = ({
         setIsAmendingItem(false); // Close the amendment modal or component
     };    
 
+    // Displaying Amendments
+    const OrderedItemAmendmentsDisplay = ({ amendments }) => {
+        return (
+            <>
+                {amendments && amendments.length > 0 && amendments.map((amendment, aIndex) => (
+                    <div key={aIndex} className="ordered-item-amendment">
+                        <span>&gt; {amendment}</span>
+                    </div>
+                ))}
+            </>
+        );
+    };    
+    
     //////////////////////////////////////////////////
     // Click Handling
 
@@ -170,21 +172,39 @@ const OrderedItemsSection = ({
         setScrollPosition(handlePosition);
     }, [isDragging, dragOffset]);
 
+    // ***********************************************************************
     // Update scrollbar handle visibility and height when ordered items change
     useEffect(() => {
+        console.log("\n");
         if (contentRef.current) {
             // Calculate total height of all rows
-            const totalRowsHeight = orderedItems.reduce((acc, _, index) => {
+            const totalOccupiedHeight = orderedItems.reduce((acc, item, index) => {
                 const row = rowRefs.current[index]; // Get each row reference
-                return acc + (row ? row.offsetHeight : 0); // Accumulate height if the row exists
-            }, 0);
+                if (row) {
+                    // Base height is the row's offsetHeight (height of the ordered item row)
+                    let rowHeight = row.offsetHeight;
+                    
+                    // Add amendment height if there are amendments for this item
+                    if (Array.isArray(item.amendments) && item.amendments.length > 0) {
+                        const amendmentRowHeight = 16; // Assuming each amendment takes 20px of height
+                        const totalAmendmentsHeight = item.amendments.length * amendmentRowHeight;
+                        rowHeight += totalAmendmentsHeight;
+                    }
+            
+                    // Accumulate the total height
+                    return acc + rowHeight;
+                }
+                return acc;
+            }, 0);            
+
             const containerHeight = contentRef.current.offsetHeight;
+            const containerHeightWithOfset = containerHeight + 20;
+            console.log("totalOccupiedHeight: ", totalOccupiedHeight, "containerHeightWithOfset: ", containerHeightWithOfset);
+            setisOrderedItemsScrollerVisible(totalOccupiedHeight >= containerHeightWithOfset);
+            contentRef.current.style.overflowY = totalOccupiedHeight >= containerHeightWithOfset ? 'auto' : 'hidden';
 
-            setisOrderedItemsScrollerVisible(totalRowsHeight >= containerHeight);
-            contentRef.current.style.overflowY = totalRowsHeight >= containerHeight ? 'auto' : 'hidden';
-
-            const calculatedHandleHeight = Math.max(20, (containerHeight - 30) * (containerHeight / totalRowsHeight));
-            setHandleHeight(Math.min(calculatedHandleHeight, containerHeight));
+            const calculatedHandleHeight = Math.max(20, (containerHeight - 30) * (containerHeightWithOfset / totalOccupiedHeight));
+            setHandleHeight(Math.min(calculatedHandleHeight, containerHeightWithOfset));
         }
     }, [orderedItems]);
 
@@ -205,26 +225,6 @@ const OrderedItemsSection = ({
         orderedItemsContent?.addEventListener('scroll', handleOrderedItemsScroll);
         return () => orderedItemsContent?.removeEventListener('scroll', handleOrderedItemsScroll);
     }, [handleOrderedItemsScroll]);
-
-    // Add mousemove and mouseup event listeners when dragging starts
-    useEffect(() => {
-        const handleMouseMoveWrapper = (e) => {
-            if (isDragging) {
-                handleMouseMove(e);
-            }
-        };
-
-        if (isDragging) {
-            window.addEventListener('mousemove', handleMouseMoveWrapper);
-            window.addEventListener('mouseup', setIsDragging(false));
-        }
-
-        return () => {
-            window.removeEventListener('mousemove', handleMouseMoveWrapper);
-            window.removeEventListener('mouseup', setIsDragging(false));
-        };
-    }, [isDragging, handleMouseMove]);
-    
     
     // Handles mouse down on the scroller handle for dragging
     const handleMouseDown = (e) => {
@@ -232,16 +232,38 @@ const OrderedItemsSection = ({
         const offset = e.clientY - handleElement.getBoundingClientRect().top;
         setDragOffset(offset);
         setIsDragging(true);
-    };   
+    };  
+    
+    // Add mousemove and mouseup event listeners when dragging starts
+    useEffect(() => {
+        const handleMouseMoveWrapper = (e) => {
+            if (isDragging) {
+                handleMouseMove(e);
+            }
+        };
+        const handleMouseUp = () => setIsDragging(false);
 
-    // Function to get the position of the selected row
-    const calculateAmendmentTopPosition = () => {
-        const definedMargin = 23;
-        const normalRowHeight = 19; // Default height
-        const selectedRowHeight = normalRowHeight + 10; // Adjusted height for selected row
-        
-        const newPosition = (definedMargin + (normalRowHeight * orderedItemSelected) + selectedRowHeight);
-        return newPosition
+        if (isDragging) {
+            console.log("is dragging mouse");
+            window.addEventListener('mousemove', handleMouseMoveWrapper);
+            
+            window.addEventListener('mouseup', handleMouseUp);
+        }
+
+        return () => {
+            window.removeEventListener('mousemove', handleMouseMoveWrapper);
+            window.removeEventListener('mouseup', handleMouseUp);
+        };
+    }, [isDragging, handleMouseMove]); 
+
+    // Function to get the absolute position of a specific row
+    const getRowPosition = (index) => {
+        if (rowRefs.current[index]) {
+            const rect = rowRefs.current[index].getBoundingClientRect();
+            const top = Math.round(rect.top + window.scrollY - 9); // Adjust for scroll position;
+            return { top };
+        }
+        return null; // If row does not exist
     };
             
     //////////////////////////////////////////////////    
@@ -293,13 +315,13 @@ const OrderedItemsSection = ({
             {isAmendingItem && (
                 <OrderedItemAmendment
                 amendItemBoxRef={amendItemBoxRef}
-                calculateAmendmentTopPosition={calculateAmendmentTopPosition}
+                getRowPosition={getRowPosition}
                 isAmendingItem={isAmendingItem}
-                setIsAmendingItem={setIsAmendingItem}
                 amendmentsInPopup={amendmentsInPopup}
                 setAmendmentsInPopup={setAmendmentsInPopup}
                 applyAmendmentToSelectedItem={applyAmendmentToSelectedItem}
                 originalAmendments={originalAmendments}
+                orderedItemSelected={orderedItemSelected}
                 />
             )}
     

@@ -199,6 +199,7 @@ const OrderScreen = () => {
                     {/* Save and Cancel */}
                     <button className="bottom-btn orderScreen-cancel" onClick={() => navigate('/')}>cancel</button>
                     <button className="bottom-btn orderScreen-save" onClick={() => navigate('/')}>save</button>
+                    <button className="bottom-btn orderScreen-next" onClick={() => navigate('/OrderSummaryScreen')}>next</button>
                 </div>
 
             </div>

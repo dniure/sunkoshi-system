@@ -66,9 +66,9 @@
 
 .orderScreen-save {
     top: 640px; /* Place where you want it vertically */
-    left: 800px; /* Align with the text */
-    background: #61A61B; /* Background color */
-    border: 2px solid #148700; /* Specific border */
+    left: 730px; /* Align with the text */
+    background: #7DB841; /* Background color */
+    border: 2px solid #61A61B; /* Specific border */
 }
 
 .orderScreen-amendItem-btn {

@@ -104,7 +104,6 @@
 .ordered-item-row.selected.amending {
     z-index: 4; /* z-index when amending items */
     background-color: #fbfcff; /* Translucent background when selected */
-    border: 2px solid rgb(0, 20, 235, 0.5);
     border-left: none;
     border-right: none;
     box-sizing: none;

@@ -5,6 +5,7 @@ import Home from './components/Home';
 import OrderScreen from './components/OrderScreen';
 import ManageOrderDetails from './components/ManageOrderDetails';
 import Menu from './components/Menu';
+import OrderSummaryScreen from './components/OrderSummaryScreen'
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Route path="/OrderScreen" element={<OrderScreen />} />
         <Route path="/ManageOrderDetails" element={<ManageOrderDetails />} />
         <Route path="/Menu" element={<Menu />} />
+        <Route path="/OrderSummaryScreen" element={<OrderSummaryScreen />} />
       </Routes>
     </Router>
   );
