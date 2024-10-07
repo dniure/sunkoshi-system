@@ -5,15 +5,18 @@ import OrderedItemAmendment from './OrderedItemAmendment';
 
 
 const OrderedItemsSection = ({
-    orderedItemsInput = [],  // List of ordered items passed as input, defaults to an empty array
-    orderedItemSelectedInput,  // Selected ordered item input
-    qtyToggle,  // Reference for quantity buttons
-    orderedItemsSectionRef,  // Reference for ordered items container
-    setOrderedItemsInput,  // Function to update ordered items
-    setOrderedItemSelectedInput,  // Function to update the selected ordered item
+    orderedItemsInput = [], 
+    orderedItemSelectedInput,
+    qtyToggle,
+    orderedItemsSectionRef,
+    setOrderedItemsInput,
+    setOrderedItemSelectedInput,
     isAmendingItem,
     setIsAmendingItem,
     amendItemBoxRef,
+    
+    loadAmendments,
+    setLoadAmendments,
 }) => {
 
     //////////////////////////////////////////////////    
@@ -21,7 +24,7 @@ const OrderedItemsSection = ({
 
     // General
     const [orderedItems, setOrderedItems] = useState(orderedItemsInput || []);  // Holds the list of ordered items
-    const [selectedOrderedItem, setSelectedOrderedItem] = useState(orderedItemSelectedInput || null);  // Selected ordered item
+    const [orderedItemSelected, setOrderedItemSelected] = useState(orderedItemSelectedInput || null);  // Selected ordered item
     const [priceSum, setPriceSum] = useState(0);  // Total price sum of the ordered items
     const [finalCost, setFinalCost] = useState(0);  // Final calculated cost
 
@@ -34,25 +37,9 @@ const OrderedItemsSection = ({
     const [dragOffset, setDragOffset] = useState(0);  // Offset for dragging the scrollbar handle
 
     // Amendments
-    const [selectedAmendments, setSelectedAmendments] = useState([]);
-    const [previousSelectedAmendments, setPreviousSelectedAmendments] = useState([]);
+    const [amendmentsInPopup, setAmendmentsInPopup] = useState([]);
+    const [originalAmendments, setOriginaAmendments] = useState([]);
 
-    const applyAmendmentToItem = (index, amendmentsToApply) => {
-        setOrderedItems(prevItems => {
-            const updatedItems = [...prevItems];
-            if (!updatedItems[index].amendments) {
-                updatedItems[index].amendments = []; // Initialize if it doesn't exist
-            }
-            updatedItems[index].amendments.push(...amendmentsToApply); // Apply the amendments
-            return updatedItems;
-        });
-    };
-    
-    // Log ordered items when they change
-    useEffect(() => {
-        console.log("Updated ordered items: ", orderedItems);
-    }, [orderedItems]);  
-    
     //////////////////////////////////////////////////    
     // Refs
     const contentRef = useRef(null);  // Ref for the ordered-items-content container
@@ -65,13 +52,13 @@ const OrderedItemsSection = ({
 
     // Update selected item and ordered items when inputs change
     useEffect(() => {
-        setSelectedOrderedItem(orderedItemSelectedInput);
+        setOrderedItemSelected(orderedItemSelectedInput);
         setOrderedItems(orderedItemsInput || []);
     }, [orderedItemsInput, orderedItemSelectedInput]);
 
-    // Update orderedItemsInput and selectedOrderedItem externally when the state changes
+    // Update orderedItemsInput and orderedItemSelected externally when the state changes
     useEffect(() => setOrderedItemsInput(orderedItems), [orderedItems, setOrderedItemsInput]);
-    useEffect(() => setOrderedItemSelectedInput(selectedOrderedItem), [selectedOrderedItem, setOrderedItemSelectedInput]);
+    useEffect(() => setOrderedItemSelectedInput(orderedItemSelected), [orderedItemSelected, setOrderedItemSelectedInput]);
 
     // Calculate the total price and handle scroll-to-bottom behavior
     useEffect(() => {
@@ -87,19 +74,56 @@ const OrderedItemsSection = ({
         previousOrderedItems.current = orderedItems;
     }, [orderedItems]);
 
+    // Effects to load amendments
+    useEffect(() => {
+        // If an item is selected and load amendments is true
+        if (orderedItemSelected !== null && loadAmendments) {
+            // If the selected item exists and it as an 'amendments' array
+            if (orderedItems[orderedItemSelected] &&
+                Array.isArray(orderedItems[orderedItemSelected].amendments))
+            {
+                // load stored amendments in the popup
+                setOriginaAmendments([...orderedItems[orderedItemSelected].amendments])
+                setAmendmentsInPopup([...orderedItems[orderedItemSelected].amendments]);
+            } else {
+                // load popup with nothing selected
+                setAmendmentsInPopup([]);
+            }
+            setLoadAmendments(false);
+        }
+    }, [loadAmendments, orderedItemSelected, orderedItems, setLoadAmendments]);       
+
+    // Function to apply selected amendments
+    const applyAmendmentToSelectedItem = (amendmentsToApply) => {
+        setOrderedItems(prevItems => {
+            const updatedItems = [...prevItems];
+            const index = orderedItemSelected;
+
+            // Initialize amendments as an array if not already present
+            if (!Array.isArray(updatedItems[index].amendments)) {
+                updatedItems[index].amendments = [];
+            }
+
+            // Apply the new amendments
+            updatedItems[index].amendments.push(...amendmentsToApply);
+            return updatedItems;
+        });
+        
+    };    
+
     //////////////////////////////////////////////////
     // Click Handling
 
     // Handles row selection when an item is clicked
-    const handleRowClick = (index) => setSelectedOrderedItem(selectedOrderedItem === index ? null : index);
+    const handleRowClick = (index) => setOrderedItemSelected(orderedItemSelected === index ? null : index);
 
     // Modify quantity of the selected ordered item
     const modifyQuantity = (modifier) => {
-        if (selectedOrderedItem === null) return;
+        if (orderedItemSelected === null) return;
 
         setOrderedItems(prevItems => {
             const updatedItems = prevItems.map((item, i) => {
-                if (i === selectedOrderedItem) {
+                if (i === orderedItemSelected) {
                     const newQuantity = (item.quantity || 1) + modifier;
                     return newQuantity > 0 ? { ...item, quantity: newQuantity } : null;
                 }
@@ -108,10 +132,10 @@ const OrderedItemsSection = ({
 
             // Adjust selected item index after modification
             const newSelectedIndex = updatedItems.length
-                ? Math.min(selectedOrderedItem, updatedItems.length - 1)
+                ? Math.min(orderedItemSelected, updatedItems.length - 1)
                 : null;
 
-            setSelectedOrderedItem(newSelectedIndex);
+            setOrderedItemSelected(newSelectedIndex);
             return updatedItems;
         });
     };
@@ -204,7 +228,7 @@ const OrderedItemsSection = ({
         const normalRowHeight = 19; // Default height
         const selectedRowHeight = normalRowHeight + 10; // Adjusted height for selected row
         
-        const newPosition = (definedMargin + (normalRowHeight * selectedOrderedItem) + selectedRowHeight);
+        const newPosition = (definedMargin + (normalRowHeight * orderedItemSelected) + selectedRowHeight);
         return newPosition
     };
             
@@ -227,7 +251,7 @@ const OrderedItemsSection = ({
                     <div
                         key={index}
                         ref={(el) => (rowRefs.current[index] = el)}
-                        className={`ordered-item-row ${selectedOrderedItem === index ? 'selected' : ''} ${isAmendingItem ? 'amending' : ''}`}
+                        className={`ordered-item-row ${orderedItemSelected === index ? 'selected' : ''} ${isAmendingItem ? 'amending' : ''}`}
                         onClick={() => handleRowClick(index)}
                     >
                         <span className="ordered-item quantity">{item.quantity || 1}</span>
@@ -255,22 +279,18 @@ const OrderedItemsSection = ({
                 calculateAmendmentTopPosition={calculateAmendmentTopPosition}
                 isAmendingItem={isAmendingItem}
                 setIsAmendingItem={setIsAmendingItem}
-
-                selectedAmendments={selectedAmendments}
-                setSelectedAmendments={setSelectedAmendments}
-                previousSelectedAmendments={previousSelectedAmendments}
-                setPreviousSelectedAmendments={setPreviousSelectedAmendments}
-                applyAmendmentToItem={applyAmendmentToItem}
-
-                selectedOrderedItem={selectedOrderedItem}
+                amendmentsInPopup={amendmentsInPopup}
+                setAmendmentsInPopup={setAmendmentsInPopup}
+                applyAmendmentToSelectedItem={applyAmendmentToSelectedItem}
+                originalAmendments={originalAmendments}
                 />
             )}
     
             {/* Footer for Quantity Control and Total Price */}
             <div className="footer">
                 <div className="quantity-buttons" ref={qtyToggle}>
-                    <button className={`decrease-btn ${selectedOrderedItem !== null ? 'active' : ''}`} onClick={() => modifyQuantity(-1)}>-</button>
-                    <button className={`increase-btn ${selectedOrderedItem !== null ? 'active' : ''}`} onClick={() => modifyQuantity(1)}>+</button>
+                    <button className={`decrease-btn ${orderedItemSelected !== null ? 'active' : ''}`} onClick={() => modifyQuantity(-1)}>-</button>
+                    <button className={`increase-btn ${orderedItemSelected !== null ? 'active' : ''}`} onClick={() => modifyQuantity(1)}>+</button>
                 </div>
                 
                 {/* Total Price Display */}                

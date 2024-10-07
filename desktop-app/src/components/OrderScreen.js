@@ -9,7 +9,6 @@ import '../css/main.css';
 import '../css/orderScreen.css';
 
 const OrderScreen = () => {
-
     // Navigation
     const navigate = useNavigate();
     
@@ -46,6 +45,19 @@ const OrderScreen = () => {
     const qtyToggle = useRef(null);
     const rightSectionOverlayRef = useRef(null);
     const [isAmendingItem, setIsAmendingItem] = useState(false);
+    
+    const [loadAmendments, setLoadAmendments] = useState(false)
+    const handleAmendButtonClick = () => {
+        setIsAmendingItem((prevIsAmendingItem) => {
+            const newIsAmendingItem = !prevIsAmendingItem;    
+            if (newIsAmendingItem) {
+                setLoadAmendments(true);
+            } else {
+                setLoadAmendments(false);
+            }
+            return newIsAmendingItem;
+        });
+    };
     
     // Section: Menu Grid
     const menuGridRef = useRef(null);
@@ -141,6 +153,9 @@ const OrderScreen = () => {
                             amendItemBoxRef={amendItemBoxRef}
                             isAmendingItem={isAmendingItem}
                             setIsAmendingItem={setIsAmendingItem}
+
+                            loadAmendments={loadAmendments}
+                            setLoadAmendments={setLoadAmendments}
                         />
 
                         {/* ORDER INFO */}
@@ -170,7 +185,7 @@ const OrderScreen = () => {
                 <div>
                     <button
                         className="bottom-btn orderScreen-amendItem-btn"
-                        onClick={() => orderedItemSelected !== null && setIsAmendingItem(!isAmendingItem)} // Only trigger if an item is selected
+                        onClick={() => handleAmendButtonClick()}
                         ref={amendItemButtonRef}
                         disabled={orderedItemSelected === null} // Disable the button if no item is selected
                     >

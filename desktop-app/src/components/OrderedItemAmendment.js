@@ -8,15 +8,10 @@ const OrderedItemAmendment = ({
     calculateAmendmentTopPosition,
     isAmendingItem,
     setIsAmendingItem,
-
-    selectedAmendments,
-    setSelectedAmendments,
-
-    previousSelectedAmendments,
-    setPreviousSelectedAmendments,
-    applyAmendmentToItem,
-
-    selectedOrderedItem,
+    amendmentsInPopup,
+    setAmendmentsInPopup,
+    applyAmendmentToSelectedItem,
+    originalAmendments,
 }) => {
     const amendItemsScrollerRef = useRef(null);
     const [isAmendItemScrollerVisible, setIsAmendItemScrollerVisible] = useState(true);
@@ -32,24 +27,24 @@ const OrderedItemAmendment = ({
     ]);
 
 
+
     const handleSelectOption = (amendmentOption) => {
-        if (selectedAmendments.includes(amendmentOption)) {
-            setSelectedAmendments(selectedAmendments.filter(selectedOption => selectedOption !== amendmentOption));
+        if (amendmentsInPopup.includes(amendmentOption)) {
+            setAmendmentsInPopup(amendmentsInPopup.filter(selectedOption => selectedOption !== amendmentOption));
         } else {
-            setSelectedAmendments([...selectedAmendments, amendmentOption]);
+            setAmendmentsInPopup([...amendmentsInPopup, amendmentOption]);
         }
     };
 
     const handleSave = () => {
-        applyAmendmentToItem(selectedOrderedItem, selectedAmendments)
-        setSelectedAmendments([]);
+        applyAmendmentToSelectedItem(amendmentsInPopup)
+        setAmendmentsInPopup([]);
         setIsAmendingItem(false); // Close the amendment modal or component
     };
-    
 
     const handleCancel = () => {
-        // Reset to the previous selected amendments when canceling
-        setSelectedAmendments(previousSelectedAmendments);
+        applyAmendmentToSelectedItem(originalAmendments);
+        setAmendmentsInPopup([]);
         setIsAmendingItem(false); // Close the amendment modal or component
     };
 
@@ -129,7 +124,7 @@ const OrderedItemAmendment = ({
     }, [isAmendDragging, handleAmendMouseMove]);
 
     useEffect(() => {
-    }, [selectedAmendments])
+    }, [amendmentsInPopup])
 
     return (
         <div ref={amendItemBoxRef}>
@@ -139,7 +134,7 @@ const OrderedItemAmendment = ({
                     {amendments.map((amendmentOption, index) => (
                         <div 
                             key={index}
-                            className={`amendmentOption ${selectedAmendments.includes(amendmentOption) ? 'selected' : ''}`}
+                            className={`amendmentOption ${amendmentsInPopup.includes(amendmentOption) ? 'selected' : ''}`}
                             onClick={() => handleSelectOption(amendmentOption)}
                         >
                             {amendmentOption}
