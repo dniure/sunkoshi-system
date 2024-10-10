@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import '../css/main.css';
-import '../css/orderedItemAmendment.css';
-import plusIcon from '../images/plus-icon.png';
+import '../../css/main.scss';
+import '../../css/OrderScreen/orderedItemAmendment.scss';
+import plusIcon from '../../images/plus-icon.png';
 
 const OrderedItemAmendment = ({
     amendItemBoxRef,

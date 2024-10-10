@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import '../css/main.css';
-import '../css/manageOrderDetails.css';
+import '../../css/main.scss';
+import '../../css/OrderScreen/manageOrderDetails.scss';
 
 const ManageOrderDetails = ({ formDataInput, orderTypeInput, updateOrderDetails, onClose }) => {         
     

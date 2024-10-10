@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import '../css/main.css';
-import '../css/orderedItemsSection.css';
+import '../../css/main.scss';
+import '../../css/OrderScreen/orderedItemsSection.scss';
 import OrderedItemAmendment from './OrderedItemAmendment';
 
 

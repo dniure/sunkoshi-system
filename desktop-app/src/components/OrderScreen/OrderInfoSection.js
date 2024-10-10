@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import '../css/main.css';
-import '../css/orderInfoSection.css';
+import '../../css/main.scss';
+import '../../css/OrderScreen/orderInfoSection.scss';
 
 const OrderInfoSection = ({
     orderType,                 // The type of order (e.g., Delivery, Pickup)

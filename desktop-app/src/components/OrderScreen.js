@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import ManageOrderDetails from './ManageOrderDetails';
-import Menu from './Menu';
-import OrderedItemsSection from './OrderedItemsSection';
-import OrderInfoSection from './OrderInfoSection';
+import ManageOrderDetails from './OrderScreen/ManageOrderDetails';
+import Menu from './OrderScreen/Menu';
+import OrderedItemsSection from './OrderScreen/OrderedItemsSection';
+import OrderInfoSection from './OrderScreen/OrderInfoSection';
 
-import '../css/main.css';
-import '../css/orderScreen.css';
+import '../css/main.scss';
+import '../css/orderScreen.scss';
 
 const OrderScreen = () => {
     // Navigation
@@ -128,13 +128,16 @@ const OrderScreen = () => {
     // MAIN HTML
     return (
         <div>
-            <span className="gradient-bg" />
-            <div className="content-container unselectable">
+            <div className="gradient-bg" />
+            <div className="orderScreen content-container unselectable">
                 <div className="main-container">
                     
                     {/* MAIN SCREEN */}
-                    <div className="left-section" ref={menuGridRef}>
-                        <Menu onSelect={(item) => handleMenuItemSelect(item)} />
+                    <div className="left-section">
+                        <Menu
+                            onSelect={(item) => handleMenuItemSelect(item)}
+                            menuGridRef={menuGridRef}
+                        />
                     </div>
 
                     <div className="right-section">      
@@ -201,7 +204,6 @@ const OrderScreen = () => {
                     <button className="bottom-btn orderScreen-save" onClick={() => navigate('/')}>save</button>
                     <button className="bottom-btn orderScreen-next" onClick={() => navigate('/OrderSummaryScreen')}>next</button>
                 </div>
-
             </div>
         </div>
     );

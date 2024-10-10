@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../css/home.css';
-import '../css/main.css';
+import '../css/homeScreen.scss';
+import '../css/main.scss';
 import powerIcon from '../images/power-icon.png';
 import logo from '../images/logo.png';
 
-const Home = () => {
+const HomeScreen = () => {
     //////////////////////////////////////////////////
     // Navigation
     const navigate = useNavigate();
@@ -47,9 +47,8 @@ const Home = () => {
     // MAIN HTML
     return (
         <div>
-            <div className="gradient-bg"></div>
-            
-            <div className="content-container unselectable">
+            <div className="gradient-bg" />            
+            <div className="homeScreen content-container unselectable">
                 {/* Title, Logo, Date & Time */}
                 <div className="sunkoshi-text">GURKHA SUNKOSHI</div>
                 <img src={logo} alt="Restaurant Logo" className="restaurant-logo" />
@@ -79,4 +78,4 @@ const Home = () => {
     );
 };
 
-export default Home;
+export default HomeScreen;

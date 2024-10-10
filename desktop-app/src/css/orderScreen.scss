@@ -1,3 +1,5 @@
+.orderScreen {
+
 .main-container {
     position: absolute; /* Enable positioning */
     
@@ -66,7 +68,14 @@
 
 .orderScreen-save {
     top: 640px; /* Place where you want it vertically */
-    left: 730px; /* Align with the text */
+    left: 700px; /* Align with the text */
+    background: #7DB841; /* Background color */
+    border: 2px solid #61A61B; /* Specific border */
+}
+
+.orderScreen-next {
+    top: 640px; /* Place where you want it vertically */
+    left: 850px; /* Align with the text */
     background: #7DB841; /* Background color */
     border: 2px solid #61A61B; /* Specific border */
 }
@@ -97,4 +106,6 @@
     pointer-events: auto; /* Make it non-interactive */
 
     z-index: 3; /* Ensure it appears above ordered items */
+}
+
 }

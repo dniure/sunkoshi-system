@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import '../css/main.css';
-import '../css/orderSummaryScreen.css';
+import '../css/main.scss';
+import '../css/orderSummaryScreen.scss';
 import logo from '../images/logo.png';
 
 const OrderSummaryScreen = () => {
@@ -45,11 +45,14 @@ const OrderSummaryScreen = () => {
             <div className="content-container unselectable">
                 
                 {/* Title, Logo, Date & Time */}
-                <img src={logo} alt="Restaurant Logo" className="restaurant-logo" />
-                <div className="datetime-container">
-                    <div className="live-time">{currentTime}</div>
-                    <div className="live-date">{currentDate}</div>
-                </div> 
+                <div className="orderSummaryScreen">
+                    <img src={logo} alt="Restaurant Logo" className="restaurant-logo" />
+                    <div className="datetime-container">
+                        <div className="live-time">{currentTime}</div>
+                        <div className="live-date">{currentDate}</div>
+                    </div> 
+                </div>
+
 
                 <div className="main-container">
 
@@ -62,12 +65,18 @@ const OrderSummaryScreen = () => {
                 </div>
 
                 {/* BOTTOM SECTION */}
-                <div>
+                <div className="orderSummaryScreen bottom-btn">
                     {/* Save and Cancel */}
-                    <button className="bottom-btn orderSummaryScreen-cancel" onClick={() => navigate('/')}>exit</button>
-                    <button className="bottom-btn orderSummaryScreen-printReceipt" onClick={() => navigate('/')}>print receipt</button>
-                    <button className="bottom-btn orderSummaryScreen-save" onClick={() => navigate('/')}>save</button>
+                    <button className="cancel" onClick={() => navigate('/')}>exit</button>
+                    <button className="printReceipt" onClick={() => navigate('/')}>print receipt</button>
+                    <button className="save" onClick={() => navigate('/')}>save</button>
                 </div>
+                {/* BOTTOM SECTION */}                
+                <div className="orderSummaryScreen">
+                    <button className="cancel" onClick={() => navigate('/')}>exit</button>
+                    <button className="printReceipt" onClick={() => navigate('/')}>print receipt</button>
+                    <button className="save" onClick={() => navigate('/')}>save</button>
+                </div>                
             </div>
         </div>
     );

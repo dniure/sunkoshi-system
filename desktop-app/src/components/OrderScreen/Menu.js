@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
-import MenuItems from '../data/MenuItems';
-import '../css/main.css';
-import '../css/menu.css';
+import MenuItems from '../../data/MenuItems';
+import '../../css/main.scss';
+import '../../css/OrderScreen/menu.scss';
 
 const Menu = ({ onSelect }) => {
     // Refs
