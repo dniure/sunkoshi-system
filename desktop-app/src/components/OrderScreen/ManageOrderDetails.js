@@ -82,7 +82,7 @@ const ManageOrderDetails = ({ formDataInput, orderTypeInput, updateOrderDetails,
     // Main Render
 
     return (
-        <div className="fullscreen-overlay unselectable">
+        <div className="manageOrderDetails fullscreen-overlay unselectable">
             
             <div className="customer-info-popup" onClick={(e) => e.stopPropagation()}>
                 
@@ -139,8 +139,8 @@ const ManageOrderDetails = ({ formDataInput, orderTypeInput, updateOrderDetails,
 
                 {/* Save and Cancel Buttons */}
                 <div>
-                    <button className="bottom-btn orderDetails-cancel" onClick={onClose}>Cancel</button>
-                    <button className="bottom-btn orderDetails-save" onClick={handleSave}>Save</button>
+                    <button className="bottom-btn cancel" onClick={onClose}>Cancel</button>
+                    <button className="bottom-btn save" onClick={handleSave}>Save</button>
                 </div>                
 
             </div>

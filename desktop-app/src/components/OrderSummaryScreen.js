@@ -42,37 +42,47 @@ const OrderSummaryScreen = () => {
     return (
         <div>
             <span className="gradient-bg" />
-            <div className="content-container unselectable">
+            <div className="orderSummaryScreen content-container unselectable">
                 
                 {/* Title, Logo, Date & Time */}
-                <div className="orderSummaryScreen">
-                    <img src={logo} alt="Restaurant Logo" className="restaurant-logo" />
-                    <div className="datetime-container">
-                        <div className="live-time">{currentTime}</div>
-                        <div className="live-date">{currentDate}</div>
-                    </div> 
+                <img src={logo} alt="Restaurant Logo" className="restaurant-logo" />
+                <div className="datetime-container">
+                    <div className="live-time">{currentTime}</div>
+                    <div className="live-date">{currentDate}</div>
                 </div>
 
-
-                <div className="main-container">
-
-                    <div className="summary-mid-section">
+                <div className="timeSinceOrder">
+                    <span className="time"> 24 minutes</span>
+                    <span className="text"> since order</span>
+                </div>
+                <div className="mid-section">
+                    <div className="header">
+                        <span className="orderType">TAKEAWAY</span>
+                        <span className="preparationTime">ASAP</span>
                     </div>
 
-                    <div className="summary-right-section">
-                    </div>                                   
+                    <div className="body">
+                        <div className="orderNo">No. 13</div>
+                        <span className="separator"/>
+                        <div className="customerName">JAMES</div>
+                        <div className="orderedTime">18:55</div>
+                        <div className="payment-section">
+                            <div className="amountToPay">£34.35</div>
+                            <div className="paymentMethod">PAID CASH</div> 
+                            <div className="discountToggle">Discount</div> 
+                        </div>
+                        <div className="notesSection">
+                            <div className="notes">Notes</div>
+                        </div>
 
+                    </div>
                 </div>
 
-                {/* BOTTOM SECTION */}
-                <div className="orderSummaryScreen bottom-btn">
-                    {/* Save and Cancel */}
-                    <button className="cancel" onClick={() => navigate('/')}>exit</button>
-                    <button className="printReceipt" onClick={() => navigate('/')}>print receipt</button>
-                    <button className="save" onClick={() => navigate('/')}>save</button>
-                </div>
+                <div className="right-section">
+                </div>                                   
+
                 {/* BOTTOM SECTION */}                
-                <div className="orderSummaryScreen">
+                <div className="buttons">
                     <button className="cancel" onClick={() => navigate('/')}>exit</button>
                     <button className="printReceipt" onClick={() => navigate('/')}>print receipt</button>
                     <button className="save" onClick={() => navigate('/')}>save</button>

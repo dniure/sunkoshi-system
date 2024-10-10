@@ -115,7 +115,7 @@ const Menu = ({ onSelect }) => {
         .join(' ');
 
     return (
-        <div className="menu-container unselectable">
+        <div className="menuSection menu-container unselectable">
             {/* Top Header */}
             <div className="top-header">
                 <span className="header">{capitalizeFirstLetter(activeCategory)}</span>

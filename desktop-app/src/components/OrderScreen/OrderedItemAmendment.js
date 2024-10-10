@@ -121,9 +121,9 @@ const OrderedItemAmendment = ({
     }, [amendmentsInPopup])
 
     return (
-        <div ref={amendItemBoxRef}>
+        <div className="orderedItemAmendment" ref={amendItemBoxRef}>
             <div
-            className="amend-item-popup"
+            className="popup"
             style={{
                 top: `${
                 getRowPosition(orderedItemSelected)?.top > 257

@@ -1,51 +1,256 @@
 .orderSummaryScreen {
-    .datetime-container {
-        display: flex; /* Aligns children (time and date) horizontally */
-        flex-direction: row;
-        align-items: center; /* Vertically centers the items in the container */
-        top: 25px;
-        left: 717px;
-    }
-    
-    .live-time, .live-date {
+// ***************************************************************************************
+.datetime-container {
+    position: absolute;
+    display: flex; /* Aligns children (time and date) horizontally */
+    top: 25px;
+    left: 666px;
+}
+
+.live-time, .live-date {
+    font-family: 'Anybody', sans-serif;
+    color: #000000;
+    padding: 0px 3px;
+}
+
+.live-time {
+    font-size: 35px;
+    font-weight: bold;
+}
+
+.live-date {
+    font-size: 35px;
+    color: #000000;
+    font-weight: normal;
+}
+
+.restaurant-logo {
+    position: absolute;
+    left: 61px;
+    top: 230px;
+    width: 220px;
+    height: auto;
+    opacity: 0.2;
+}
+
+/* *************************** */
+// LEFT SECTION
+
+.timeSinceOrder {
+    position: absolute;
+    background-color: #e90000;
+    height: 60px;
+    width: 220px;
+
+    top: 140px;
+    left: 50px;
+
+    border-radius: 20px;
+    border: 5px solid rgb(154, 0, 0);
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+
+    .time, .text {
         font-family: 'Anybody', sans-serif;
-        color: #000000;
-        padding: 0px 3px;
+        flex: 1;
+        display: flex;           /* Enable flexbox for child items */
+        justify-content: center;  /* Center content horizontally */
+        align-items: center;      /* Center content vertically */
+        color: #ffffff;
+        text-align: center;
+        width: 100%;
+        font-size: 25px;;
     }
-    
-    .live-time {
-        font-size: 22px;
-        font-weight: bold;
-    }
-    
-    .live-date {
-        font-size: 22px;
-        color: #000000;
-        font-weight: normal;
-    }
-    
-    .restaurant-logo {
-        position: absolute;
-        left: 61px;
-        top: 230px;
-        width: 220px;
-        height: auto;
-        opacity: 0.2;
+
+    .time {
+        font-size: 30px;
+        font-weight: 700;
+        padding-top: 3px;
     }
 }
 
 /* *************************** */
-.summary-right-section {
+.mid-section {
     position: absolute; /* Enable positioning to the right */
 
     background-color: #7878784d; /* Background with 23% opacity */
     border: 2px solid rgb(231, 226, 226, 0.30); /* Stroke with 15% opacity */
     border-radius: 20px; /* Round corners */
 
-    width: 280px; /* Set your desired width */
+    width: 270px; /* Set your desired width */
     height: 530px; /* Set your desired height */
-    top: 40px;
-    left: 630px; /* Position from the right */
+    top: 70px;
+
+    left: 335px; /* Position from the right */
+    
+    display: flex; /* Enable flexbox */
+    flex-direction: column; /* Stack items vertically */
+
+    gap: 7px; /* Space between the sections */
+    
+    padding: 10px 4px; /* Top, Right, Bottom, Left */
+
+    z-index: 3;
+    
+
+    .header {
+        width: 100%;
+        background-color: #4E54F9;
+        border-radius: 12px;
+        padding: 10px 0;
+        
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+
+        .orderType, .preparationTime {
+            font-family: 'Anybody', sans-serif;
+            flex: 1;
+            display: flex;           /* Enable flexbox for child items */
+            justify-content: center;  /* Center content horizontally */
+            align-items: center;      /* Center content vertically */
+            color: #ffffff;
+            text-align: center;
+            width: 100%;
+            font-size: 27px;
+            background-color: transparent;
+        }
+
+        .preparationTime {
+            font-weight: 400;
+        }
+    }
+
+    .body {
+        width: 100%;
+        height: 100%;
+        background-color: #F2F5FF;
+        border-radius: 12px;;
+        
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        overflow: hidden;
+
+        font-family: 'Anybody', sans-serif;
+        flex: 1;
+
+        .orderNo {
+            color: rgb(0, 0, 0);
+            width: 100%;
+            text-align: center;
+            padding-top: 10px;
+            font-size: 17px;
+            margin-bottom: 2px;
+        }
+
+        .separator {
+            width: 80%;
+            height: 1px;
+            background-color: #c0c0c0;
+        }
+
+        .customerName {
+            font-size: 30px;
+            font-weight: 600;
+            color: #333;
+            padding: 8px 0;
+        }
+
+        .payment-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            width: 90%;
+            background-color: #ffffff;
+            border-radius: 10px;
+            margin: 10px;
+            padding: 10px 0 10px 0;
+
+            .amountToPay {
+                font-size: 25px;
+                font-weight: bold;
+                color: #000000;
+            }
+
+            .paymentMethod {
+                font-size: 18px;
+                font-weight: 500;
+                color: #ffffff;
+                background-color: #615AB2;
+                width: 90%;
+                border-radius: 5px;
+                height: 40px;
+
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                overflow: hidden;
+                
+                padding: 2px 0;
+            }
+
+            .discountToggle {
+                font-size: 18px;
+                font-weight: 500;
+                color: #ffffff;
+                background-color: #8F8E9D;
+                width: 90%;
+                border-radius: 5px;
+                height: 40px;
+
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                overflow: hidden;
+
+                padding: 2px 0;
+            }
+        }
+
+        .notesSection {
+            width: 85%;
+            background-color: #E5E6EE;
+            display: flex;
+            justify-content: flex-start; /* Align content to the left */
+            align-items: flex-start; /* Align items to the top */
+            border-radius: 7px;
+            margin: 20px 0;
+            padding: 10px; /* Add padding for text inside the notes section */
+            height: 100%; /* Adjust height to fit content */
+        
+            .notes {
+                width: 100%; /* Ensure the text takes up full width */
+                text-align: left; /* Align text inside the notes */
+                font-weight: 700;
+                color: #333; /* Set the text color for better visibility */
+            }
+        }
+        
+    }
+}
+
+/* *************************** */
+.right-section {
+    position: absolute; /* Enable positioning to the right */
+
+    background-color: #7878784d; /* Background with 23% opacity */
+    border: 2px solid rgb(231, 226, 226, 0.30); /* Stroke with 15% opacity */
+    border-radius: 20px; /* Round corners */
+
+    width: 270px; /* Set your desired width */
+    height: 530px; /* Set your desired height */
+    top: 70px;
+    left: 660px; /* Position from the right */
     
     display: flex; /* Enable flexbox */
     flex-direction: column; /* Stack items vertically */
@@ -57,32 +262,8 @@
     z-index: 3;
 }
 
-.summary-mid-section {
-    position: absolute; /* Enable positioning to the right */
-
-    background-color: #7878784d; /* Background with 23% opacity */
-    border: 2px solid rgb(231, 226, 226, 0.30); /* Stroke with 15% opacity */
-    border-radius: 20px; /* Round corners */
-
-    width: 280px; /* Set your desired width */
-    height: 530px; /* Set your desired height */
-    top: 40px;
-
-    left: 300px; /* Position from the right */
-    
-    display: flex; /* Enable flexbox */
-    flex-direction: column; /* Stack items vertically */
-
-    gap: 7px; /* Space between the sections */
-    
-    padding: 7px 5px 7px 5px; /* Top, Right, Bottom, Left */
-
-    z-index: 3;
-}
-
-/* ***************************** */
-/* BUTTONS */
-.orderSummaryScreen {
+/* *************************** */
+button {
     font-family: 'Anybody', sans-serif;
     font-size: 19px;
     font-weight: lighter;
@@ -92,39 +273,27 @@
     border-radius: 8px;
     position: absolute;
     cursor: pointer;
+}
+.cancel {
+    top: 640px;
+    left: 20px;
+    background: #CB0000;
+    border: 3px solid #9c0505;
+}
 
-    button {
-        /* General button styling */
-        font-family: inherit; /* Inherit from the parent */
-        font-size: inherit;
-        font-weight: inherit;
-        color: inherit;
-        width: inherit;
-        height: inherit;
-        border-radius: inherit;
-        position: absolute; /* Keep buttons positioned absolutely */
-        cursor: pointer;
-    }
+.printReceipt {
+    top: 640px;
+    left: 390px;
+    background: #51538F;
+    border-radius: 5px;
+    width: 190px; /* Adjusted width for this specific button */
+}
 
-    .cancel {
-        top: 640px;
-        left: 20px;
-        background: #CB0000;
-        border: 3px solid #9c0505;
-    }
-
-    .printReceipt {
-        top: 640px;
-        left: 390px;
-        background: #51538F;
-        border-radius: 5px;
-        width: 190px; /* Adjusted width for this specific button */
-    }
-
-    .save {
-        top: 640px;
-        left: 800px;
-        background: #61A61B;
-        border: 2px solid #61A61B;
-    }
+.save {
+    top: 640px;
+    left: 800px;
+    background: #61A61B;
+    border: 2px solid #61A61B;
+}
+// ***************************************************************************************
 }

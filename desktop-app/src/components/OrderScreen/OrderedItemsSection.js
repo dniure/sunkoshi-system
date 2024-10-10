@@ -46,7 +46,6 @@ const OrderedItemsSection = ({
     const previousOrderedItems = useRef(orderedItemsInput);  // Keeps track of previous ordered items for scrolling behavior
 
 
-
     //////////////////////////////////////////////////    
     // Effects
 
@@ -129,7 +128,13 @@ const OrderedItemsSection = ({
     // Click Handling
 
     // Handles row selection when an item is clicked
-    const handleRowClick = (index) => setOrderedItemSelected(orderedItemSelected === index ? null : index);
+    const handleRowClick = (index) => {
+        if (!isAmendingItem){
+            setOrderedItemSelected(orderedItemSelected === index ? null : index);
+            return;
+        }
+        setIsAmendingItem(false);
+    }
 
     // Modify quantity of the selected ordered item
     const modifyQuantity = (modifier) => {
@@ -199,7 +204,7 @@ const OrderedItemsSection = ({
 
             const containerHeight = contentRef.current.offsetHeight;
             const containerHeightWithOfset = containerHeight + 20;
-            console.log("totalOccupiedHeight: ", totalOccupiedHeight, "containerHeightWithOfset: ", containerHeightWithOfset);
+            // console.log("totalOccupiedHeight: ", totalOccupiedHeight, "containerHeightWithOfset: ", containerHeightWithOfset);
             setisOrderedItemsScrollerVisible(totalOccupiedHeight >= containerHeightWithOfset);
             contentRef.current.style.overflowY = totalOccupiedHeight >= containerHeightWithOfset ? 'auto' : 'hidden';
 
