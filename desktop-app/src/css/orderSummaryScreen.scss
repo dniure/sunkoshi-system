@@ -96,7 +96,6 @@
 
     z-index: 3;
     
-
     .header {
         width: 100%;
         background-color: #4E54F9;
@@ -120,6 +119,7 @@
             width: 100%;
             font-size: 27px;
             background-color: transparent;
+            cursor: default;
         }
 
         .preparationTime {
@@ -159,7 +159,7 @@
         .customerName {
             font-size: 30px;
             font-weight: 600;
-            color: #333;
+            color: #000000;
             padding: 8px 0;
         }
 
@@ -231,7 +231,7 @@
             .notes {
                 width: 100%; /* Ensure the text takes up full width */
                 text-align: left; /* Align text inside the notes */
-                font-weight: 700;
+                font-weight: 400;
                 color: #333; /* Set the text color for better visibility */
             }
         }
@@ -242,25 +242,55 @@
 /* *************************** */
 .right-section {
     position: absolute; /* Enable positioning to the right */
-
     background-color: #7878784d; /* Background with 23% opacity */
-    border: 2px solid rgb(231, 226, 226, 0.30); /* Stroke with 15% opacity */
+    border: 2px solid rgba(231, 226, 226, 0.30); /* Stroke with 15% opacity */
     border-radius: 20px; /* Round corners */
-
     width: 270px; /* Set your desired width */
     height: 530px; /* Set your desired height */
     top: 70px;
     left: 660px; /* Position from the right */
-    
     display: flex; /* Enable flexbox */
     flex-direction: column; /* Stack items vertically */
-
-    gap: 7px; /* Space between the sections */
-    
     padding: 7px 5px 7px 5px; /* Top, Right, Bottom, Left */
 
-    z-index: 3;
+    .ordered-items {
+        display: flex;
+        flex-direction: column;
+
+        flex: 85%; /* Takes 85% of the space */
+        position: relative;
+        background-color: #ffffff;
+        border-radius: 20px 20px 0px 0px;    
+        padding: 0px; 
+        margin-bottom: 0;   
+    }
+
+    .editOrderClass {
+        display: flex; /* Added */
+        flex: 15%;
+
+        background-color: #ffffff;
+        border-radius: 0px 0px 20px 20px;
+        padding: 0px 10px 10px 0px;
+        
+        justify-content: center; /* Center horizontally */
+            
+        .editOrderBtn {
+            background-color: #FFC34B;
+            border: 2px solid #AC6611;
+            color:#000000;
+            height: 45px;
+            width: 170px;
+            font-size: 22px;
+            border-radius: 8px;
+            
+            position: relative;
+            top: 12px;
+        }    
+    }
+   
 }
+
 
 /* *************************** */
 button {
