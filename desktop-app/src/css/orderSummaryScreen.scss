@@ -254,24 +254,59 @@
     padding: 7px 5px 7px 5px; /* Top, Right, Bottom, Left */
 
     .ordered-items {
-        display: flex;
-        flex-direction: column;
+        position: relative;      
+        border-radius: 20px 20px 0px 0px;
+        background-color: rgb(255, 255, 255);
 
-        flex: 85%; /* Takes 85% of the space */
-        position: relative;
-        background-color: #ffffff;
-        border-radius: 20px 20px 0px 0px;    
-        padding: 0px; 
-        margin-bottom: 0;   
+        display: flex;
+        flex: 88;
+
+        .headers {
+            .label {
+                position: absolute;
+                &.quantity {
+                    left: 4px;
+                }
+                &.item {
+                    left: 40px;
+                }
+                &.price {
+                    left: 220px;
+                }
+            }
+        }
+
+        .content {
+            .vertical-line {
+                position: absolute;
+                height: 100%;
+                top: 0;
+            }
+            height: 362px;
+            background-color: rgba(47, 0, 255, 0);
+            scrollbar-width: none;
+            position: absolute;
+            margin-top: 25px;
+            width: 100%;
+
+            .price {
+                position: absolute;
+                right: 10px;
+            }
+        }
+
+        .footer {
+            margin: 0;
+            padding: 3px;
+        }
     }
 
     .editOrderClass {
         display: flex; /* Added */
-        flex: 15%;
+        flex: 13;
 
         background-color: #ffffff;
         border-radius: 0px 0px 20px 20px;
-        padding: 0px 10px 10px 0px;
         
         justify-content: center; /* Center horizontally */
             
@@ -324,6 +359,32 @@ button {
     left: 800px;
     background: #61A61B;
     border: 2px solid #61A61B;
+}
+
+.addItemTest{
+    top: 10px;
+    left: 20px;
+    background: #2f00ff;
+}
+
+.addAmendmentTest {
+    top: 10px;
+    left: 150px;
+    width: 170px;
+    background: #61A61B;
+}
+
+.removeLastItem {
+    top: 10px;
+    left: 330px;
+    background: #ff0a0a;
+}
+
+.clearContentTest {
+    top: 10px;
+    left: 460px;
+    width: 170px;
+    background: #ff0a0a;
 }
 // ***************************************************************************************
 }

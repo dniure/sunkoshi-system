@@ -291,7 +291,7 @@ const OrderedItemsSection = ({
 
             {/* Ordered Items Content */}
             <div className="ordered-items-content" ref={contentRef}>
-                <div className="vertical-line"></div>
+                <div className="vertical-line" />
 
                 {orderedItems.map((item, index) => (
                     <div key={index}>
