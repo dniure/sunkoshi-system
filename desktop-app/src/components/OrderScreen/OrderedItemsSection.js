@@ -180,7 +180,6 @@ const OrderedItemsSection = ({
     // ***********************************************************************
     // Update scrollbar handle visibility and height when ordered items change
     useEffect(() => {
-        console.log("\n");
         if (contentRef.current) {
             // Calculate total height of all rows
             const totalOccupiedHeight = orderedItems.reduce((acc, item, index) => {
@@ -204,7 +203,6 @@ const OrderedItemsSection = ({
 
             const containerHeight = contentRef.current.offsetHeight;
             const containerHeightWithOfset = containerHeight + 20;
-            // console.log("totalOccupiedHeight: ", totalOccupiedHeight, "containerHeightWithOfset: ", containerHeightWithOfset);
             setisOrderedItemsScrollerVisible(totalOccupiedHeight >= containerHeightWithOfset);
             contentRef.current.style.overflowY = totalOccupiedHeight >= containerHeightWithOfset ? 'auto' : 'hidden';
 
@@ -223,13 +221,22 @@ const OrderedItemsSection = ({
             setScrollPosition((contentRef.current.scrollTop / scrollableHeight) * handleMaxPos);
         }
     }, []);
-    
-    // Add scroll event listener to content on mount
+
     useEffect(() => {
         const orderedItemsContent = contentRef.current;
-        orderedItemsContent?.addEventListener('scroll', handleOrderedItemsScroll);
-        return () => orderedItemsContent?.removeEventListener('scroll', handleOrderedItemsScroll);
+        
+        if (orderedItemsContent) {
+            orderedItemsContent.addEventListener('scroll', handleOrderedItemsScroll);
+        }
+    
+        // Cleanup listener on component unmount
+        return () => {
+            if (orderedItemsContent) {
+                orderedItemsContent.removeEventListener('scroll', handleOrderedItemsScroll);
+            }
+        };
     }, [handleOrderedItemsScroll]);
+    
     
     // Handles mouse down on the scroller handle for dragging
     const handleMouseDown = (e) => {
@@ -249,7 +256,6 @@ const OrderedItemsSection = ({
         const handleMouseUp = () => setIsDragging(false);
 
         if (isDragging) {
-            console.log("is dragging mouse");
             window.addEventListener('mousemove', handleMouseMoveWrapper);
             
             window.addEventListener('mouseup', handleMouseUp);
