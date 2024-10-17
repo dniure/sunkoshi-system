@@ -123,6 +123,33 @@ const OrderScreen = () => {
         setOrderedItems(prevItems => [...prevItems, { ...item, quantity: 1, amendments: []}]);
         setOrderedItemSelected(orderedItems.length);
     };
+
+    const handleSaveOrder = async () => {
+        const today = new Date().toISOString().split('T')[0];  // Format: YYYY-MM-DD
+        const orderData = {
+            orderType,
+            formData,
+            orderedItems, // This should be an array of the ordered items
+        };
+     
+        // Log to verify the orderedItems are correct
+        console.log('Saving order data:', orderData);
+     
+        try {
+            const response = await fetch(`http://localhost:3001/orders`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(orderData),
+            });
+     
+            const result = await response.json();
+            console.log(result.message);  // Log success message and order number
+        } catch (error) {
+            console.error('Error saving order:', error);
+        }
+    };    
             
     // ////////////////////////////////////////////////
     // MAIN HTML
@@ -201,7 +228,7 @@ const OrderScreen = () => {
 
                     {/* Save and Cancel */}
                     <button className="bottom-btn orderScreen-cancel" onClick={() => navigate('/')}>cancel</button>
-                    <button className="bottom-btn orderScreen-save" onClick={() => navigate('/')}>save</button>
+                    <button className="bottom-btn orderScreen-save" onClick={handleSaveOrder}>save</button>
                     <button className="bottom-btn orderScreen-next" onClick={() => navigate('/OrderSummaryScreen')}>next</button>
                 </div>
             </div>

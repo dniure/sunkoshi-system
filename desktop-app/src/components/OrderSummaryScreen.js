@@ -119,14 +119,14 @@ const OrderSummaryScreen = () => {
                 return acc;
             }, 0);            
 
-            const containerHeight = itemsContainerRef.current.offsetHeight;
+            const containerHeight = itemsContainerRef.current.offsetHeight + 8;
             // console.log("containerHeight: ", containerHeight);
             // console.log("totalOccupiedHeight: ", totalOccupiedHeight);
 
             setisOrderedItemsScrollerVisible(totalOccupiedHeight >= containerHeight);
             itemsContainerRef.current.style.overflowY = totalOccupiedHeight >= containerHeight ? 'auto' : 'hidden';
 
-            const calculatedHandleHeight = Math.max(20, (containerHeight - 30) * (containerHeight / totalOccupiedHeight));
+            const calculatedHandleHeight = Math.max(20, (containerHeight - 40) * (containerHeight / totalOccupiedHeight));
 
             setHandleHeight(Math.min(calculatedHandleHeight, containerHeight));
         }
