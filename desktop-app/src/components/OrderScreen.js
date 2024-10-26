@@ -158,7 +158,7 @@ const OrderScreen = () => {
 
             if (response.ok) {
                 console.log('Order saved successfully:', result.message);
-                // navigate('/OrderSummaryScreen'); // Navigate to Order Summary screen on success
+                navigate('/OrderSummaryScreen', { state: { tempOrderID: result.order.id } });
             } else {
                 console.error('Error creating order:', result.message);
                 alert(`Error: ${result.message}`);
@@ -246,7 +246,7 @@ const OrderScreen = () => {
                     {/* Save and Cancel */}
                     <button className="bottom-btn orderScreen-cancel" onClick={() => navigate('/')}>cancel</button>
                     <button className="bottom-btn orderScreen-save" onClick={handleSaveOrder}>save</button>
-                    <button className="bottom-btn orderScreen-next" onClick={() => navigate('/OrderSummaryScreen')}>next</button>
+                    <button className="bottom-btn orderScreen-next" onClick={handleSaveOrder}>next</button>
                 </div>
             </div>
         </div>

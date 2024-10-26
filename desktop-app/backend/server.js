@@ -59,6 +59,13 @@ app.post('/tempOrders', async (req, res) => {
             orderType,
             customerID, // Use the determined customerID
         });
+        
+        // Updated response with tempOrderID
+        res.status(201).json({ 
+            message: 'Temporary order created successfully', 
+            order: newTempOrder,
+            tempOrderID: newTempOrder.id // Add this line to return the ID
+        });        
 
         res.status(201).json({ message: 'Temporary order created successfully', order: newTempOrder });
     } catch (error) {

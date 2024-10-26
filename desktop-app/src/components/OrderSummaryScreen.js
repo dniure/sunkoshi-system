@@ -1,10 +1,29 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
 import '../css/main.scss';
 import '../css/orderSummaryScreen.scss';
 import logo from '../images/logo.png';
 const OrderSummaryScreen = () => {
+    const location = useLocation();
+    const { tempOrderID } = location.state || {}; // Get tempOrderID from state
+    
+    useEffect(() => {
+        if (tempOrderID) {
+            // Fetch the order details using tempOrderID
+            fetch(`http://localhost:3001/tempOrders/${tempOrderID}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Handle the data (e.g., display the order details)
+                    console.log('Fetched order details:', data);
+                })
+                .catch(error => {
+                    console.error('Error fetching order details:', error);
+                });
+        }
+    }, [tempOrderID]);
+
 
     const itemsContainerRef = useRef(null);
     const rowRefs = useRef([]);
