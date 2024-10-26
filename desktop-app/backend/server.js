@@ -12,18 +12,43 @@ app.post('/orders', async (req, res) => {
     try {
         const { orderType, formData, orderedItems } = req.body;
         console.log('Incoming order data:', req.body);
-        const orderDate = new Date().toISOString().split('T')[0]; // Format date as YYYY-MM-DD
+        
+        // Format date as YYYY-MM-DD
+        const orderDate = new Date().toISOString().split('T')[0]; 
         const orderCount = await Order.count({ where: { orderDate } });
         const orderNumber = (orderCount + 1).toString().padStart(4, '0');
 
-        const customer = await Customer.create({
-            name: formData.name || null,
-            phone: formData.phone || null,
-            postcode: formData.postcode || null,
-            address: formData.address || null,
-            notes: formData.notes || null,
-        });
+        let customerID;
 
+        // Check if the order is a takeaway with all fields empty
+        if (orderType === 'takeaway' && (!formData.name && !formData.phone && !formData.postcode && !formData.address)) {
+            customerID = 0; // Use customer ID 0 for takeaways
+
+            // Check if customer with ID 0 exists, if not create it
+            const existingCustomer = await Customer.findOne({ where: { customerID: 0 } });
+            if (!existingCustomer) {
+                await Customer.create({
+                    customerID: 0,
+                    name: '',
+                    phone: '',
+                    postcode: '',
+                    address: '',
+                    notes: ''
+                });
+            }
+        } else {
+            // Create a new customer with provided formData
+            const customer = await Customer.create({
+                name: formData.name || null,
+                phone: formData.phone || null,
+                postcode: formData.postcode || null,
+                address: formData.address || null,
+                notes: formData.notes || null,
+            });
+            customerID = customer.customerID; // Get the newly created customer's ID
+        }
+
+        // Create the new order with the appropriate customerID
         const newOrder = await Order.create({
             orderDate,
             orderNumber,
@@ -31,7 +56,7 @@ app.post('/orders', async (req, res) => {
             paymentMethod: formData.paymentMethod || null,
             orderNotes: formData.notes || null,
             orderType,
-            customerID: customer.customerID,
+            customerID, // Use the determined customerID
         });
         
         res.status(201).json({ message: 'Order created successfully', order: newOrder });
