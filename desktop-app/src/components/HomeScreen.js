@@ -42,7 +42,6 @@ const HomeScreen = () => {
 
         return () => clearInterval(intervalId); // Cleanup interval on component unmount
     }, []);
-
     //////////////////////////////////////////////////
     // MAIN HTML
     return (

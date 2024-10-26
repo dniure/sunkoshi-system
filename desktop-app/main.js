@@ -23,10 +23,14 @@ async function createWindow() {
     minHeight: 663,
     maxWidth: 1268,
     maxHeight: 951,
+
     webPreferences: {
+      preload: path.join(__dirname, 'preload.js'), // Modify preload if needed
       nodeIntegration: true,
       contextIsolation: false,
-    }
+      enableRemoteModule: true,  // Modify based on your requirements
+      sandbox: false
+    }    
   });
 
   // Set aspect ratio for the window to maintain during resizing

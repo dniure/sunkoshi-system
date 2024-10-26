@@ -125,31 +125,51 @@ const OrderScreen = () => {
     };
 
     const handleSaveOrder = async () => {
-        const today = new Date().toISOString().split('T')[0];  // Format: YYYY-MM-DD
+        // Construct order data to match the server requirements
         const orderData = {
             orderType,
-            formData,
-            orderedItems, // This should be an array of the ordered items
+            formData: {
+                name: formData.name,
+                phone: formData.phone,
+                postcode: formData.postcode,
+                address: formData.address,
+                notes: formData.notes,
+                paymentMethod: formData.paymentMethod || 'cash', // Set default payment method
+            },
+            orderedItems: orderedItems.map(item => ({
+                name: item.name,
+                price: item.price,
+                quantity: item.quantity,
+                amendments: item.amendments,
+            })),
         };
-     
-        // Log to verify the orderedItems are correct
+    
         console.log('Saving order data:', orderData);
-     
+    
         try {
-            const response = await fetch(`http://localhost:3001/orders`, {
+            // Save the order to the server
+            const response = await fetch('http://localhost:3001/orders', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(orderData),
             });
-     
+    
             const result = await response.json();
-            console.log(result.message);  // Log success message and order number
+    
+            if (response.ok) {
+                console.log('Order saved successfully:', result.message);
+                // navigate('/OrderSummaryScreen'); // Navigate to Order Summary screen on success
+            } else {
+                console.error('Error creating order:', result.message);
+                alert(`Error: ${result.message}`);
+            }
         } catch (error) {
             console.error('Error saving order:', error);
+            alert('An unexpected error occurred. Please try again later.');
         }
-    };    
+    };      
             
     // ////////////////////////////////////////////////
     // MAIN HTML
