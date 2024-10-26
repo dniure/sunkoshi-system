@@ -10,23 +10,22 @@ const Order = sequelize.define('Order', {
     orderNumber: {
         type: DataTypes.STRING(4),
         allowNull: false,
-    },
-    creationTime: {
-        type: DataTypes.DATE,
-        allowNull: false,
-        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
-    },
-    lastModifiedTime: {
-        type: DataTypes.DATE,
-        allowNull: false,
-        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
-    },
-    orderedItems: {
-        type: DataTypes.JSONB,
-        allowNull: false,
+        primaryKey: true,
     },
     orderType: {
         type: DataTypes.STRING(50),
+        allowNull: false,
+    },
+    customerID: {
+        type: DataTypes.INTEGER,
+        references: {
+            model: 'Customers', // Name of the referenced table
+            key: 'customerID', // Name of the column in the referenced table
+        },
+        allowNull: true,
+    },
+    orderedItems: {
+        type: DataTypes.JSONB,
         allowNull: false,
     },
     orderNotes: {
@@ -37,14 +36,21 @@ const Order = sequelize.define('Order', {
         type: DataTypes.STRING(50),
         allowNull: false,
     },
-    customerID: {
-        type: DataTypes.INTEGER,
-        references: {
-            model: 'customerInfo',
-            key: 'customerID',
-        },
-        allowNull: true,
+    createdAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
     },
+    updatedAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+    },
+}, {
+    tableName: 'Orders',
+    timestamps: true,
+    updatedAt: 'updatedAt',
+    createdAt: 'createdAt',
 });
 
 module.exports = Order;
