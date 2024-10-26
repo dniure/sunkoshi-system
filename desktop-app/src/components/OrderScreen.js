@@ -143,12 +143,9 @@ const OrderScreen = () => {
                 amendments: item.amendments,
             })),
         };
-    
-        console.log('Saving order data:', orderData);
-    
+
         try {
-            // Save the order to the server
-            const response = await fetch('http://localhost:3001/orders', {
+            const response = await fetch('http://localhost:3001/tempOrders', { // Updated the endpoint to match your backend
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -157,7 +154,8 @@ const OrderScreen = () => {
             });
     
             const result = await response.json();
-    
+            console.log('Temporary order saved:', result);
+
             if (response.ok) {
                 console.log('Order saved successfully:', result.message);
                 // navigate('/OrderSummaryScreen'); // Navigate to Order Summary screen on success
@@ -166,10 +164,9 @@ const OrderScreen = () => {
                 alert(`Error: ${result.message}`);
             }
         } catch (error) {
-            console.error('Error saving order:', error);
-            alert('An unexpected error occurred. Please try again later.');
+            console.error('Error saving temporary order:', error);
         }
-    };      
+    };
             
     // ////////////////////////////////////////////////
     // MAIN HTML
