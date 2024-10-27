@@ -1,34 +1,66 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
 
 import '../css/main.scss';
 import '../css/orderSummaryScreen.scss';
+import '../css/OrderScreen/orderedItemsSection.scss';
+
 import logo from '../images/logo.png';
 const OrderSummaryScreen = () => {
+    // ***********************************************************************
+    // Database
     const location = useLocation();
-    const { tempOrderID } = location.state || {}; // Get tempOrderID from state
-    
-    useEffect(() => {
-        if (tempOrderID) {
-            // Fetch the order details using tempOrderID
-            fetch(`http://localhost:3001/tempOrders/${tempOrderID}`)
-                .then(response => response.json())
-                .then(data => {
-                    // Handle the data (e.g., display the order details)
-                    console.log('Fetched order details:', data);
-                })
-                .catch(error => {
-                    console.error('Error fetching order details:', error);
-                });
-        }
-    }, [tempOrderID]);
+    const { orderData } = location.state || {}; // Use the passed orderData
+    const [orderedItems, setOrderedItems] = useState([]);
 
+    const [orderDetails, setOrderDetails] = useState({
+        orderType: '',
+        orderNumber: '',
+        orderNotes: '',
+        createdAt: '',
+        createdAtTime: '',
+        timeSinceOrder: '',
+        prepareOrderFor: '',
+        customerDisplayName: '',
+        amountToPay: '',
+        paymentMethod: '',
+    });
+
+    // Use effect to set order details based on passed orderData
+    useEffect(() => {
+        if (orderData) {
+            const createdAtDate = new Date(orderData.order.createdAt);
+            const hours = String(createdAtDate.getHours()).padStart(2, '0');
+            const minutes = String(createdAtDate.getMinutes()).padStart(2, '0');
+            const createdAtTime = `${hours}:${minutes}`;
+
+            console.log("prepareOrderFor (summary): ", orderData.order.prepareOrderFor);
+            // Set the order details with combined data
+            setOrderDetails({
+                orderType: orderData.order.orderType || '',
+                orderNumber: orderData.order.orderNumber || '',
+                orderNotes: orderData.order.orderNotes || '',
+                createdAt: orderData.order.createdAt || '',
+                createdAtTime: createdAtTime,
+                timeSinceOrder: '',
+                prepareOrderFor: orderData.order.prepareOrderFor || '',
+                customerDisplayName: orderData.order.customerName || orderData.order.orderType || '', // Compact assignment
+                amountToPay: '',
+                paymentMethod: orderData.order.paymentMethod || '',
+            });
+
+            setOrderedItems(orderData.order.orderedItems);
+
+        } else {
+            console.log('No orderData provided, order details not set.');
+        }
+    }, [orderData]);
+        
+    // ***********************************************************************
 
     const itemsContainerRef = useRef(null);
     const rowRefs = useRef([]);
-    const [orderedItems, setOrderedItems] = useState([]);
-    const orderedItemsScroller = useRef(null);  // Ref for the scroller handle
+    const orderedItemsScrollerRef = useRef(null);  // Ref for the scroller handle
 
     // Main Scroller
     const [scrollPosition, setScrollPosition] = useState(0);  // Scroll position of the list
@@ -37,51 +69,6 @@ const OrderSummaryScreen = () => {
     const [handleHeight, setHandleHeight] = useState(50);  // Height of the scrollbar handle
     const [dragOffset, setDragOffset] = useState(0);  // Offset for dragging the scrollbar handle
     
-    
-    const addItemFunction = () => {
-        setOrderedItems(prevItems => [
-            ...prevItems,
-            {
-                name: "ITEM",
-                quantity: 1,
-                price: 4.99,
-                amendments: []
-            }
-        ]);
-    };
-
-    const addAmendmentFunction = () => {
-        if (orderedItems[0]){
-            setOrderedItems(prevItems => {
-                const updatedItems = [...prevItems];
-                
-                const lastItem = updatedItems[updatedItems.length - 1];
-                const updatedLastItem = {
-                    ...lastItem,
-                    amendments: [...lastItem.amendments, 'amendment'] // Add new amendment
-                };
-                updatedItems[updatedItems.length - 1] = updatedLastItem;
-
-                return updatedItems;
-            });
-        }
-    };
-
-    const removeLastItem = () => {
-        setOrderedItems(prevItems => {
-            if (prevItems.length === 0) {
-                return prevItems;
-            }
-            
-            return prevItems.slice(0, -1);
-        });
-    };
-
-    const clearOrederdItems = () => {
-        setOrderedItems([]); // Set orderedItems to an empty array
-    };
-    
-
     // Displaying Amendments
     const OrderedItemAmendmentsDisplay = ({ amendments }) => {
         return (
@@ -97,14 +84,14 @@ const OrderSummaryScreen = () => {
 
     // Handle mouse movement for dragging the scroller handle
     const handleMouseMove = useCallback((e) => {
-        if (!isDragging || !itemsContainerRef.current || !orderedItemsScroller.current) return;
+        if (!isDragging || !itemsContainerRef.current || !orderedItemsScrollerRef.current) return;
 
         const scrollerHandle = document.querySelector('.orderedItemsScroller-handle');
-        const scrollerHeight = orderedItemsScroller.current.clientHeight;
+        const scrollerHeight = orderedItemsScrollerRef.current.clientHeight;
         const scrollableHeight = itemsContainerRef.current.scrollHeight - itemsContainerRef.current.clientHeight;
 
         // Calculate new position and scroll content accordingly
-        const handlePosition = Math.max(0, Math.min(e.clientY - orderedItemsScroller.current.getBoundingClientRect().top - dragOffset, scrollerHeight - scrollerHandle.clientHeight));
+        const handlePosition = Math.max(0, Math.min(e.clientY - orderedItemsScrollerRef.current.getBoundingClientRect().top - dragOffset, scrollerHeight - scrollerHandle.clientHeight));
         itemsContainerRef.current.scrollTop = (handlePosition / (scrollerHeight - scrollerHandle.clientHeight)) * scrollableHeight;
 
         setScrollPosition(handlePosition);
@@ -114,7 +101,6 @@ const OrderSummaryScreen = () => {
     // ***********************************************************************
     // Update scrollbar handle visibility and height when ordered items change
     useEffect(() => {
-        console.log("\n-------------------");
         if (itemsContainerRef.current) {
             // Calculate total height of all rows
             const totalOccupiedHeight = orderedItems.reduce((acc, item, index) => {
@@ -154,9 +140,9 @@ const OrderSummaryScreen = () => {
     // ***************************************************  
     // Update ordered items scroller on mouse scroll
     const handleOrderedItemsScroll = useCallback(() => {
-        if (itemsContainerRef.current && orderedItemsScroller.current) {
+        if (itemsContainerRef.current && orderedItemsScrollerRef.current) {
             const scrollableHeight = itemsContainerRef.current.scrollHeight - itemsContainerRef.current.clientHeight;
-            const scrollerHeight = orderedItemsScroller.current.clientHeight;
+            const scrollerHeight = orderedItemsScrollerRef.current.clientHeight;
             const handleMaxPos = scrollerHeight - document.querySelector('.orderedItemsScroller-handle').clientHeight;
             setScrollPosition((itemsContainerRef.current.scrollTop / scrollableHeight) * handleMaxPos);
         }
@@ -205,10 +191,10 @@ const OrderSummaryScreen = () => {
             window.removeEventListener('mousemove', handleMouseMoveWrapper);
             window.removeEventListener('mouseup', handleMouseUp);
         };
-    }, [isDragging, handleMouseMove]); 
+    }, [isDragging, handleMouseMove]);  
     
-    
-    // *****************************************************
+
+// *****************************************************
     const navigate = useNavigate();
 
     //////////////////////////////////////////////////
@@ -232,14 +218,81 @@ const OrderSummaryScreen = () => {
 
             setCurrentTime(formattedTime);
             setCurrentDate(formattedDate);
-        };
 
+            // Calculate timeSinceOrder if orderDetails has createdAt
+            if (orderDetails.createdAt) {
+
+                // Extract HH:MM from createdAt
+                const createdAtDate = new Date(orderDetails.createdAt);
+                const currentTime = new Date();
+
+                const currentMinutes = currentTime.getHours() * 60 + currentTime.getMinutes();
+                const createdAtMinutes = createdAtDate.getHours() * 60 + createdAtDate.getMinutes();
+                const timeSinceOrder = currentMinutes - createdAtMinutes;
+                                
+                // Update orderDetails with new timeSinceOrder
+                setOrderDetails(prevOrderDetails => ({
+                    ...prevOrderDetails,
+                    timeSinceOrder: timeSinceOrder,
+                }));
+            }
+        }
         updateTime(); // Initial call to set time immediately
         const intervalId = setInterval(updateTime, 1000); // Update every second
 
         return () => clearInterval(intervalId); // Cleanup interval on component unmount
-    }, []);
+    }, [orderDetails.createdAt]);
+
+    const handleEditOrderClick = () => {
+        navigate('/OrderScreen', { state: { orderData: orderData } });
+    }
+    
+
+    const addItemFunction = () => {
+        setOrderedItems(prevItems => [
+            ...prevItems,
+            {
+                name: "ITEM",
+                quantity: 1,
+                price: 4.99,
+                amendments: []
+            }
+        ]);
+    };
+
+    const addAmendmentFunction = () => {
+        if (orderedItems[0]){
+            setOrderedItems(prevItems => {
+                const updatedItems = [...prevItems];
+                
+                const lastItem = updatedItems[updatedItems.length - 1];
+                const updatedLastItem = {
+                    ...lastItem,
+                    amendments: [...lastItem.amendments, 'amendment'] // Add new amendment
+                };
+                updatedItems[updatedItems.length - 1] = updatedLastItem;
+
+                return updatedItems;
+            });
+        }
+    };
+
+    const removeLastItem = () => {
+        setOrderedItems(prevItems => {
+            if (prevItems.length === 0) {
+                return prevItems;
+            }
             
+            return prevItems.slice(0, -1);
+        });
+    };
+
+    const clearOrederdItems = () => {
+        setOrderedItems([]); // Set orderedItems to an empty array
+    };
+    
+
+
     // ////////////////////////////////////////////////
     // MAIN HTML
     return (
@@ -255,32 +308,37 @@ const OrderSummaryScreen = () => {
                 </div>
 
                 <div className="timeSinceOrder">
-                    <span className="time"> 24 minutes</span>
+                    <span className="time"> {orderDetails.timeSinceOrder} minutes</span>
                     <span className="text"> since order</span>
                 </div>
+
+                {/* *************************************************** */}
+                {/* MID SECTION */}
                 <div className="mid-section">
                     <div className="header">
-                        <span className="orderType">TAKEAWAY</span>
-                        <span className="preparationTime">ASAP</span>
+                        <span className="orderType">{orderDetails.orderType}</span>
+                        <span className="preparationTime">{orderDetails.prepareOrderFor}</span>
                     </div>
 
                     <div className="body">
-                        <div className="orderNo">No. 13</div>
+                        <div className="orderNo">No. {orderDetails.orderNumber}</div>
                         <span className="separator"/>
-                        <div className="customerName">JAMES</div>
-                        <div className="orderedTime">18:55</div>
+                        <div className="customerName">{orderDetails.customerDisplayName}</div>
+                        <div className="orderedTime">{orderDetails.createdAtTime}</div>
                         <div className="payment-section">
                             <div className="amountToPay">£34.35</div>
-                            <div className="paymentMethod">PAID CASH</div> 
+                            <div className="paymentMethod">TO PAY: {orderDetails.paymentMethod}</div> 
                             <div className="discountToggle">Discount</div> 
                         </div>
                         <div className="notesSection">
-                            <div className="notes">Notes</div>
+                            <div className="notes">Notes {orderDetails.notes}</div>
                         </div>
 
                     </div>
                 </div>
-
+                
+                {/* *************************************************** */}
+                {/* RIGHT SECTION */}
                 <div className="right-section">
                     <div className="ordered-items">
                         {/* Headers for Quantity, Item, and Price */}
@@ -310,7 +368,7 @@ const OrderSummaryScreen = () => {
 
                         {/* Scrollbar */}
                         {isOrderedItemsScrollerVisible && (
-                            <div className="orderedItemsScroller" ref={orderedItemsScroller}>
+                            <div className="orderedItemsScroller" ref={orderedItemsScrollerRef}>
                                 <div
                                     className="orderedItemsScroller-handle"
                                     style={{ top: `${scrollPosition}px`, height: `${handleHeight}px` }}
@@ -328,7 +386,7 @@ const OrderSummaryScreen = () => {
                         </div>
                     </div>
                     <div className="editOrderClass">
-                        <button className="editOrderBtn">edit order</button>
+                        <button className="editOrderBtn" onClick={handleEditOrderClick}>edit order</button>
                     </div>
                 </div>                                   
 

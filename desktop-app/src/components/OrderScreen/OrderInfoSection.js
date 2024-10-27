@@ -4,6 +4,8 @@ import '../../css/OrderScreen/orderInfoSection.scss';
 
 const OrderInfoSection = ({
     orderType,                 // The type of order (e.g., Delivery, Pickup)
+    prepareOrderFor,
+    setPrepareOrderFor,
     formData,                  // Customer details passed as input
     modifyTimePopupRef,        // Reference for the time modification popup
     setIsCustomerPopupVisible, // Function to show/hide customer info popup
@@ -17,7 +19,7 @@ const OrderInfoSection = ({
 
     const [currentTime, setCurrentTime] = useState(new Date());         // Tracks the current time
     const [orderTimeInMinutes, setOrderTimeInMinutes] = useState(25);   // Tracks the order time in minutes
-
+    
     //////////////////////////////////////////////////
     // Timer Effect
 
@@ -27,6 +29,10 @@ const OrderInfoSection = ({
         return () => clearInterval(timer); // Clears the interval when the component unmounts
     }, []);
 
+    useEffect(() => {
+        setPrepareOrderFor(orderTimeInMinutes === 25 ? 'ASAP' : getTimeInHHMM());
+    }, [orderTimeInMinutes, prepareOrderFor, setPrepareOrderFor]);
+    
     //////////////////////////////////////////////////
     // Time Adjustment Logic
 
@@ -68,10 +74,11 @@ const OrderInfoSection = ({
     // Time Formatting Logic
 
     // Returns the formatted order time in HH:MM format
-    const getFormattedTime = () => {
+    const getTimeInHHMM = () => {
         const totalMinutes = orderTimeInMinutes + currentTime.getMinutes();
         const hours = (currentTime.getHours() + Math.floor(totalMinutes / 60)) % 24;
         const minutes = totalMinutes % 60;
+
         return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
     };
 
@@ -123,7 +130,7 @@ const OrderInfoSection = ({
                 style={{ zIndex: 2 }} // Ensure the button appears above other elements
             >
                 {/* Display ASAP or the formatted order time */}
-                <span>{orderTimeInMinutes === 25 ? 'ASAP' : getFormattedTime()}</span>
+                <span>{prepareOrderFor}</span>
                 <span className="arrow"> ▲</span>
             </button>
 
@@ -153,7 +160,7 @@ const OrderInfoSection = ({
                     {/* Exact Time Adjustment Buttons */}
                     <div className="section exact-time">
                         <button onClick={() => adjustOrderTime("decrease", "exactTime")}>-</button>
-                        <span>{getFormattedTime()}</span>
+                        <span>{getTimeInHHMM()}</span>
                         <button onClick={() => adjustOrderTime("increase", "exactTime")}>+</button>
                     </div>
                 </div>

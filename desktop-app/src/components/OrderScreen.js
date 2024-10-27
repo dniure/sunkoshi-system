@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import ManageOrderDetails from './OrderScreen/ManageOrderDetails';
 import Menu from './OrderScreen/Menu';
 import OrderedItemsSection from './OrderScreen/OrderedItemsSection';
@@ -9,9 +9,12 @@ import '../css/main.scss';
 import '../css/orderScreen.scss';
 
 const OrderScreen = () => {
-    // Navigation
+    // User
     const navigate = useNavigate();
-    
+    const location = useLocation(); // Import useLocation to access navigation state
+    const { orderData } = location.state || {};
+    const [newOrder, setNewOrder] = useState(true);
+
     //////////////////////////////////////////////////    
     // Click Handling
 
@@ -23,6 +26,7 @@ const OrderScreen = () => {
     // Section: Manage Order Details (popup, when clicking on Order Info Section)
     const [isCustomerPopupVisible, setIsCustomerPopupVisible] = useState(false);
     const [orderType, setOrderType] = useState("takeaway");
+    const [prepareOrderFor, setPrepareOrderFor] = useState('Unknown');
     const [formData, setFormData] = useState({
         name: '',
         phone: '',
@@ -62,6 +66,25 @@ const OrderScreen = () => {
     // Section: Menu Grid
     const menuGridRef = useRef(null);
 
+    // Check for order data from navigation state
+    useEffect(() => {
+        if (orderData) {
+            console.log("\n\nEDITING ORDER*****************");
+            setNewOrder(false);
+
+            setOrderType(orderData.order.orderType || "UNKNOWN");
+            setOrderedItems(orderData.order.orderedItems || [])
+            setPrepareOrderFor(orderData.order.prepareOrderFor)
+
+            setFormData({
+                name: orderData.customerInfo.name,
+                phone: orderData.customerInfo.phone,
+                postcode: orderData.customerInfo.postcode,
+                address: orderData.customerInfo.address,
+                notes: orderData.customerInfo.notes,
+            })
+        }
+    }, [location.state]);
 
     // Click Handling
     useEffect(() => {    
@@ -125,46 +148,42 @@ const OrderScreen = () => {
     };
 
     const handleSaveOrder = async () => {
-        // Construct order data to match the server requirements
-        const orderData = {
-            orderType,
-            formData: {
-                name: formData.name,
-                phone: formData.phone,
-                postcode: formData.postcode,
-                address: formData.address,
-                notes: formData.notes,
-                paymentMethod: formData.paymentMethod || 'cash', // Set default payment method
-            },
-            orderedItems: orderedItems.map(item => ({
-                name: item.name,
-                price: item.price,
-                quantity: item.quantity,
-                amendments: item.amendments,
-            })),
-        };
+        if (newOrder){
+            // Data to input to server
+            const orderData = {
+                orderType,
+                prepareOrderFor,
+                formData,
+                orderedItems,
+                paymentMethod: 'SELECT',
+            };
 
-        try {
-            const response = await fetch('http://localhost:3001/tempOrders', { // Updated the endpoint to match your backend
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(orderData),
-            });
-    
-            const result = await response.json();
-            console.log('Temporary order saved:', result);
+            try {
+                const response = await fetch('http://localhost:3001/tempOrders', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    // Input to server
+                    body: JSON.stringify(orderData),
+                });
 
-            if (response.ok) {
-                console.log('Order saved successfully:', result.message);
-                navigate('/OrderSummaryScreen', { state: { tempOrderID: result.order.id } });
-            } else {
-                console.error('Error creating order:', result.message);
-                alert(`Error: ${result.message}`);
+                // Output from server
+                const result = await response.json();
+
+                console.log("result: ", result);
+
+                if (response.ok) {
+                    navigate('/OrderSummaryScreen', { state: { orderData: result} });
+                } else {
+                    console.error('Error creating order:', result);
+                }
+            } catch (error) {
+                console.error('Error saving temporary order:', error);
             }
-        } catch (error) {
-            console.error('Error saving temporary order:', error);
+        } else{
+            console.log("orderData: ", orderData);
+            navigate('/OrderSummaryScreen', { state: { orderData: orderData} });
         }
     };
             
@@ -212,6 +231,8 @@ const OrderScreen = () => {
                         {/* ORDER INFO */}
                         <OrderInfoSection
                             orderType={orderType}
+                            prepareOrderFor={prepareOrderFor}
+                            setPrepareOrderFor={setPrepareOrderFor}
                             formData={formData}
                             modifyTimePopupRef={modifyTimePopupRef}
                             setIsCustomerPopupVisible={setIsCustomerPopupVisible}

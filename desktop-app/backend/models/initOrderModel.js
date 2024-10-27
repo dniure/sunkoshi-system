@@ -17,6 +17,10 @@ const initOrderModel = (sequelize) => {
             type: DataTypes.STRING(50),
             allowNull: false,
         },
+        prepareOrderFor: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
         customerID: {
             type: DataTypes.INTEGER,
             references: {

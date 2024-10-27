@@ -1,114 +1,60 @@
 .orderSummaryScreen {
-// ***************************************************************************************
-.datetime-container {
-    position: absolute;
-    display: flex; /* Aligns children (time and date) horizontally */
-    top: 25px;
-    left: 666px;
-}
-
-.live-time, .live-date {
-    font-family: 'Anybody', sans-serif;
-    color: #000000;
-}
-
-.live-time {
-    font-size: 35px;
-    font-weight: bold;
-}
-
-.live-date {
-    font-size: 35px;
-    color: #000000;
-    font-weight: normal;
-    padding-left: 15px;
-}
-
-.restaurant-logo {
-    position: absolute;
-    left: 61px;
-    top: 230px;
-    width: 220px;
-    height: auto;
-    opacity: 0.2;
-}
-
-/* *************************** */
-// LEFT SECTION
-
-.timeSinceOrder {
-    position: absolute;
-    background-color: #e90000;
-    height: 60px;
-    width: 220px;
-
-    top: 140px;
-    left: 50px;
-
-    border-radius: 20px;
-    border: 5px solid rgb(154, 0, 0);
-
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-
-    .time, .text {
+    // ***************************************************************************************
+    .datetime-container {
+        position: absolute;
+        display: flex; /* Aligns children (time and date) horizontally */
+        top: 25px;
+        left: 666px;
+    }
+    
+    .live-time, .live-date {
         font-family: 'Anybody', sans-serif;
-        flex: 1;
-        display: flex;           /* Enable flexbox for child items */
-        justify-content: center;  /* Center content horizontally */
-        align-items: center;      /* Center content vertically */
-        color: #ffffff;
-        text-align: center;
-        width: 100%;
-        font-size: 25px;;
+        color: #000000;
     }
-
-    .time {
-        font-size: 30px;
-        font-weight: 700;
-        padding-top: 3px;
+    
+    .live-time {
+        font-size: 35px;
+        font-weight: bold;
     }
-}
-
-/* *************************** */
-.mid-section {
-    position: absolute; /* Enable positioning to the right */
-
-    background-color: #7878784d; /* Background with 23% opacity */
-    border: 2px solid rgb(231, 226, 226, 0.30); /* Stroke with 15% opacity */
-    border-radius: 20px; /* Round corners */
-
-    width: 270px; /* Set your desired width */
-    height: 530px; /* Set your desired height */
-    top: 70px;
-
-    left: 335px; /* Position from the right */
     
-    display: flex; /* Enable flexbox */
-    flex-direction: column; /* Stack items vertically */
-
-    gap: 7px; /* Space between the sections */
+    .live-date {
+        font-size: 35px;
+        color: #000000;
+        font-weight: normal;
+        padding-left: 15px;
+    }
     
-    padding: 10px 4px; /* Top, Right, Bottom, Left */
-
-    z-index: 3;
+    .restaurant-logo {
+        position: absolute;
+        left: 61px;
+        top: 230px;
+        width: 220px;
+        height: auto;
+        opacity: 0.2;
+    }
     
-    .header {
-        width: 100%;
-        background-color: #4E54F9;
-        border-radius: 12px;
-        padding: 10px 0;
-        
+    /* *************************** */
+    // LEFT SECTION
+    
+    .timeSinceOrder {
+        position: absolute;
+        background-color: #e90000;
+        height: 60px;
+        width: 220px;
+    
+        top: 140px;
+        left: 50px;
+    
+        border-radius: 20px;
+        border: 5px solid rgb(154, 0, 0);
+    
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
         overflow: hidden;
-
-        .orderType, .preparationTime {
+    
+        .time, .text {
             font-family: 'Anybody', sans-serif;
             flex: 1;
             display: flex;           /* Enable flexbox for child items */
@@ -117,274 +63,333 @@
             color: #ffffff;
             text-align: center;
             width: 100%;
-            font-size: 27px;
-            background-color: transparent;
-            cursor: default;
+            font-size: 25px;;
         }
-
-        .preparationTime {
-            font-weight: 400;
+    
+        .time {
+            font-size: 30px;
+            font-weight: 700;
+            padding-top: 3px;
         }
     }
-
-    .body {
-        width: 100%;
-        height: 100%;
-        background-color: #F2F5FF;
-        border-radius: 12px;;
+    
+    /* *************************** */
+    .mid-section {
+        position: absolute; /* Enable positioning to the right */
+    
+        background-color: #7878784d; /* Background with 23% opacity */
+        border: 2px solid rgb(231, 226, 226, 0.30); /* Stroke with 15% opacity */
+        border-radius: 20px; /* Round corners */
+    
+        width: 270px; /* Set your desired width */
+        height: 530px; /* Set your desired height */
+        top: 70px;
+        left: 335px; /* Position from the right */
         
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        overflow: hidden;
+        text-transform: uppercase;
 
-        font-family: 'Anybody', sans-serif;
-        flex: 1;
-
-        .orderNo {
-            color: rgb(0, 0, 0);
+        display: flex; /* Enable flexbox */
+        flex-direction: column; /* Stack items vertically */
+    
+        gap: 7px; /* Space between the sections */
+        
+        padding: 10px 4px; /* Top, Right, Bottom, Left */
+    
+        z-index: 3;
+        
+        .header {
             width: 100%;
-            text-align: center;
-            padding-top: 10px;
-            font-size: 17px;
-            margin-bottom: 2px;
-        }
-
-        .separator {
-            width: 80%;
-            height: 1px;
-            background-color: #c0c0c0;
-        }
-
-        .customerName {
-            font-size: 30px;
-            font-weight: 600;
-            color: #000000;
-            padding: 8px 0;
-        }
-
-        .payment-section {
+            background-color: #4E54F9;
+            border-radius: 12px;
+            padding: 10px 0;
+            
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 8px;
-            width: 90%;
-            background-color: #ffffff;
-            border-radius: 10px;
-            margin: 10px;
-            padding: 10px 0 10px 0;
+            justify-content: center;
+            overflow: hidden;
+    
+            .orderType, .preparationTime {
+                font-family: 'Anybody', sans-serif;
+                flex: 1;
+                display: flex;           /* Enable flexbox for child items */
+                justify-content: center;  /* Center content horizontally */
+                align-items: center;      /* Center content vertically */
+                color: #ffffff;
+                text-align: center;
+                width: 100%;
+                font-size: 27px;
+                background-color: transparent;
+                cursor: default;
+            }
 
-            .amountToPay {
-                font-size: 25px;
+            .orderType {
                 font-weight: bold;
-                color: #000000;
             }
-
-            .paymentMethod {
-                font-size: 18px;
-                font-weight: 500;
-                color: #ffffff;
-                background-color: #615AB2;
-                width: 90%;
-                border-radius: 5px;
-                height: 40px;
-
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                overflow: hidden;
-                
-                padding: 2px 0;
-            }
-
-            .discountToggle {
-                font-size: 18px;
-                font-weight: 500;
-                color: #ffffff;
-                background-color: #8F8E9D;
-                width: 90%;
-                border-radius: 5px;
-                height: 40px;
-
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                overflow: hidden;
-
-                padding: 2px 0;
-            }
-        }
-
-        .notesSection {
-            width: 85%;
-            background-color: #E5E6EE;
-            display: flex;
-            justify-content: flex-start; /* Align content to the left */
-            align-items: flex-start; /* Align items to the top */
-            border-radius: 7px;
-            margin: 20px 0;
-            padding: 10px; /* Add padding for text inside the notes section */
-            height: 100%; /* Adjust height to fit content */
-        
-            .notes {
-                width: 100%; /* Ensure the text takes up full width */
-                text-align: left; /* Align text inside the notes */
+    
+            .preparationTime {
                 font-weight: 400;
-                color: #333; /* Set the text color for better visibility */
             }
         }
-        
-    }
-}
-
-/* *************************** */
-.right-section {
-    position: absolute; /* Enable positioning to the right */
-    background-color: #7878784d; /* Background with 23% opacity */
-    border: 2px solid rgba(231, 226, 226, 0.30); /* Stroke with 15% opacity */
-    border-radius: 20px; /* Round corners */
-    width: 270px; /* Set your desired width */
-    height: 530px; /* Set your desired height */
-    top: 70px;
-    left: 660px; /* Position from the right */
-    display: flex; /* Enable flexbox */
-    flex-direction: column; /* Stack items vertically */
-    padding: 7px 5px 7px 5px; /* Top, Right, Bottom, Left */
-
-    .ordered-items {
-        position: relative;      
-        border-radius: 20px 20px 0px 0px;
-        background-color: rgb(255, 255, 255);
-
-        display: flex;
-        flex: 88;
-
-        .headers {
-            .label {
-                position: absolute;
-                &.quantity {
-                    left: 4px;
-                }
-                &.item {
-                    left: 40px;
-                }
-                &.price {
-                    left: 220px;
-                }
-            }
-        }
-
-        .content {
-            .vertical-line {
-                position: absolute;
-                height: 100%;
-                top: 0;
-            }
-            height: 362px;
-            background-color: rgba(47, 0, 255, 0);
-            scrollbar-width: none;
-            position: absolute;
-            margin-top: 25px;
+    
+        .body {
             width: 100%;
-
-            .price {
+            height: 100%;
+            background-color: #F2F5FF;
+            border-radius: 12px;;
+            
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow: hidden;
+    
+            font-family: 'Anybody', sans-serif;
+            flex: 1;
+    
+            .orderNo {
+                color: rgb(0, 0, 0);
+                width: 100%;
+                text-align: center;
+                padding-top: 10px;
+                font-size: 17px;
+                margin-bottom: 2px;
+            }
+    
+            .separator {
+                width: 80%;
+                height: 1px;
+                background-color: #c0c0c0;
+            }
+    
+            .customerName {
+                font-size: 30px;
+                font-weight: 600;
+                color: #000000;
+                padding: 8px 0;
+            }
+    
+            .payment-section {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 8px;
+                width: 90%;
+                background-color: #ffffff;
+                border-radius: 10px;
+                margin: 10px;
+                padding: 10px 0 10px 0;
+    
+                .amountToPay {
+                    font-size: 25px;
+                    font-weight: bold;
+                    color: #000000;
+                }
+    
+                .paymentMethod {
+                    font-size: 18px;
+                    font-weight: 500;
+                    color: #ffffff;
+                    background-color: #615AB2;
+                    width: 90%;
+                    border-radius: 5px;
+                    height: 40px;
+    
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    overflow: hidden;
+                    
+                    padding: 2px 0;
+                }
+    
+                .discountToggle {
+                    font-size: 18px;
+                    font-weight: 500;
+                    color: #ffffff;
+                    background-color: #8F8E9D;
+                    width: 90%;
+                    border-radius: 5px;
+                    height: 40px;
+    
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    overflow: hidden;
+    
+                    padding: 2px 0;
+                }
+            }
+    
+            .notesSection {
+                width: 85%;
+                background-color: #E5E6EE;
+                display: flex;
+                justify-content: flex-start; /* Align content to the left */
+                align-items: flex-start; /* Align items to the top */
+                border-radius: 7px;
+                margin: 20px 0;
+                padding: 10px; /* Add padding for text inside the notes section */
+                height: 100%; /* Adjust height to fit content */
+            
+                .notes {
+                    width: 100%; /* Ensure the text takes up full width */
+                    text-align: left; /* Align text inside the notes */
+                    font-weight: 400;
+                    color: #333; /* Set the text color for better visibility */
+                }
+            }
+            
+        }
+    }
+    
+    /* *************************** */
+    .right-section {
+        position: absolute; /* Enable positioning to the right */
+        background-color: #7878784d; /* Background with 23% opacity */
+        border: 2px solid rgba(231, 226, 226, 0.30); /* Stroke with 15% opacity */
+        border-radius: 20px; /* Round corners */
+        width: 270px; /* Set your desired width */
+        height: 530px; /* Set your desired height */
+        top: 70px;
+        left: 660px; /* Position from the right */
+        display: flex; /* Enable flexbox */
+        flex-direction: column; /* Stack items vertically */
+        padding: 7px 5px 7px 5px; /* Top, Right, Bottom, Left */
+    
+        .ordered-items {
+            position: relative;      
+            border-radius: 20px 20px 0px 0px;
+            background-color: rgb(255, 255, 255);
+    
+            display: flex;
+            flex: 88;
+    
+            .headers {
+                .label {
+                    position: absolute;
+                    &.quantity {
+                        left: 4px;
+                    }
+                    &.item {
+                        left: 40px;
+                    }
+                    &.price {
+                        left: 220px;
+                    }
+                }
+            }
+    
+            .content {
+                .vertical-line {
+                    position: absolute;
+                    height: 100%;
+                    top: 0;
+                }
+                height: 362px;
+                background-color: rgba(47, 0, 255, 0);
+                scrollbar-width: none;
                 position: absolute;
-                right: 10px;
+                margin-top: 25px;
+                width: 100%;
+    
+                .price {
+                    position: absolute;
+                    right: 10px;
+                }
+            }
+    
+            .footer {
+                margin: 0;
+                padding: 3px;
             }
         }
-
-        .footer {
-            margin: 0;
-            padding: 3px;
+    
+        .editOrderClass {
+            display: flex; /* Added */
+            flex: 13;
+    
+            background-color: #ffffff;
+            border-radius: 0px 0px 20px 20px;
+            
+            justify-content: center; /* Center horizontally */
+                
+            .editOrderBtn {
+                background-color: #FFC34B;
+                border: 2px solid #AC6611;
+                color:#000000;
+                height: 45px;
+                width: 170px;
+                font-size: 22px;
+                border-radius: 8px;
+                
+                position: relative;
+                top: 12px;
+            }    
         }
+       
     }
-
-    .editOrderClass {
-        display: flex; /* Added */
-        flex: 13;
-
-        background-color: #ffffff;
-        border-radius: 0px 0px 20px 20px;
-        
-        justify-content: center; /* Center horizontally */
-            
-        .editOrderBtn {
-            background-color: #FFC34B;
-            border: 2px solid #AC6611;
-            color:#000000;
-            height: 45px;
-            width: 170px;
-            font-size: 22px;
-            border-radius: 8px;
-            
-            position: relative;
-            top: 12px;
-        }    
+    
+    
+    /* *************************** */
+    button {
+        font-family: 'Anybody', sans-serif;
+        font-size: 19px;
+        font-weight: lighter;
+        color: #ffffff;
+        width: 120px;
+        height: 40px;
+        border-radius: 8px;
+        position: absolute;
+        cursor: pointer;
     }
-   
-}
-
-
-/* *************************** */
-button {
-    font-family: 'Anybody', sans-serif;
-    font-size: 19px;
-    font-weight: lighter;
-    color: #ffffff;
-    width: 120px;
-    height: 40px;
-    border-radius: 8px;
-    position: absolute;
-    cursor: pointer;
-}
-.cancel {
-    top: 640px;
-    left: 20px;
-    background: #CB0000;
-    border: 3px solid #9c0505;
-}
-
-.printReceipt {
-    top: 640px;
-    left: 390px;
-    background: #51538F;
-    border-radius: 5px;
-    width: 190px; /* Adjusted width for this specific button */
-}
-
-.save {
-    top: 640px;
-    left: 800px;
-    background: #61A61B;
-    border: 2px solid #61A61B;
-}
-
-.addItemTest{
-    top: 10px;
-    left: 20px;
-    background: #2f00ff;
-}
-
-.addAmendmentTest {
-    top: 10px;
-    left: 150px;
-    width: 170px;
-    background: #61A61B;
-}
-
-.removeLastItem {
-    top: 10px;
-    left: 330px;
-    background: #ff0a0a;
-}
-
-.clearContentTest {
-    top: 10px;
-    left: 460px;
-    width: 170px;
-    background: #ff0a0a;
-}
-// ***************************************************************************************
-}
+    .cancel {
+        top: 640px;
+        left: 20px;
+        background: #CB0000;
+        border: 3px solid #9c0505;
+    }
+    
+    .printReceipt {
+        top: 640px;
+        left: 390px;
+        background: #51538F;
+        border-radius: 5px;
+        width: 190px; /* Adjusted width for this specific button */
+    }
+    
+    .save {
+        top: 640px;
+        left: 800px;
+        background: #61A61B;
+        border: 2px solid #61A61B;
+    }
+    
+    .addItemTest{
+        top: 10px;
+        left: 20px;
+        background: #2f00ff;
+    }
+    
+    .addAmendmentTest {
+        top: 10px;
+        left: 150px;
+        width: 170px;
+        background: #61A61B;
+    }
+    
+    .removeLastItem {
+        top: 10px;
+        left: 330px;
+        background: #ff0a0a;
+    }
+    
+    .clearContentTest {
+        top: 10px;
+        left: 460px;
+        width: 170px;
+        background: #ff0a0a;
+    }
+    // ***************************************************************************************
+    }

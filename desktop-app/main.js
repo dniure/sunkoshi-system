@@ -25,7 +25,7 @@ async function createWindow() {
     maxHeight: 951,
 
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'), // Modify preload if needed
+      // preload: path.join(__dirname, 'preload.js'), // Modify preload if needed
       nodeIntegration: true,
       contextIsolation: false,
       enableRemoteModule: true,  // Modify based on your requirements
