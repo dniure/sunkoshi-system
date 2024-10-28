@@ -20,10 +20,10 @@ const OrderScreen = () => {
         prepareOrderFor: 'Unknown',
         orderTimeInMinutes: null,
         orderedItems: [],
-        priceSum: null,
+        totalPrice: null,
         discounts:[],
         fees: [],
-        finalSum: null,
+        finalCost: null,
         paymentMethod: 'Unknown'
     });    
     const [formData, setFormData] = useState({
@@ -33,6 +33,8 @@ const OrderScreen = () => {
         address: '',
         notes: '',
     });
+
+  
 
     // Fetches full order info if an order number is passed
     useEffect(() => {
@@ -50,7 +52,8 @@ const OrderScreen = () => {
                 if (response.ok) {
                     const { customerID, ...orderData } = result;
                     setOrderDetails(orderData);
-                    if (customerID) {
+
+                    if (customerID !== null) {
                         setCustomerID(customerID);
                         await fetchCustomerDetails(customerID);
                     }
@@ -95,10 +98,11 @@ const OrderScreen = () => {
         }
         // else set the orderTimeInMinutes to 25
         else {
-            setOrderDetails((prev) => ({
+            setOrderDetails(prev => ({
                 ...prev,
                 orderTimeInMinutes: 25,
-            }));        }
+            }));             
+        }
     }, [existingOrderNoToEdit]);  
 
     //////////////////////////////////////////////////    
@@ -111,31 +115,24 @@ const OrderScreen = () => {
 
     // Section: Manage Order Details (popup, when clicking on Order Info Section)
     const [isCustomerPopupVisible, setIsCustomerPopupVisible] = useState(false);
-    
-    const setOrderInfo = (formDataChanges, orderTypeChanges) => {
-        setFormData(formDataChanges);
-        setOrderDetails(({
-            orderType: orderTypeChanges,
-        }));
-    };
 
     // Section: Ordered Items
     const [orderedItemSelected, setOrderedItemSelected] = useState(null);
     const orderedItemsSectionRef = useRef(null);
     const amendItemButtonRef = useRef(null);
     const amendItemBoxRef = useRef(null);
-    const qtyToggle = useRef(null);
-    const rightSectionOverlayRef = useRef(null);
     const [isAmendingItem, setIsAmendingItem] = useState(false);
+    const qtyToggleRef = useRef(null);
+    const rightSectionOverlayRef = useRef(null);
     
-    const [loadAmendments, setLoadAmendments] = useState(false)
+    const [isLoadingAmendments, setIsLoadingAmendments] = useState(false)
     const handleAmendButtonClick = () => {
         setIsAmendingItem((prevIsAmendingItem) => {
             const newIsAmendingItem = !prevIsAmendingItem;    
             if (newIsAmendingItem) {
-                setLoadAmendments(true);
+                setIsLoadingAmendments(true);
             } else {
-                setLoadAmendments(false);
+                setIsLoadingAmendments(false);
             }
             return newIsAmendingItem;
         });
@@ -144,7 +141,7 @@ const OrderScreen = () => {
     // Section: Menu Grid
     const menuGridRef = useRef(null);
 
-    // Click Handling
+    // Set Up click listener
     useEffect(() => {    
         document.addEventListener('mousedown', handleClick);
         return () => {
@@ -180,7 +177,7 @@ const OrderScreen = () => {
         // Handle clicks inside ordered-items-section
 
         // If clicked in qty toggle or amendItemBox do nothing
-        else if ((qtyToggle.current && qtyToggle.current.contains(event.target)) ||
+        else if ((qtyToggleRef.current && qtyToggleRef.current.contains(event.target)) ||
             (amendItemBoxRef.current && amendItemBoxRef.current.contains(event.target))) {
             return;
         } else {
@@ -201,25 +198,19 @@ const OrderScreen = () => {
     };
 
     const handleMenuItemSelect = (item) => {
+        // New state is a copy of orderDetails,
+        // with orderedItems being a copy all of orderedItems plus a copy of the passed item
+        // with additional fields quantiy and amendments
         setOrderDetails((prev) => ({
             ...prev,
-            orderedItems: prevItems => [...prevItems, { ...item, quantity: 1, amendments: []}],
-        }));
+            orderedItems: [...prev.orderedItems, { ...item, quantity: 1, amendments: [] }],
+        }));            
         setOrderedItemSelected(orderDetails.orderedItems.length);
     };
 
     const handleSaveOrder = async () => {
+        // If it's a new order
         if (!existingOrderNoToEdit){            
-            // Data to input to server            
-            const newOrderData = {
-                orderType: orderDetails.orderType,
-                orderTimeInMinutes: orderDetails.orderTimeInMinutes,
-                prepareOrderFor: orderDetails.prepareOrderFor,
-                orderedItems: orderDetails.orderedItems,
-                paymentMethod: orderDetails.paymentMethod,
-                formData,
-            };
-    
             try {
                 // Server creates a record for this order
                 const response = await fetch('http://localhost:3001/tempOrders', {
@@ -228,9 +219,9 @@ const OrderScreen = () => {
                         'Content-Type': 'application/json',
                     },
                     // Input to server
-                    body: JSON.stringify(newOrderData),
+                    body: JSON.stringify({...orderDetails, formData}),
                 });
-    
+                
                 // Server returns the record (everything about the order)
                 const result = await response.json();
     
@@ -242,16 +233,10 @@ const OrderScreen = () => {
             } catch (error) {
                 console.error('Error saving temporary order:', error);
             }
-        } else {
+        }
+        // If it's an existing order
+        else {
             // Data to update the existing order
-            const updatedOrderData = {
-                orderType: orderDetails.orderType,
-                prepareOrderFor: orderDetails.prepareOrderFor,
-                orderTimeInMinutes: orderDetails.orderTimeInMinutes,
-                orderedItems: orderDetails.orderedItems,
-                paymentMethod: orderDetails.paymentMethod,
-            };
-    
             try {
                 // Server updates the existing order
                 const response = await fetch(`http://localhost:3001/tempOrders/${existingOrderNoToEdit}`, {
@@ -259,13 +244,15 @@ const OrderScreen = () => {
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(updatedOrderData),
+                    body: JSON.stringify({...orderDetails, formData}),
                 });
     
                 // Server returns the updated record
                 const result = await response.json();
         
                 if (response.ok) {
+
+                    console.log("customerID2: ", customerID);
                     const customerResponse = await fetch(`http://localhost:3001/customers/${customerID}`, {
                         method: 'PUT', // or 'PATCH' depending on your server setup
                         headers: {
@@ -315,27 +302,24 @@ const OrderScreen = () => {
                         <OrderedItemsSection
                             orderedItemsSectionRef={orderedItemsSectionRef}
 
-                            orderedItemsInput={orderDetails.orderedItems}
                             orderDetails={orderDetails}
                             setOrderDetails={setOrderDetails} 
 
-                            orderedItemSelectedInput={orderedItemSelected}
-                            setOrderedItemSelectedInput={setOrderedItemSelected}
+                            orderedItemSelected={orderedItemSelected}
+                            setOrderedItemSelected={setOrderedItemSelected}
 
-                            qtyToggle={qtyToggle}
-
+                            qtyToggleRef={qtyToggleRef}
                             amendItemBoxRef={amendItemBoxRef}
+                            
                             isAmendingItem={isAmendingItem}
                             setIsAmendingItem={setIsAmendingItem}
 
-                            loadAmendments={loadAmendments}
-                            setLoadAmendments={setLoadAmendments}
+                            isLoadingAmendments={isLoadingAmendments}
+                            setIsLoadingAmendments={setIsLoadingAmendments}
                         />
 
                         {/* ORDER INFO */}
                         <OrderInfoSection
-                            orderType={orderDetails.orderType}
-                            prepareOrderFor={orderDetails.prepareOrderFor}
                             orderDetails={orderDetails}
                             setOrderDetails={setOrderDetails}
                             formData={formData}
@@ -344,7 +328,6 @@ const OrderScreen = () => {
                             isModifyingTime={isModifyingTime}
                             setIsModifyingTime={setIsModifyingTime}
                             modifyTimeButtonRef={modifyTimeButtonRef}
-                            orderTimeInMinutes={orderDetails.orderTimeInMinutes}
                         />                        
                     </div>
                 </div>
@@ -352,11 +335,12 @@ const OrderScreen = () => {
                 {/* MANAGE ORDER DETAILS */}
                 {isCustomerPopupVisible && (
                     <ManageOrderDetails 
-                        formDataInput={formData}
-                        orderTypeInput={orderDetails.orderType}
-                        setOrderInfo={setOrderInfo}
-                        onClose={() => setIsCustomerPopupVisible(false)}
-                    />
+                        setIsCustomerPopupVisible={setIsCustomerPopupVisible}
+                        formData={formData}
+                        updateFormData={(newFormData) => setFormData(newFormData)}
+                        orderDetails={orderDetails}
+                        updateOrderType={(newOrderType) => setOrderDetails(prev => ({ ...prev, orderType: newOrderType}))}
+                        />
                 )}
 
                 {/* BOTTOM SECTION */}

@@ -4,28 +4,30 @@ import '../../css/OrderScreen/orderedItemsSection.scss';
 import OrderedItemAmendment from './OrderedItemAmendment';
 
 
-const OrderedItemsSection = ({
-    orderedItemsInput = [], 
-    orderedItemSelectedInput,
-    qtyToggle,
+const OrderedItemsSection = ({   
     orderedItemsSectionRef,
+    
     orderDetails,
     setOrderDetails,
-    setOrderedItemSelectedInput,
-    isAmendingItem,
-    setIsAmendingItem,
+    
+    orderedItemSelected,
+    setOrderedItemSelected,
+    
+    qtyToggleRef,
     amendItemBoxRef,
     
-    loadAmendments,
-    setLoadAmendments,
-}) => {  
-    //////////////////////////////////////////////////    
-    // State Variables
+    isAmendingItem,
+    setIsAmendingItem,
+    
+    isLoadingAmendments,
+    setIsLoadingAmendments,    
+}) => {
 
-    // General
-    const [orderedItems, setOrderedItems] = useState(orderedItemsInput || []);  // Holds the list of ordered items
-    const [orderedItemSelected, setOrderedItemSelected] = useState(orderedItemSelectedInput || null);  // Selected ordered item
-
+    const [tempOrderedItems, setTempOrderedItems] = useState(orderDetails.orderedItems)
+    useEffect(() => {
+        setTempOrderedItems(orderDetails.orderedItems)
+    }, [orderDetails]);  
+     
     // Main Scroller
     const [scrollPosition, setScrollPosition] = useState(0);  // Scroll position of the list
     const [isDragging, setIsDragging] = useState(false);  // Whether the scrollbar handle is being dragged
@@ -42,119 +44,100 @@ const OrderedItemsSection = ({
     const contentRef = useRef(null);  // Ref for the ordered-items-content container
     const rowRefs = useRef([])
     const orderedItemsScroller = useRef(null);  // Ref for the scroller handle
-    const previousOrderedItems = useRef(orderedItemsInput);  // Keeps track of previous ordered items for scrolling behavior
-
+    const previousOrderedItems = useRef(orderDetails.orderedItems);  // Keeps track of previous ordered items for scrolling behavior
 
     //////////////////////////////////////////////////    
     // Effects
 
-    // Update selected item and ordered items when inputs change
-    useEffect(() => {
-        setOrderedItemSelected(orderedItemSelectedInput);
-        setOrderedItems(orderedItemsInput || []);
-    }, [orderedItemsInput, orderedItemSelectedInput]);
-
-    // Update orderedItemsInput and orderedItemSelected externally when the state changes
-    useEffect(() => {
-        setOrderDetails((prev) => ({
-            ...prev,
-            orderedItems: orderedItems,
-        }));
-    }, [orderedItems, setOrderDetails]);
-    useEffect(() => setOrderedItemSelectedInput(orderedItemSelected), [orderedItemSelected, setOrderedItemSelectedInput]);
-
     // Calculate the total price and handle scroll-to-bottom behavior
     useEffect(() => {
-        const total = (orderedItems || []).reduce((sum, { price, quantity = 1 }) => sum + price * quantity, 0);
+        // Calculate the sum price of all items
+        const total = tempOrderedItems.reduce((sum, { price, quantity = 1 }) => sum + price * quantity, 0);
         
-        setOrderDetails({
-            priceSum: total.toFixed(2),
+        setOrderDetails(prev => ({
+            ...prev,
+            totalPrice: total.toFixed(2),
             finalCost: total.toFixed(2)
-        });
+        }));
 
         // Scroll to the bottom if new items are added
-        if (contentRef.current && previousOrderedItems.current.length < orderedItems.length) {
+        if (contentRef.current && (previousOrderedItems.current || []).length < orderDetails.orderedItems.length) {
             contentRef.current.scrollTop = contentRef.current.scrollHeight;
         }
 
-        previousOrderedItems.current = orderedItems;
-    }, [orderedItems]);
+        previousOrderedItems.current = orderDetails.orderedItems;
+    }, [orderDetails.orderedItems, setOrderDetails]);
 
     // Effects to load amendments
     useEffect(() => {
         // If an item is selected and load amendments is true
-        if (orderedItemSelected !== null && loadAmendments) {
-            // If the selected item exists and it as an 'amendments' array
-            if (orderedItems[orderedItemSelected] &&
-                Array.isArray(orderedItems[orderedItemSelected].amendments))
-            {
+        if (orderedItemSelected !== null && isLoadingAmendments) {
+            // If the selected item exists and it has an 'amendments' array
+            const selectedRow = orderDetails.orderedItems[orderedItemSelected];
+            if (selectedRow && selectedRow.amendments){
                 // load stored amendments in the popup
-                setOriginaAmendments([...orderedItems[orderedItemSelected].amendments])
-                setAmendmentsInPopup([...orderedItems[orderedItemSelected].amendments]);
+                setOriginaAmendments([...orderDetails.orderedItems[orderedItemSelected].amendments])
+                setAmendmentsInPopup([...orderDetails.orderedItems[orderedItemSelected].amendments]);
             } else {
                 // load popup with nothing selected
                 setAmendmentsInPopup([]);
             }
-            setLoadAmendments(false);
+
+            setIsLoadingAmendments(false);
         }
-    }, [loadAmendments, orderedItemSelected, orderedItems, setLoadAmendments]);       
+    }, [isLoadingAmendments]);       
 
     // Function to apply selected amendments
-    const applyAmendmentToSelectedItem = (amendmentsToApply) => {
-        setOrderedItems(prevItems => {
-            const updatedItems = [...prevItems];
-            const index = orderedItemSelected;
+    const applyAmendment = (amendmentsToApply) => {
+        setOrderDetails((prev) => {
+            const updatedItems = prev.orderedItems.map((item, index) => {
+                // Check if this is the item that needs to be updated
+                if (index === orderedItemSelected) {
+                    // Initialise amendments as an array if not already present
+                    return {
+                        ...item,
+                        amendments: [...amendmentsToApply] // Apply the new amendments
+                    };
+                }
+                return item; // Return unchanged item for others
+            });
 
-            // Initialize amendments as an array if not already present
-            if (!Array.isArray(updatedItems[index].amendments)) {
-                updatedItems[index].amendments = [];
-            }
-
-            // Apply the new amendments
-            updatedItems[index].amendments = [...amendmentsToApply];
-            return updatedItems;
+            return {
+                ...prev,
+                orderedItems: updatedItems, // Return updated orderedItems array
+            };
         });
-        setAmendmentsInPopup([]);
-        setIsAmendingItem(false); // Close the amendment modal or component
-    };    
 
-    // Displaying Amendments
-    const OrderedItemAmendmentsDisplay = ({ amendments }) => {
-        return (
-            <>
-                {amendments && amendments.length > 0 && amendments.map((amendment, aIndex) => (
-                    <div key={aIndex} className="ordered-item-amendment">
-                        <span>&gt; {amendment}</span>
-                    </div>
-                ))}
-            </>
-        );
-    };    
-    
-    //////////////////////////////////////////////////
-    // Click Handling
+        setAmendmentsInPopup([]); // Clear popup amendments
+        setIsAmendingItem(false); // Close the amendment modal or component
+    };
+ 
 
     // Handles row selection when an item is clicked
     const handleRowClick = (index) => {
-        if (!isAmendingItem){
+        if (isAmendingItem){
+            setIsAmendingItem(false);
+        }
+        else {
             setOrderedItemSelected(orderedItemSelected === index ? null : index);
             return;
         }
-        setIsAmendingItem(false);
     }
 
     // Modify quantity of the selected ordered item
     const modifyQuantity = (modifier) => {
         if (orderedItemSelected === null) return;
 
-        setOrderedItems(prevItems => {
-            const updatedItems = prevItems.map((item, i) => {
-                if (i === orderedItemSelected) {
-                    const newQuantity = (item.quantity || 1) + modifier;
-                    return newQuantity > 0 ? { ...item, quantity: newQuantity } : null;
-                }
-                return item;
-            }).filter(Boolean);
+        setOrderDetails((prev) => {
+            const updatedItems = prev.orderedItems
+                .map((item, i) => {
+                    if (i === orderedItemSelected) {
+                        const newQuantity = (item.quantity || 1) + modifier;
+                        return newQuantity > 0 ? { ...item, quantity: newQuantity } : null;
+                    }
+                    return item;
+                })
+                .filter(Boolean); // Remove any null items if quantity goes below 1
 
             // Adjust selected item index after modification
             const newSelectedIndex = updatedItems.length
@@ -162,7 +145,11 @@ const OrderedItemsSection = ({
                 : null;
 
             setOrderedItemSelected(newSelectedIndex);
-            return updatedItems;
+
+            return {
+                ...prev,
+                orderedItems: updatedItems,
+            };
         });
     };
 
@@ -189,16 +176,16 @@ const OrderedItemsSection = ({
     useEffect(() => {
         if (contentRef.current) {
             // Calculate total height of all rows
-            const totalOccupiedHeight = orderedItems.reduce((acc, item, index) => {
+            const totalOccupiedHeight = tempOrderedItems.reduce((acc, item, index) => {
                 const row = rowRefs.current[index]; // Get each row reference
                 if (row) {
                     // Base height is the row's offsetHeight (height of the ordered item row)
                     let rowHeight = row.offsetHeight;
                     
                     // Add amendment height if there are amendments for this item
-                    if (Array.isArray(item.amendments) && item.amendments.length > 0) {
+                    if (Array.isArray(item.amendments) && (item.amendments || []).length > 0) {
                         const amendmentRowHeight = 16; // Assuming each amendment takes 20px of height
-                        const totalAmendmentsHeight = item.amendments.length * amendmentRowHeight;
+                        const totalAmendmentsHeight = (item.amendments || []).length * amendmentRowHeight;
                         rowHeight += totalAmendmentsHeight;
                     }
             
@@ -216,7 +203,7 @@ const OrderedItemsSection = ({
             const calculatedHandleHeight = Math.max(20, (containerHeight - 30) * (containerHeightWithOfset / totalOccupiedHeight));
             setHandleHeight(Math.min(calculatedHandleHeight, containerHeightWithOfset));
         }
-    }, [orderedItems]);
+    }, [orderDetails.orderedItems]);
 
     // ***************************************************  
     // Update ordered items scroller on mouse scroll
@@ -283,7 +270,7 @@ const OrderedItemsSection = ({
         }
         return null; // If row does not exist
     };
-            
+
     //////////////////////////////////////////////////    
     // Main Render
     return (
@@ -300,7 +287,7 @@ const OrderedItemsSection = ({
             <div className="ordered-items-content" ref={contentRef}>
                 <div className="vertical-line" />
 
-                {orderedItems.map((item, index) => (
+                {tempOrderedItems.map((item, index) => (
                     <div key={index}>
                         <div
                             ref={(el) => (rowRefs.current[index] = el)}
@@ -313,7 +300,11 @@ const OrderedItemsSection = ({
                         </div>
                         
                         {/* Display amendments using the new component */}
-                        <OrderedItemAmendmentsDisplay amendments={item.amendments} />
+                        {item.amendments && (item.amendments || []).length > 0 && item.amendments.map((amendment, aIndex) => (
+                            <div key={aIndex} className="ordered-item-amendment">
+                                <span>&gt; {amendment}</span>
+                            </div>
+                        ))}
                     </div>
                 ))}
 
@@ -332,20 +323,22 @@ const OrderedItemsSection = ({
             {/* Amend Item Popup */}
             {isAmendingItem && (
                 <OrderedItemAmendment
-                amendItemBoxRef={amendItemBoxRef}
-                getRowPosition={getRowPosition}
-                isAmendingItem={isAmendingItem}
-                amendmentsInPopup={amendmentsInPopup}
-                setAmendmentsInPopup={setAmendmentsInPopup}
-                applyAmendmentToSelectedItem={applyAmendmentToSelectedItem}
-                originalAmendments={originalAmendments}
-                orderedItemSelected={orderedItemSelected}
+                    amendItemBoxRef={amendItemBoxRef}
+                    getRowPosition={getRowPosition}
+                    isAmendingItem={isAmendingItem}
+
+                    amendmentsInPopup={amendmentsInPopup}
+                    setAmendmentsInPopup={setAmendmentsInPopup}
+                    
+                    applyAmendment={applyAmendment}
+                    originalAmendments={originalAmendments}
+                    orderedItemSelected={orderedItemSelected}
                 />
             )}
     
             {/* Footer for Quantity Control and Total Price */}
             <div className="footer">
-                <div className="quantity-buttons" ref={qtyToggle}>
+                <div className="quantity-buttons" ref={qtyToggleRef}>
                     <button className={`decrease-btn ${orderedItemSelected !== null ? 'active' : ''}`} onClick={() => modifyQuantity(-1)}>-</button>
                     <button className={`increase-btn ${orderedItemSelected !== null ? 'active' : ''}`} onClick={() => modifyQuantity(1)}>+</button>
                 </div>

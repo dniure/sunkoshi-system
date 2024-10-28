@@ -6,6 +6,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// *************************************************************************
+// POST
+
 // Create a new temporary order
 app.post('/tempOrders', async (req, res) => {
     try {
@@ -88,89 +91,8 @@ app.post('/tempOrders', async (req, res) => {
     }    
 });
 
-// Update a temporary order by orderNumber
-app.put('/tempOrders/:orderNumber', async (req, res) => {
-    try {
-        const { orderNumber } = req.params;
-        const {
-            orderType,
-            prepareOrderFor,
-            orderTimeInMinutes,
-            orderedItems,
-            paymentMethod,
-            orderNotes
-        } = req.body;
-
-        // Find the temporary order
-        const tempOrder = await TempOrder.findOne({ where: { orderNumber } });
-        if (!tempOrder) {
-            return res.status(404).json({ message: 'Temporary order not found' });
-        }
-
-        tempOrder.orderType = orderType;
-        tempOrder.prepareOrderFor = prepareOrderFor;
-        tempOrder.orderTimeInMinutes = orderTimeInMinutes;
-        tempOrder.orderedItems = orderedItems;
-        tempOrder.paymentMethod = paymentMethod;
-        tempOrder.orderNotes = orderNotes;
-
-        // Save the updated order
-        await tempOrder.save();
-
-        res.status(200).json({ message: 'Temporary order updated successfully', tempOrder });
-    } catch (error) {
-        console.error('Error updating temporary order:', error);
-        res.status(500).json({ message: 'Error updating temporary order', error: error.message });
-    }
-});
-
-// Finalize a temporary order and move it to the Orders table
-app.post('/finalizeOrder/:tempOrderNumber', async (req, res) => {
-    try {
-        const { tempOrderNumber } = req.params;
-        const orderDate = new Date().toISOString().split('T')[0];
-        
-        // Count existing orders for today to create a unique order number
-        const orderCount = await Order.count({ where: { orderDate } });
-        const orderNumber = (orderCount + 1).toString().padStart(4, '0');
-
-        // Retrieve the temporary order by orderNumber
-        const tempOrder = await TempOrder.findOne({ where: { orderNumber: tempOrderNumber } }); // Updated to use orderNumber
-        if (!tempOrder) {
-            return res.status(404).json({ message: 'Temporary order not found' });
-        }
-
-        // Create the new order from the temporary order
-        const newOrder = await Order.create({
-            orderDate: tempOrder.orderDate,
-            orderNumber: orderNumber, // Unique order number based on existing orders
-            orderedItems: tempOrder.orderedItems,
-            paymentMethod: tempOrder.paymentMethod,
-            orderNotes: tempOrder.orderNotes,
-            orderType: tempOrder.orderType,
-            customerID: tempOrder.customerID, // Link to the customerID from temp order
-        });
-
-        // Delete the temporary order after finalization
-        await TempOrder.destroy({ where: { orderNumber: tempOrderNumber } }); // Updated to use orderNumber
-
-        res.status(201).json({ message: 'Order finalized successfully', order: newOrder });
-    } catch (error) {
-        console.error('Error finalizing order:', error);
-        res.status(500).json({ message: 'Error finalizing order', error: error.message });
-    }
-});
-
-// Retrieve all temporary orders
-app.get('/tempOrders', async (req, res) => {
-    try {
-        const tempOrders = await TempOrder.findAll();
-        res.status(200).json(tempOrders);
-    } catch (error) {
-        console.error('Error fetching temporary orders:', error);
-        res.status(500).json({ message: 'Error fetching temporary orders' });
-    }
-});
+// *************************************************************************
+// GET
 
 // Retrieve a temporary order by orderNumber
 app.get('/tempOrders/:orderNumber', async (req, res) => {
@@ -192,18 +114,6 @@ app.get('/tempOrders/:orderNumber', async (req, res) => {
     }
 });
 
-
-// Retrieve all finalized orders
-app.get('/orders', async (req, res) => {
-    try {
-        const orders = await Order.findAll();
-        res.status(200).json(orders);
-    } catch (error) {
-        console.error('Error fetching orders:', error);
-        res.status(500).json({ message: 'Error fetching orders' });
-    }
-});
-
 app.get('/customers/:customerID', async (req, res) => {
     try {
         const { customerID } = req.params;
@@ -222,6 +132,60 @@ app.get('/customers/:customerID', async (req, res) => {
         res.status(500).json({ message: 'Error fetching customer', error: error.message });
     }
 });
+
+// *************************************************************************
+// PUT
+
+// Update a temporary order by orderNumber
+app.put('/tempOrders/:orderNumber', async (req, res) => {
+    try {
+        const { orderNumber } = req.params;
+        const {
+            orderType,
+            prepareOrderFor,
+            orderTimeInMinutes,
+            orderedItems,
+            paymentMethod,
+            orderNotes,
+            formData // Include formData to create a new customer if needed
+        } = req.body;
+
+        // Find the temporary order
+        const tempOrder = await TempOrder.findOne({ where: { orderNumber } });
+        if (!tempOrder) {
+            return res.status(404).json({ message: 'Temporary order not found' });
+        }
+
+        // Check if customerID is 0, and create a new customer if so
+        if (tempOrder.customerID === 0) {
+            const newCustomer = await Customer.create({
+                name: formData.name || null,
+                phone: formData.phone || null,
+                postcode: formData.postcode || null,
+                address: formData.address || null,
+                notes: formData.notes || null,
+            });
+            tempOrder.customerID = newCustomer.customerID; // Update tempOrder with new customerID
+        }
+
+        // Update tempOrder details
+        tempOrder.orderType = orderType;
+        tempOrder.prepareOrderFor = prepareOrderFor;
+        tempOrder.orderTimeInMinutes = orderTimeInMinutes;
+        tempOrder.orderedItems = orderedItems;
+        tempOrder.paymentMethod = paymentMethod;
+        tempOrder.orderNotes = orderNotes;
+
+        // Save the updated order
+        await tempOrder.save();
+
+        res.status(200).json({ message: 'Temporary order updated successfully', tempOrder });
+    } catch (error) {
+        console.error('Error updating temporary order:', error);
+        res.status(500).json({ message: 'Error updating temporary order', error: error.message });
+    }
+});
+
 
 // Update customer details by customerID
 app.put('/customers/:customerID', async (req, res) => {

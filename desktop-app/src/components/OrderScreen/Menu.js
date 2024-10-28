@@ -107,13 +107,14 @@ const Menu = ({ onSelect }) => {
         };
     }, [isDragging, handleMouseMove]);
 
-    // Helper Functions
+    // Helper Function
     const capitalizeFirstLetter = (str) =>
     str
         .split(' ')
         .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
         .join(' ');
 
+    // MAIN HTML
     return (
         <div className="menuSection menu-container unselectable">
             {/* Top Header */}
@@ -161,8 +162,8 @@ const Menu = ({ onSelect }) => {
                     <div key={index} className="menu-item" onClick={(event) => onSelect(item, event)}>
                         <div className="item-number">{index + 1}</div>
                         <div className="nameAndPrice">
-                        <div className="item-name">{item.name}</div>
-                        <div className="item-price">{item.price}</div>
+                            <div className="item-name">{item.name}</div>
+                            <div className="item-price">{item.price}</div>
                         </div>
                     </div>
                     ))}

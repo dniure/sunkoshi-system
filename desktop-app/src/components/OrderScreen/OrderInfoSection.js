@@ -3,44 +3,41 @@ import '../../css/main.scss';
 import '../../css/OrderScreen/orderInfoSection.scss';
 
 const OrderInfoSection = ({
-    orderType,                 // The type of order (e.g., Delivery, Pickup)
-    prepareOrderFor,
     orderDetails,
     setOrderDetails,
-    formData,                  // Customer details passed as input
-    modifyTimePopupRef,        // Reference for the time modification popup
-    setIsCustomerPopupVisible, // Function to show/hide customer info popup
-    isModifyingTime,           // Boolean indicating if the time is being modified
-    setIsModifyingTime,        // Function to toggle time modification mode
-    modifyTimeButtonRef,        // Reference to the modify time button
-    orderTimeInMinutes,
+    formData,
+    modifyTimePopupRef,
+    setIsCustomerPopupVisible,
+    isModifyingTime,
+    setIsModifyingTime,
+    modifyTimeButtonRef,        
 }) => {
 
     //////////////////////////////////////////////////
-    const [currentTime, setCurrentTime] = useState(new Date());         // Tracks the current time
+    const [currentTime, setCurrentTime] = useState(new Date());
     
-    // Sets up a timer to update the current time every second for accurate order creation
+    // Update time every second
     useEffect(() => {
         const timer = setInterval(() => setCurrentTime(new Date()), 1000);
         return () => clearInterval(timer); // Clears the interval when the component unmounts
     }, []);
 
     useEffect(() => {
-        setOrderDetails(prevDetails => ({
-            ...prevDetails,
-            prepareOrderFor: (orderTimeInMinutes === 25 ? 'ASAP' : getTimeInHHMM())
+        setOrderDetails(prev => ({
+            ...prev,
+            prepareOrderFor: (orderDetails.orderTimeInMinutes === 25 ? 'ASAP' : getTimeInHHMM())
         }));        
         
-    }, [orderTimeInMinutes]);
+    }, [orderDetails.orderTimeInMinutes]);
     
     //////////////////////////////////////////////////
     // Time Adjustment Logic
 
     const setOrderTimeInMinutes = (newVal) => {
-        setOrderDetails(prevDetails => ({
-            ...prevDetails,
+        setOrderDetails(prev => ({
+            ...prev,
             orderTimeInMinutes: newVal,
-        }));
+        }));  
     };
     
     // Function to adjust the order time based on user actions
@@ -67,11 +64,11 @@ const OrderInfoSection = ({
 
             const prev = orderDetails.orderTimeInMinutes;
             
-            if ((currentTime.getMinutes() + orderTimeInMinutes) % 5 === 0) {
+            if ((currentTime.getMinutes() + orderDetails.orderTimeInMinutes) % 5 === 0) {
                 setOrderTimeInMinutes(Math.max(prev + (modifier * 5), 0));
             } else {
                 for (let i = 1; i < 5; i++) {
-                    if ((currentTime.getMinutes() + orderTimeInMinutes + (modifier * i)) % 5 === 0) {
+                    if ((currentTime.getMinutes() + orderDetails.orderTimeInMinutes + (modifier * i)) % 5 === 0) {
                         setOrderTimeInMinutes(Math.max(prev + (modifier * i), 0));
                         return;
                     }
@@ -85,7 +82,7 @@ const OrderInfoSection = ({
 
     // Returns the formatted order time in HH:MM format
     const getTimeInHHMM = () => {
-        const totalMinutes = orderTimeInMinutes + currentTime.getMinutes();
+        const totalMinutes = orderDetails.orderTimeInMinutes + currentTime.getMinutes();
         const hours = (currentTime.getHours() + Math.floor(totalMinutes / 60)) % 24;
         const minutes = totalMinutes % 60;
 
@@ -99,6 +96,7 @@ const OrderInfoSection = ({
     const handleOrderInfoClick = (event) => {
         // If the user is not modifying time and clicks outside the modify time button
         if (!isModifyingTime && !modifyTimeButtonRef.current.contains(event.target)) {
+            console.log("clicked here");
             setIsCustomerPopupVisible(true); // Show customer info popup
         }
 
@@ -116,7 +114,7 @@ const OrderInfoSection = ({
 
             {/* Order Type Heading */}
             <div className="heading-text">
-                <span>{orderType}</span>
+                <span>{orderDetails.orderType}</span>
             </div>
 
             {/* Customer Info Display */}
@@ -124,8 +122,8 @@ const OrderInfoSection = ({
                 <div className="info-text">
                     {formData.name && <span>{formData.name}</span>}
                     {formData.phone && <span>{formData.phone}</span>}
-                    {formData.postcode && <span>{formData.postcode}</span>}
                     {formData.address && <span>{formData.address}</span>}
+                    {formData.postcode && <span>{formData.postcode}</span>}
                 </div>
             ) : null}
 
@@ -140,12 +138,12 @@ const OrderInfoSection = ({
                 style={{ zIndex: 2 }} // Ensure the button appears above other elements
             >
                 {/* Display ASAP or the formatted order time */}
-                <span>{prepareOrderFor}</span>
+                <span>{orderDetails.prepareOrderFor}</span>
                 <span className="arrow"> ▲</span>
             </button>
 
             {/* Dark Overlay (Shown when modifying time) */}
-            {isModifyingTime && <div className="order-info-overlay"></div>}
+            {isModifyingTime && <div className="order-info-overlay"/>}
 
             {/* Modify Time Popup (Visible when the user is modifying time) */}
             {isModifyingTime && (
@@ -153,7 +151,7 @@ const OrderInfoSection = ({
                     <div className="asap-section">
                         {/* ASAP Button */}
                         <button
-                            className={`asap-button ${orderTimeInMinutes === 25 ? 'selected' : ''}`}
+                            className={`asap-button ${orderDetails.orderTimeInMinutes === 25 ? 'selected' : ''}`}
                             onClick={() => adjustOrderTime("reset")}
                         >
                             ASAP
@@ -163,7 +161,7 @@ const OrderInfoSection = ({
                     {/* Time Adjustment Buttons (Increment by minutes) */}
                     <div className="section time-toggle">
                         <button onClick={() => adjustOrderTime("decrease", "timeFromNow")}>-</button>
-                        <span>{orderTimeInMinutes} mins</span>
+                        <span>{orderDetails.orderTimeInMinutes} mins</span>
                         <button onClick={() => adjustOrderTime("increase", "timeFromNow")}>+</button>
                     </div>
 

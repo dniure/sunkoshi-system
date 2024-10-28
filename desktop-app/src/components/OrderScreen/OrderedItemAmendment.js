@@ -9,10 +9,11 @@ const OrderedItemAmendment = ({
     isAmendingItem,
     amendmentsInPopup,
     setAmendmentsInPopup,
-    applyAmendmentToSelectedItem,
+    applyAmendment,
     originalAmendments,
     orderedItemSelected,
 }) => {
+
     const amendItemsScrollerRef = useRef(null);
     const [isAmendItemScrollerVisible, setIsAmendItemScrollerVisible] = useState(true);
     const [amendScrollPosition, setAmendScrollPosition] = useState(0);
@@ -32,14 +33,6 @@ const OrderedItemAmendment = ({
         } else {
             setAmendmentsInPopup([...amendmentsInPopup, amendmentOption]);
         }
-    };
-
-    const handleSave = () => {
-        applyAmendmentToSelectedItem(amendmentsInPopup)
-    };
-
-    const handleCancel = () => {
-        applyAmendmentToSelectedItem(originalAmendments);
     };
 
     const handleAmendMouseMove = useCallback((e) => {
@@ -67,6 +60,7 @@ const OrderedItemAmendment = ({
         }
     }, [amendItemBoxRef]);
 
+    // Adding a scroller listener
     useEffect(() => {
         const amendmentContent = amendItemBoxRef.current?.querySelector('.amendment-content');
 
@@ -78,6 +72,8 @@ const OrderedItemAmendment = ({
         }
     }, [isAmendingItem, handleAmendScroll, amendItemBoxRef]);
 
+
+    // Scroller Function
     useEffect(() => {
         const amendmentContent = document.querySelector('.amendment-content');
         if (amendItemsScrollerRef.current && amendmentContent) {
@@ -98,6 +94,7 @@ const OrderedItemAmendment = ({
         setIsAmendDragging(true);
     };
 
+    // Scroller Dragging
     useEffect(() => {
         const handleMouseMoveWrapper = (e) => {
             if (isAmendDragging) {
@@ -116,9 +113,6 @@ const OrderedItemAmendment = ({
             };
         }
     }, [isAmendDragging, handleAmendMouseMove]);
-
-    useEffect(() => {
-    }, [amendmentsInPopup])
 
     return (
         <div className="orderedItemAmendment" ref={amendItemBoxRef}>
@@ -164,8 +158,8 @@ const OrderedItemAmendment = ({
                 {/* Footer */}
                 <div className="amend-item-footer">
                     <span className="amend-item-separator" />
-                    <button className="cancel-button" onClick={handleCancel}>Cancel</button>
-                    <button className="save-button" onClick={handleSave}>Save</button>
+                    <button className="cancel-button" onClick={() => applyAmendment(originalAmendments)}>Cancel</button>
+                    <button className="save-button" onClick={() => applyAmendment(amendmentsInPopup)}>Save</button>
                 </div>
             </div>
         </div>
