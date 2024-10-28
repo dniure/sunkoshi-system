@@ -9,11 +9,97 @@ import '../css/main.scss';
 import '../css/orderScreen.scss';
 
 const OrderScreen = () => {
-    // User
+
     const navigate = useNavigate();
-    const location = useLocation(); // Import useLocation to access navigation state
-    const { orderData } = location.state || {};
-    const [newOrder, setNewOrder] = useState(true);
+    const location = useLocation();
+    const { existingOrderNoToEdit } = location.state || {};
+
+    const [customerID, setCustomerID] = useState(null);
+    const [orderDetails, setOrderDetails] = useState({
+        orderType: "takeaway",
+        prepareOrderFor: 'Unknown',
+        orderTimeInMinutes: null,
+        orderedItems: [],
+        priceSum: null,
+        discounts:[],
+        fees: [],
+        finalSum: null,
+        paymentMethod: 'Unknown'
+    });    
+    const [formData, setFormData] = useState({
+        name: '',
+        phone: '',
+        postcode: '',
+        address: '',
+        notes: '',
+    });
+
+    // Fetches full order info if an order number is passed
+    useEffect(() => {
+        // Fetch Existing Order Info
+        const fetchTempOrderByNumber = async (orderNumberToFetch) => {
+            try {
+                const response = await fetch(`http://localhost:3001/tempOrders/${orderNumberToFetch}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+                const result = await response.json();
+    
+                if (response.ok) {
+                    const { customerID, ...orderData } = result;
+                    setOrderDetails(orderData);
+                    if (customerID) {
+                        setCustomerID(customerID);
+                        await fetchCustomerDetails(customerID);
+                    }
+                } else {
+                    console.error('Temporary order not found');
+                }
+            } catch (error) {
+                console.error('Error fetching order:', error);
+            }
+        };
+        
+        // Fetch Existing Customer Info
+        const fetchCustomerDetails = async (customerID) => {
+            try {
+                const customerResponse = await fetch(`http://localhost:3001/customers/${customerID}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+                const customerResult = await customerResponse.json();
+    
+                if (customerResponse.ok) {
+                    setFormData({
+                        name: customerResult.name || '',
+                        phone: customerResult.phone || '',
+                        postcode: customerResult.postcode || '',
+                        address: customerResult.address || '',
+                        notes: customerResult.notes || '',
+                    });
+                } else {
+                    console.error('Customer not found');
+                }
+            } catch (error) {
+                console.error('Error fetching customer details:', error);
+            }
+        };
+        
+        // If an existing order number is passed, fetch it
+        if (existingOrderNoToEdit){
+            fetchTempOrderByNumber(existingOrderNoToEdit);   
+        }
+        // else set the orderTimeInMinutes to 25
+        else {
+            setOrderDetails((prev) => ({
+                ...prev,
+                orderTimeInMinutes: 25,
+            }));        }
+    }, [existingOrderNoToEdit]);  
 
     //////////////////////////////////////////////////    
     // Click Handling
@@ -25,23 +111,15 @@ const OrderScreen = () => {
 
     // Section: Manage Order Details (popup, when clicking on Order Info Section)
     const [isCustomerPopupVisible, setIsCustomerPopupVisible] = useState(false);
-    const [orderType, setOrderType] = useState("takeaway");
-    const [prepareOrderFor, setPrepareOrderFor] = useState('Unknown');
-    const [formData, setFormData] = useState({
-        name: '',
-        phone: '',
-        postcode: '',
-        address: '',
-        notes: '',
-    });
     
-    const updateOrderDetails = (formDataChanges, orderTypeChanges) => {
+    const setOrderInfo = (formDataChanges, orderTypeChanges) => {
         setFormData(formDataChanges);
-        setOrderType(orderTypeChanges);
+        setOrderDetails(({
+            orderType: orderTypeChanges,
+        }));
     };
 
     // Section: Ordered Items
-    const [orderedItems, setOrderedItems] = useState([]);
     const [orderedItemSelected, setOrderedItemSelected] = useState(null);
     const orderedItemsSectionRef = useRef(null);
     const amendItemButtonRef = useRef(null);
@@ -65,26 +143,6 @@ const OrderScreen = () => {
     
     // Section: Menu Grid
     const menuGridRef = useRef(null);
-
-    // Check for order data from navigation state
-    useEffect(() => {
-        if (orderData) {
-            console.log("\n\nEDITING ORDER*****************");
-            setNewOrder(false);
-
-            setOrderType(orderData.order.orderType || "UNKNOWN");
-            setOrderedItems(orderData.order.orderedItems || [])
-            setPrepareOrderFor(orderData.order.prepareOrderFor)
-
-            setFormData({
-                name: orderData.customerInfo.name,
-                phone: orderData.customerInfo.phone,
-                postcode: orderData.customerInfo.postcode,
-                address: orderData.customerInfo.address,
-                notes: orderData.customerInfo.notes,
-            })
-        }
-    }, [location.state]);
 
     // Click Handling
     useEffect(() => {    
@@ -143,48 +201,93 @@ const OrderScreen = () => {
     };
 
     const handleMenuItemSelect = (item) => {
-        setOrderedItems(prevItems => [...prevItems, { ...item, quantity: 1, amendments: []}]);
-        setOrderedItemSelected(orderedItems.length);
+        setOrderDetails((prev) => ({
+            ...prev,
+            orderedItems: prevItems => [...prevItems, { ...item, quantity: 1, amendments: []}],
+        }));
+        setOrderedItemSelected(orderDetails.orderedItems.length);
     };
 
     const handleSaveOrder = async () => {
-        if (newOrder){
-            // Data to input to server
-            const orderData = {
-                orderType,
-                prepareOrderFor,
+        if (!existingOrderNoToEdit){            
+            // Data to input to server            
+            const newOrderData = {
+                orderType: orderDetails.orderType,
+                orderTimeInMinutes: orderDetails.orderTimeInMinutes,
+                prepareOrderFor: orderDetails.prepareOrderFor,
+                orderedItems: orderDetails.orderedItems,
+                paymentMethod: orderDetails.paymentMethod,
                 formData,
-                orderedItems,
-                paymentMethod: 'SELECT',
             };
-
+    
             try {
+                // Server creates a record for this order
                 const response = await fetch('http://localhost:3001/tempOrders', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     // Input to server
-                    body: JSON.stringify(orderData),
+                    body: JSON.stringify(newOrderData),
                 });
-
-                // Output from server
+    
+                // Server returns the record (everything about the order)
                 const result = await response.json();
-
-                console.log("result: ", result);
-
+    
                 if (response.ok) {
-                    navigate('/OrderSummaryScreen', { state: { orderData: result} });
+                    navigate('/OrderSummaryScreen', { state: { orderNumber: result.order.orderNumber} });
                 } else {
                     console.error('Error creating order:', result);
                 }
             } catch (error) {
                 console.error('Error saving temporary order:', error);
             }
-        } else{
-            console.log("orderData: ", orderData);
-            navigate('/OrderSummaryScreen', { state: { orderData: orderData} });
-        }
+        } else {
+            // Data to update the existing order
+            const updatedOrderData = {
+                orderType: orderDetails.orderType,
+                prepareOrderFor: orderDetails.prepareOrderFor,
+                orderTimeInMinutes: orderDetails.orderTimeInMinutes,
+                orderedItems: orderDetails.orderedItems,
+                paymentMethod: orderDetails.paymentMethod,
+            };
+    
+            try {
+                // Server updates the existing order
+                const response = await fetch(`http://localhost:3001/tempOrders/${existingOrderNoToEdit}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(updatedOrderData),
+                });
+    
+                // Server returns the updated record
+                const result = await response.json();
+        
+                if (response.ok) {
+                    const customerResponse = await fetch(`http://localhost:3001/customers/${customerID}`, {
+                        method: 'PUT', // or 'PATCH' depending on your server setup
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(formData),
+                    });
+
+                    const customerResult = await customerResponse.json();
+                    
+                    if (!customerResponse.ok) {
+                        console.error('Error updating customer:', customerResult);
+                    }
+
+                    navigate('/OrderSummaryScreen', { state: { orderNumber: existingOrderNoToEdit } });
+                } else {
+                    console.error('Error updating order:', result);
+                }
+            } catch (error) {
+                console.error('Error updating existing order:', error);
+            }
+        }      
     };
             
     // ////////////////////////////////////////////////
@@ -212,8 +315,9 @@ const OrderScreen = () => {
                         <OrderedItemsSection
                             orderedItemsSectionRef={orderedItemsSectionRef}
 
-                            orderedItemsInput={orderedItems}
-                            setOrderedItemsInput={setOrderedItems} 
+                            orderedItemsInput={orderDetails.orderedItems}
+                            orderDetails={orderDetails}
+                            setOrderDetails={setOrderDetails} 
 
                             orderedItemSelectedInput={orderedItemSelected}
                             setOrderedItemSelectedInput={setOrderedItemSelected}
@@ -230,15 +334,17 @@ const OrderScreen = () => {
 
                         {/* ORDER INFO */}
                         <OrderInfoSection
-                            orderType={orderType}
-                            prepareOrderFor={prepareOrderFor}
-                            setPrepareOrderFor={setPrepareOrderFor}
+                            orderType={orderDetails.orderType}
+                            prepareOrderFor={orderDetails.prepareOrderFor}
+                            orderDetails={orderDetails}
+                            setOrderDetails={setOrderDetails}
                             formData={formData}
                             modifyTimePopupRef={modifyTimePopupRef}
                             setIsCustomerPopupVisible={setIsCustomerPopupVisible}
                             isModifyingTime={isModifyingTime}
                             setIsModifyingTime={setIsModifyingTime}
                             modifyTimeButtonRef={modifyTimeButtonRef}
+                            orderTimeInMinutes={orderDetails.orderTimeInMinutes}
                         />                        
                     </div>
                 </div>
@@ -247,8 +353,8 @@ const OrderScreen = () => {
                 {isCustomerPopupVisible && (
                     <ManageOrderDetails 
                         formDataInput={formData}
-                        orderTypeInput={orderType}
-                        updateOrderDetails={updateOrderDetails}
+                        orderTypeInput={orderDetails.orderType}
+                        setOrderInfo={setOrderInfo}
                         onClose={() => setIsCustomerPopupVisible(false)}
                     />
                 )}

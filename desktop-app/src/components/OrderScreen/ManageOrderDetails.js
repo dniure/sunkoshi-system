@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import '../../css/main.scss';
 import '../../css/OrderScreen/manageOrderDetails.scss';
 
-const ManageOrderDetails = ({ formDataInput, orderTypeInput, updateOrderDetails, onClose }) => {         
+const ManageOrderDetails = ({ formDataInput, orderTypeInput, setOrderInfo, onClose }) => {         
     
     //////////////////////////////////////////////////    
     // State Management
@@ -51,7 +51,7 @@ const ManageOrderDetails = ({ formDataInput, orderTypeInput, updateOrderDetails,
         if (Object.keys(newErrors).length) {
             setErrors(newErrors);  // Set error state
         } else {
-            updateOrderDetails(formData, orderType);  // Pass updated data to parent component
+            setOrderInfo(formData, orderType);  // Pass updated data to parent component
             setErrors({});  // Clear errors
             onClose();  // Close the form
         }

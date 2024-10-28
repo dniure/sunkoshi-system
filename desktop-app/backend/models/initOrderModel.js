@@ -21,6 +21,10 @@ const initOrderModel = (sequelize) => {
             type: DataTypes.STRING,
             allowNull: true,
         },
+        orderTimeInMinutes: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+        },
         customerID: {
             type: DataTypes.INTEGER,
             references: {

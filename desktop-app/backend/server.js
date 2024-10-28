@@ -9,7 +9,13 @@ app.use(express.json());
 // Create a new temporary order
 app.post('/tempOrders', async (req, res) => {
     try {
-        const { orderType, prepareOrderFor, formData, orderedItems, paymentMethod } = req.body;
+        const { orderType,
+                orderTimeInMinutes,
+                prepareOrderFor,
+                orderedItems,
+                paymentMethod,
+                formData
+            } = req.body;
 
         // Format date as YYYY-MM-DD
         const orderDate = new Date().toISOString().split('T')[0];
@@ -18,9 +24,9 @@ app.post('/tempOrders', async (req, res) => {
 
         let customerID;
 
-        // Check if the order is a takeaway with all fields empty
+        // If the order is a takeaway with all fields empty
         if (orderType === 'takeaway' && (!formData.name && !formData.phone && !formData.postcode && !formData.address)) {
-            customerID = 0; // Use customer ID 0 for takeaways
+            customerID = 0;
 
             // Check if customer with ID 0 exists, if not create it
             const existingCustomer = await Customer.findOne({ where: { customerID: 0 } });
@@ -43,36 +49,78 @@ app.post('/tempOrders', async (req, res) => {
                 address: formData.address || null,
                 notes: formData.notes || null,
             });
-            customerID = customer.customerID; // Get the newly created customer's ID
+            customerID = customer.customerID;
         }
-
-        // Inside your POST endpoint for creating a temporary order
-        const newTempOrder = await TempOrder.create({
-            orderType,
-            orderNumber: tempOrderNumber,
-            orderNotes: formData.notes || null,
-
-            orderedItems,
-            prepareOrderFor,
-            orderDate,
-            
-            customerID,
-            paymentMethod,
-        });
-
-        // Fetch the current customer information
+        // Retrieve the info of the newly created customer
         const customerInfo = await Customer.findOne({ where: { customerID } });
 
-        // Combine the order and customerInfo into a single object
-        const combinedResponse = {...newTempOrder.dataValues, customerName: customerInfo.name};
+        console.log("customerInfo: ", customerInfo);
+        // Inside your POST endpoint for creating a temporary order
+        const newTempOrder = await TempOrder.create({
+            orderDate,
+            orderNumber: tempOrderNumber,
+            
+            orderType,
+            prepareOrderFor,
+            orderTimeInMinutes,         
+            orderedItems,
+            paymentMethod,
+
+            customerID,
+            orderNotes: formData.notes || null,
+        });
 
         res.status(201).json({order: newTempOrder, customerInfo});
 
     } catch (error) {
+        console.error("Error details:", error);
+        if (error.name === 'SequelizeValidationError') {
+            const errors = error.errors.map(err => err.message); // Get all validation error messages
+            return res.status(400).json({
+                message: 'Validation errors occurred',
+                errors,
+            });
+        }
         res.status(500).json({
             message: 'Error creating temporary order',
             error: error.message,
-        });
+        });    
+    }    
+});
+
+// Update a temporary order by orderNumber
+app.put('/tempOrders/:orderNumber', async (req, res) => {
+    try {
+        const { orderNumber } = req.params;
+        const {
+            orderType,
+            prepareOrderFor,
+            orderTimeInMinutes,
+            orderedItems,
+            paymentMethod,
+            orderNotes
+        } = req.body;
+
+        // Find the temporary order
+        const tempOrder = await TempOrder.findOne({ where: { orderNumber } });
+        if (!tempOrder) {
+            return res.status(404).json({ message: 'Temporary order not found' });
+        }
+
+        tempOrder.orderType = orderType;
+        tempOrder.prepareOrderFor = prepareOrderFor;
+        tempOrder.orderTimeInMinutes = orderTimeInMinutes;
+        tempOrder.orderedItems = orderedItems;
+        tempOrder.paymentMethod = paymentMethod;
+        tempOrder.orderNotes = orderNotes;
+
+        // Save the updated order
+        await tempOrder.save();
+
+        res.status(200).json({ message: 'Temporary order updated successfully', tempOrder });
+    } catch (error) {
+        console.error('Error updating temporary order:', error);
+        res.status(500).json({ message: 'Error updating temporary order', error: error.message });
     }
 });
 
@@ -153,6 +201,55 @@ app.get('/orders', async (req, res) => {
     } catch (error) {
         console.error('Error fetching orders:', error);
         res.status(500).json({ message: 'Error fetching orders' });
+    }
+});
+
+app.get('/customers/:customerID', async (req, res) => {
+    try {
+        const { customerID } = req.params;
+        console.log('Fetching customer with ID:', customerID); // Log the incoming customerID
+
+        const customer = await Customer.findOne({ where: { customerID } });
+        
+        // Log the fetched customer details or null if not found
+        console.log('Fetched customer:', customer ? customer : 'No customer found');
+
+        if (!customer) return res.status(404).json({ message: 'Customer not found' });
+        
+        res.status(200).json(customer);
+    } catch (error) {
+        console.error('Error fetching customer:', error);
+        res.status(500).json({ message: 'Error fetching customer', error: error.message });
+    }
+});
+
+// Update customer details by customerID
+app.put('/customers/:customerID', async (req, res) => {
+    try {
+        const { customerID } = req.params;
+        const { name, phone, postcode, address, notes } = req.body;
+
+        // Find the customer by ID
+        const customer = await Customer.findOne({ where: { customerID } });
+
+        if (!customer) {
+            return res.status(404).json({ message: 'Customer not found' });
+        }
+
+        // Update customer details
+        customer.name = name !== undefined ? name : customer.name;
+        customer.phone = phone !== undefined ? phone : customer.phone;
+        customer.postcode = postcode !== undefined ? postcode : customer.postcode;
+        customer.address = address !== undefined ? address : customer.address;
+        customer.notes = notes !== undefined ? notes : customer.notes;
+
+        // Save the updated customer
+        await customer.save();
+
+        res.status(200).json({ message: 'Customer updated successfully', customer });
+    } catch (error) {
+        console.error('Error updating customer:', error);
+        res.status(500).json({ message: 'Error updating customer', error: error.message });
     }
 });
 

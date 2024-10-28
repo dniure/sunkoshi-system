@@ -257,6 +257,8 @@
         display: flex; /* Enable flexbox */
         flex-direction: column; /* Stack items vertically */
         padding: 7px 5px 7px 5px; /* Top, Right, Bottom, Left */
+
+        cursor: default;
     
         .ordered-items {
             position: relative;      

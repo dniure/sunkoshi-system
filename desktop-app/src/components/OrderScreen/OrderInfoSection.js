@@ -5,37 +5,44 @@ import '../../css/OrderScreen/orderInfoSection.scss';
 const OrderInfoSection = ({
     orderType,                 // The type of order (e.g., Delivery, Pickup)
     prepareOrderFor,
-    setPrepareOrderFor,
+    orderDetails,
+    setOrderDetails,
     formData,                  // Customer details passed as input
     modifyTimePopupRef,        // Reference for the time modification popup
     setIsCustomerPopupVisible, // Function to show/hide customer info popup
     isModifyingTime,           // Boolean indicating if the time is being modified
     setIsModifyingTime,        // Function to toggle time modification mode
-    modifyTimeButtonRef        // Reference to the modify time button
+    modifyTimeButtonRef,        // Reference to the modify time button
+    orderTimeInMinutes,
 }) => {
 
     //////////////////////////////////////////////////
-    // State Variables
-
     const [currentTime, setCurrentTime] = useState(new Date());         // Tracks the current time
-    const [orderTimeInMinutes, setOrderTimeInMinutes] = useState(25);   // Tracks the order time in minutes
     
-    //////////////////////////////////////////////////
-    // Timer Effect
-
-    // Sets up a timer to update the current time every second for accurate ordering
+    // Sets up a timer to update the current time every second for accurate order creation
     useEffect(() => {
         const timer = setInterval(() => setCurrentTime(new Date()), 1000);
         return () => clearInterval(timer); // Clears the interval when the component unmounts
     }, []);
 
     useEffect(() => {
-        setPrepareOrderFor(orderTimeInMinutes === 25 ? 'ASAP' : getTimeInHHMM());
-    }, [orderTimeInMinutes, prepareOrderFor, setPrepareOrderFor]);
+        setOrderDetails(prevDetails => ({
+            ...prevDetails,
+            prepareOrderFor: (orderTimeInMinutes === 25 ? 'ASAP' : getTimeInHHMM())
+        }));        
+        
+    }, [orderTimeInMinutes]);
     
     //////////////////////////////////////////////////
     // Time Adjustment Logic
 
+    const setOrderTimeInMinutes = (newVal) => {
+        setOrderDetails(prevDetails => ({
+            ...prevDetails,
+            orderTimeInMinutes: newVal,
+        }));
+    };
+    
     // Function to adjust the order time based on user actions
     const adjustOrderTime = (adjustType, modifyOn) => {
         // Reset the order time to the default value
@@ -46,23 +53,26 @@ const OrderInfoSection = ({
 
         // Adjust the time from now (increase or decrease by 5 minutes)
         if (modifyOn === "timeFromNow") {
+            const prev = orderDetails.orderTimeInMinutes;
             if (adjustType === "increase") {
-                setOrderTimeInMinutes(prev => prev + 5);
+                setOrderTimeInMinutes(prev + 5);
             } else if (adjustType === "decrease") {
-                setOrderTimeInMinutes(prev => Math.max(prev - 5, 0));
+                setOrderTimeInMinutes(Math.max(prev - 5, 0));
             }
         }
 
         // Adjust the exact time (in increments aligned with 5-minute intervals)
         else if (modifyOn === "exactTime") {
-            const modifier = adjustType === "increase" ? 1 : -1;
+            const modifier = (adjustType === "increase") ? 1 : -1;
 
+            const prev = orderDetails.orderTimeInMinutes;
+            
             if ((currentTime.getMinutes() + orderTimeInMinutes) % 5 === 0) {
-                setOrderTimeInMinutes(prev => Math.max(prev + (modifier * 5), 0));
+                setOrderTimeInMinutes(Math.max(prev + (modifier * 5), 0));
             } else {
                 for (let i = 1; i < 5; i++) {
                     if ((currentTime.getMinutes() + orderTimeInMinutes + (modifier * i)) % 5 === 0) {
-                        setOrderTimeInMinutes(prev => Math.max(prev + (modifier * i), 0));
+                        setOrderTimeInMinutes(Math.max(prev + (modifier * i), 0));
                         return;
                     }
                 }

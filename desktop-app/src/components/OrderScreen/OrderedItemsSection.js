@@ -9,7 +9,8 @@ const OrderedItemsSection = ({
     orderedItemSelectedInput,
     qtyToggle,
     orderedItemsSectionRef,
-    setOrderedItemsInput,
+    orderDetails,
+    setOrderDetails,
     setOrderedItemSelectedInput,
     isAmendingItem,
     setIsAmendingItem,
@@ -24,8 +25,6 @@ const OrderedItemsSection = ({
     // General
     const [orderedItems, setOrderedItems] = useState(orderedItemsInput || []);  // Holds the list of ordered items
     const [orderedItemSelected, setOrderedItemSelected] = useState(orderedItemSelectedInput || null);  // Selected ordered item
-    const [priceSum, setPriceSum] = useState(0);  // Total price sum of the ordered items
-    const [finalCost, setFinalCost] = useState(0);  // Final calculated cost
 
     // Main Scroller
     const [scrollPosition, setScrollPosition] = useState(0);  // Scroll position of the list
@@ -56,14 +55,22 @@ const OrderedItemsSection = ({
     }, [orderedItemsInput, orderedItemSelectedInput]);
 
     // Update orderedItemsInput and orderedItemSelected externally when the state changes
-    useEffect(() => setOrderedItemsInput(orderedItems), [orderedItems, setOrderedItemsInput]);
+    useEffect(() => {
+        setOrderDetails((prev) => ({
+            ...prev,
+            orderedItems: orderedItems,
+        }));
+    }, [orderedItems, setOrderDetails]);
     useEffect(() => setOrderedItemSelectedInput(orderedItemSelected), [orderedItemSelected, setOrderedItemSelectedInput]);
 
     // Calculate the total price and handle scroll-to-bottom behavior
     useEffect(() => {
         const total = (orderedItems || []).reduce((sum, { price, quantity = 1 }) => sum + price * quantity, 0);
-        setPriceSum(total.toFixed(2));
-        setFinalCost(total.toFixed(2));
+        
+        setOrderDetails({
+            priceSum: total.toFixed(2),
+            finalCost: total.toFixed(2)
+        });
 
         // Scroll to the bottom if new items are added
         if (contentRef.current && previousOrderedItems.current.length < orderedItems.length) {
@@ -345,8 +352,8 @@ const OrderedItemsSection = ({
                 
                 {/* Total Price Display */}                
                 <span className="total">TOTAL</span>
-                <span className="price-sum">£{priceSum}</span>
-                <span className="final-price">£{finalCost}</span>
+                <span className="price-sum">£{orderDetails.priceSum}</span>
+                <span className="final-price">£{orderDetails.finalCost}</span>
             </div>
         </div>
     );

@@ -7,55 +7,101 @@ import '../css/OrderScreen/orderedItemsSection.scss';
 
 import logo from '../images/logo.png';
 const OrderSummaryScreen = () => {
-    // ***********************************************************************
-    // Database
     const location = useLocation();
-    const { orderData } = location.state || {}; // Use the passed orderData
-    const [orderedItems, setOrderedItems] = useState([]);
+    const { orderNumber } = location.state || {};
 
     const [orderDetails, setOrderDetails] = useState({
-        orderType: '',
-        orderNumber: '',
-        orderNotes: '',
-        createdAt: '',
-        createdAtTime: '',
-        timeSinceOrder: '',
-        prepareOrderFor: '',
-        customerDisplayName: '',
-        amountToPay: '',
-        paymentMethod: '',
+        orderType: "takeaway",
+        prepareOrderFor: 'Unknown',
+        orderTimeInMinutes: null,
+        orderedItems: [],
+        priceSum: null,
+        discounts:[],
+        fees: [],
+        finalSum: null,        
+        paymentMethod: 'SELECT',
     });
 
-    // Use effect to set order details based on passed orderData
+    const [formData, setFormData] = useState({
+        name: '',
+        phone: '',
+        postcode: '',
+        address: '',
+        notes: '',
+    });
+
+    let customerDisplayName;
+    const [orderCreatedDate, setOrderCreatedDate] = useState(null);
+    const [orderCreatedAtTime, setOrderCreatedAtTime] = useState('');
+    const [minutesSinceOrder, setMinutesSinceOrder] = useState('')
+
     useEffect(() => {
-        if (orderData) {
-            const createdAtDate = new Date(orderData.order.createdAt);
-            const hours = String(createdAtDate.getHours()).padStart(2, '0');
-            const minutes = String(createdAtDate.getMinutes()).padStart(2, '0');
-            const createdAtTime = `${hours}:${minutes}`;
-
-            console.log("prepareOrderFor (summary): ", orderData.order.prepareOrderFor);
-            // Set the order details with combined data
-            setOrderDetails({
-                orderType: orderData.order.orderType || '',
-                orderNumber: orderData.order.orderNumber || '',
-                orderNotes: orderData.order.orderNotes || '',
-                createdAt: orderData.order.createdAt || '',
-                createdAtTime: createdAtTime,
-                timeSinceOrder: '',
-                prepareOrderFor: orderData.order.prepareOrderFor || '',
-                customerDisplayName: orderData.order.customerName || orderData.order.orderType || '', // Compact assignment
-                amountToPay: '',
-                paymentMethod: orderData.order.paymentMethod || '',
-            });
-
-            setOrderedItems(orderData.order.orderedItems);
-
-        } else {
-            console.log('No orderData provided, order details not set.');
-        }
-    }, [orderData]);
+        const fetchTempOrderByNumber = async (orderNumberToFetch) => {
+            try {
+                const response = await fetch(`http://localhost:3001/tempOrders/${orderNumberToFetch}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+                const result = await response.json();
+    
+                if (response.ok) {
+                    const { customerID, ...orderData } = result;
+                    setOrderDetails(orderData);
+                    
+                    const orderCreatedDate = new Date(orderData.createdAt);
+                    setOrderCreatedDate(orderCreatedDate);
+                    const hours = String(orderCreatedDate.getHours()).padStart(2, '0');
+                    const minutes = String(orderCreatedDate.getMinutes()).padStart(2, '0');
+                    setOrderCreatedAtTime(`${hours}:${minutes}`);
+                    
+                    if (customerID) {
+                        await fetchCustomerDetails(customerID); // Ensure this is awaited
+                    }
+                } else {
+                    console.error('Temporary order not found');
+                }
+            } catch (error) {
+                console.error('Error fetching order:', error);
+            }
+        };
+    
+        const fetchCustomerDetails = async (customerID) => { // Marked as async
+            try {
+                const customerResponse = await fetch(`http://localhost:3001/customers/${customerID}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+                const customerResult = await customerResponse.json();
+    
+                if (customerResponse.ok) {
+                    setFormData({
+                        name: customerResult.name || '',
+                        phone: customerResult.phone || '',
+                        postcode: customerResult.postcode || '',
+                        address: customerResult.address || '',
+                        notes: customerResult.notes || '',
+                    });
+                } else {
+                    console.error('Customer not found');
+                }
+            } catch (error) {
+                console.error('Error fetching customer details:', error);
+            }
+        };
+    
+        fetchTempOrderByNumber(orderNumber);
+    }, [orderNumber]); // Ensure orderNumber is a dependency if it changes
+    
         
+    const handleEditOrderClick = () => {
+        navigate('/OrderScreen', { state: { existingOrderNoToEdit: orderNumber} });
+    }
+    customerDisplayName = formData.name || orderDetails.orderType
+
     // ***********************************************************************
 
     const itemsContainerRef = useRef(null);
@@ -103,7 +149,7 @@ const OrderSummaryScreen = () => {
     useEffect(() => {
         if (itemsContainerRef.current) {
             // Calculate total height of all rows
-            const totalOccupiedHeight = orderedItems.reduce((acc, item, index) => {
+            const totalOccupiedHeight = orderDetails.orderedItems.reduce((acc, item, index) => {
                 const row = rowRefs.current[index]; // Get each row reference
                 if (row) {
                     // console.log("row detected: ", row);
@@ -135,7 +181,7 @@ const OrderSummaryScreen = () => {
 
             setHandleHeight(Math.min(calculatedHandleHeight, containerHeight));
         }
-    }, [orderedItems]);
+    }, [orderDetails.orderedItems]);
 
     // ***************************************************  
     // Update ordered items scroller on mouse scroll
@@ -196,7 +242,6 @@ const OrderSummaryScreen = () => {
 
 // *****************************************************
     const navigate = useNavigate();
-
     //////////////////////////////////////////////////
     // Date & Time    
     const [currentDate, setCurrentDate] = useState('');
@@ -219,79 +264,80 @@ const OrderSummaryScreen = () => {
             setCurrentTime(formattedTime);
             setCurrentDate(formattedDate);
 
-            // Calculate timeSinceOrder if orderDetails has createdAt
-            if (orderDetails.createdAt) {
-
-                // Extract HH:MM from createdAt
-                const createdAtDate = new Date(orderDetails.createdAt);
-                const currentTime = new Date();
-
-                const currentMinutes = currentTime.getHours() * 60 + currentTime.getMinutes();
-                const createdAtMinutes = createdAtDate.getHours() * 60 + createdAtDate.getMinutes();
-                const timeSinceOrder = currentMinutes - createdAtMinutes;
-                                
-                // Update orderDetails with new timeSinceOrder
-                setOrderDetails(prevOrderDetails => ({
-                    ...prevOrderDetails,
-                    timeSinceOrder: timeSinceOrder,
-                }));
+            if (orderCreatedDate) {
+                setMinutesSinceOrder(Math.floor((now - orderCreatedDate) / 60000));
             }
+            
         }
         updateTime(); // Initial call to set time immediately
         const intervalId = setInterval(updateTime, 1000); // Update every second
 
         return () => clearInterval(intervalId); // Cleanup interval on component unmount
-    }, [orderDetails.createdAt]);
-
-    const handleEditOrderClick = () => {
-        navigate('/OrderScreen', { state: { orderData: orderData } });
-    }
-    
+    }, [orderCreatedDate]);    
 
     const addItemFunction = () => {
-        setOrderedItems(prevItems => [
-            ...prevItems,
-            {
-                name: "ITEM",
-                quantity: 1,
-                price: 4.99,
-                amendments: []
-            }
-        ]);
+        setOrderDetails(prevOrderDetails => ({
+            ...prevOrderDetails,
+            orderedItems: [
+                ...prevOrderDetails.orderedItems,
+                {
+                    name: "ITEM",
+                    quantity: 1,
+                    price: 4.99,
+                    amendments: []
+                }
+            ]
+        }));
     };
+    
 
     const addAmendmentFunction = () => {
-        if (orderedItems[0]){
-            setOrderedItems(prevItems => {
-                const updatedItems = [...prevItems];
-                
+        setOrderDetails(prevOrderDetails => {
+            if (prevOrderDetails.orderedItems.length > 0) {
+                const updatedItems = [...prevOrderDetails.orderedItems];
                 const lastItem = updatedItems[updatedItems.length - 1];
+    
+                // Update the last item with the new amendment
                 const updatedLastItem = {
                     ...lastItem,
                     amendments: [...lastItem.amendments, 'amendment'] // Add new amendment
                 };
+    
+                // Replace the last item in the array with the updated item
                 updatedItems[updatedItems.length - 1] = updatedLastItem;
-
-                return updatedItems;
-            });
-        }
-    };
-
-    const removeLastItem = () => {
-        setOrderedItems(prevItems => {
-            if (prevItems.length === 0) {
-                return prevItems;
+    
+                // Return the updated orderDetails with modified orderedItems
+                return {
+                    ...prevOrderDetails,
+                    orderedItems: updatedItems
+                };
             }
-            
-            return prevItems.slice(0, -1);
+            return prevOrderDetails; // Return the unchanged orderDetails if no items exist
         });
-    };
-
-    const clearOrederdItems = () => {
-        setOrderedItems([]); // Set orderedItems to an empty array
     };
     
 
+    const removeLastItem = () => {
+        setOrderDetails(prevOrderDetails => {
+            const prevItems = prevOrderDetails.orderedItems;
+    
+            if (prevItems.length === 0) {
+                return prevOrderDetails; // Return unchanged if no items
+            }
+    
+            return {
+                ...prevOrderDetails,
+                orderedItems: prevItems.slice(0, -1) // Remove the last item
+            };
+        });
+    };    
+
+    const clearOrderedItems = () => {
+        setOrderDetails(prevOrderDetails => ({
+            ...prevOrderDetails,
+            orderedItems: []
+        }));
+    };
 
     // ////////////////////////////////////////////////
     // MAIN HTML
@@ -308,7 +354,9 @@ const OrderSummaryScreen = () => {
                 </div>
 
                 <div className="timeSinceOrder">
-                    <span className="time"> {orderDetails.timeSinceOrder} minutes</span>
+                    <span className="time">
+                    {minutesSinceOrder} {minutesSinceOrder === 1 ? "minute" : "minutes"}
+                    </span>
                     <span className="text"> since order</span>
                 </div>
 
@@ -323,15 +371,15 @@ const OrderSummaryScreen = () => {
                     <div className="body">
                         <div className="orderNo">No. {orderDetails.orderNumber}</div>
                         <span className="separator"/>
-                        <div className="customerName">{orderDetails.customerDisplayName}</div>
-                        <div className="orderedTime">{orderDetails.createdAtTime}</div>
+                        <div className="customerName">{customerDisplayName}</div>
+                        <div className="orderedTime">{orderCreatedAtTime}</div>
                         <div className="payment-section">
                             <div className="amountToPay">£34.35</div>
                             <div className="paymentMethod">TO PAY: {orderDetails.paymentMethod}</div> 
                             <div className="discountToggle">Discount</div> 
                         </div>
                         <div className="notesSection">
-                            <div className="notes">Notes {orderDetails.notes}</div>
+                            <div className="notes">Notes {formData.notes}</div>
                         </div>
 
                     </div>
@@ -352,7 +400,7 @@ const OrderSummaryScreen = () => {
                         <div className="content" ref={itemsContainerRef}>
                             <div className="vertical-line" />
 
-                            {orderedItems.map((item, index) => (
+                            {orderDetails.orderedItems.map((item, index) => (
                                 <div key={index}>
                                     <div className="ordered-item-row" ref={(el) => (rowRefs.current[index] = el)}>
                                         <span className="ordered-item quantity">{item.quantity || 1}</span>
@@ -398,7 +446,7 @@ const OrderSummaryScreen = () => {
                     <button className="addItemTest" onClick={addItemFunction}>ADD ITEM</button>
                     <button className="removeLastItem" onClick={removeLastItem}>REMOVE</button>
                     <button className="addAmendmentTest" onClick={addAmendmentFunction}>ADD AMENDMENT</button>
-                    <button className="clearContentTest" onClick={clearOrederdItems}>CLEAR CONTENT</button>
+                    <button className="clearContentTest" onClick={clearOrderedItems}>CLEAR CONTENT</button>
                 </div>                
             </div>
         </div>
