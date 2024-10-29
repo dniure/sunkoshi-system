@@ -20,7 +20,7 @@ const OrderScreen = () => {
         prepareOrderFor: 'Unknown',
         orderTimeInMinutes: null,
         orderedItems: [],
-        totalPrice: null,
+        priceSum: null,
         discounts:[],
         fees: [],
         finalCost: null,
@@ -33,8 +33,6 @@ const OrderScreen = () => {
         address: '',
         notes: '',
     });
-
-  
 
     // Fetches full order info if an order number is passed
     useEffect(() => {
@@ -249,11 +247,10 @@ const OrderScreen = () => {
     
                 // Server returns the updated record
                 const result = await response.json();
-        
+                const updatedCustomerID = result.newCustomerID;
+                console.log("updatedCustomerID: ", updatedCustomerID);
                 if (response.ok) {
-
-                    console.log("customerID2: ", customerID);
-                    const customerResponse = await fetch(`http://localhost:3001/customers/${customerID}`, {
+                    const customerResponse = await fetch(`http://localhost:3001/customers/${updatedCustomerID}`, {
                         method: 'PUT', // or 'PATCH' depending on your server setup
                         headers: {
                             'Content-Type': 'application/json',
