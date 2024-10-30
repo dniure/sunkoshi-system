@@ -36,24 +36,18 @@ const OrderScreen = () => {
 
     // Fetches full order info if an order number is passed
     useEffect(() => {
-        // Fetch Existing Order Info
         const fetchTempOrderByNumber = async (orderNumberToFetch) => {
             try {
-                const response = await fetch(`http://localhost:3001/tempOrders/${orderNumberToFetch}`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                });
-                const result = await response.json();
-    
-                if (response.ok) {
+                // Use window.api for fetching order details
+                const result = await window.api.fetchTempOrder(orderNumberToFetch);
+
+                if (result) {
                     const { customerID, ...orderData } = result;
                     setOrderDetails(orderData);
 
                     if (customerID !== null) {
                         setCustomerID(customerID);
-                        await fetchCustomerDetails(customerID);
+                        await fetchCustomerDetails(customerID); // Update this as well
                     }
                 } else {
                     console.error('Temporary order not found');
@@ -62,19 +56,13 @@ const OrderScreen = () => {
                 console.error('Error fetching order:', error);
             }
         };
-        
         // Fetch Existing Customer Info
         const fetchCustomerDetails = async (customerID) => {
             try {
-                const customerResponse = await fetch(`http://localhost:3001/customers/${customerID}`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                });
-                const customerResult = await customerResponse.json();
-    
-                if (customerResponse.ok) {
+                // Use window.api for fetching customer details
+                const customerResult = await window.api.fetchCustomerInfo(customerID);
+
+                if (customerResult) {
                     setFormData({
                         name: customerResult.name || '',
                         phone: customerResult.phone || '',
@@ -89,19 +77,17 @@ const OrderScreen = () => {
                 console.error('Error fetching customer details:', error);
             }
         };
-        
-        // If an existing order number is passed, fetch it
-        if (existingOrderNoToEdit){
-            fetchTempOrderByNumber(existingOrderNoToEdit);   
-        }
-        // else set the orderTimeInMinutes to 25
-        else {
+
+        if (existingOrderNoToEdit) {
+            fetchTempOrderByNumber(existingOrderNoToEdit);
+        } else {
             setOrderDetails(prev => ({
                 ...prev,
                 orderTimeInMinutes: 25,
-            }));             
+            }));
         }
-    }, [existingOrderNoToEdit]);  
+    }, [existingOrderNoToEdit]);
+
 
     //////////////////////////////////////////////////    
     // Click Handling
@@ -207,72 +193,29 @@ const OrderScreen = () => {
     };
 
     const handleSaveOrder = async () => {
-        // If it's a new order
-        if (!existingOrderNoToEdit){            
-            try {
-                // Server creates a record for this order
-                const response = await fetch('http://localhost:3001/tempOrders', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    // Input to server
-                    body: JSON.stringify({...orderDetails, formData}),
-                });
-                
-                // Server returns the record (everything about the order)
-                const result = await response.json();
-    
-                if (response.ok) {
-                    navigate('/OrderSummaryScreen', { state: { orderNumber: result.order.orderNumber} });
+        try {
+            if (existingOrderNoToEdit == null) {
+                // Use window.api for creating a new order
+                const result = await window.api.createTempOrder({ ...orderDetails, formData });
+                if (result) {
+                    navigate('/OrderSummaryScreen', { state: { orderNumber: result.order.orderNumber } });
                 } else {
-                    console.error('Error creating order:', result);
+                    console.error('Error creating order');
                 }
-            } catch (error) {
-                console.error('Error saving temporary order:', error);
+            } else {
+                // Use window.api for updating an existing order
+                const result = await window.api.updateTempOrder({orderDetails});
+                if (result) {
+                    const result = await window.api.updateCustomerInfo({customerID, formData});
+                    if (result) {navigate('/OrderSummaryScreen', { state: { orderNumber: existingOrderNoToEdit } });}
+                } else {
+                    console.error('Error updating order');
+                }
             }
+        } catch (error) {
+            console.error('Error saving order:', error);
         }
-        // If it's an existing order
-        else {
-            // Data to update the existing order
-            try {
-                // Server updates the existing order
-                const response = await fetch(`http://localhost:3001/tempOrders/${existingOrderNoToEdit}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({...orderDetails, formData}),
-                });
-    
-                // Server returns the updated record
-                const result = await response.json();
-                const updatedCustomerID = result.newCustomerID;
-                console.log("updatedCustomerID: ", updatedCustomerID);
-                if (response.ok) {
-                    const customerResponse = await fetch(`http://localhost:3001/customers/${updatedCustomerID}`, {
-                        method: 'PUT', // or 'PATCH' depending on your server setup
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify(formData),
-                    });
-
-                    const customerResult = await customerResponse.json();
-                    
-                    if (!customerResponse.ok) {
-                        console.error('Error updating customer:', customerResult);
-                    }
-
-                    navigate('/OrderSummaryScreen', { state: { orderNumber: existingOrderNoToEdit } });
-                } else {
-                    console.error('Error updating order:', result);
-                }
-            } catch (error) {
-                console.error('Error updating existing order:', error);
-            }
-        }      
-    };
+    };    
             
     // ////////////////////////////////////////////////
     // MAIN HTML

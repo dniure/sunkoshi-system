@@ -1,5 +1,6 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
+const databaseFunctions = require('./backend/databaseFunctions.js'); // Assume you have a file with your DB functions
 
 let isDev;
 
@@ -25,11 +26,11 @@ async function createWindow() {
     maxHeight: 951,
 
     webPreferences: {
-      // preload: path.join(__dirname, 'preload.js'), // Modify preload if needed
-      nodeIntegration: true,
-      contextIsolation: false,
-      enableRemoteModule: true,  // Modify based on your requirements
-      sandbox: false
+      preload: path.join(__dirname, 'preload.js'), // Add preload script here
+      nodeIntegration: false,       // Disable node integration
+      enableRemoteModule: false,    // Disable remote module access
+      contextIsolation: true,       // Enable context isolation
+      sandbox: true                 // Enable sandboxing      
     }    
   });
 
@@ -65,6 +66,65 @@ async function createWindow() {
   });
 }
 
+
+
+
+// ***************************************************************
+
+const axios = require('axios');
+
+ipcMain.handle('createTempOrder', async (event, data) => {
+    try {
+        const response = await axios.post('http://localhost:3001/tempOrders', data);
+        return response.data;
+    } catch (error) {
+        console.error('Error creating temp order:', error);
+        throw error; // Handle the error accordingly
+    }
+});
+
+ipcMain.handle('fetchTempOrder', async (event, orderNumber) => {
+    try {
+        const response = await axios.get(`http://localhost:3001/tempOrders/${orderNumber}`);
+        return response.tempOrder;
+    } catch (error) {
+        console.error('Error fetching temp order:', error);
+        throw error; // Handle the error accordingly
+    }
+});
+
+ipcMain.handle('updateTempOrder', async (event, data) => {
+  try {
+      const response = await axios.put(`http://localhost:3001/tempOrders/${data.orderDetails.orderNumber}`, data);      
+      return response.updatedTempOrder; // Return the response data from the server
+  } catch (error) {
+      console.error('Error updating temp order:', error);
+      throw error; // Handle the error accordingly
+  }
+});
+
+ipcMain.handle('fetchCustomerInfo', async (event, customerID) => {
+    try {
+        const response = await axios.get(`http://localhost:3001/customers/${customerID}`);
+        return response.fetchedCustomer;
+    } catch (error) {
+        console.error('Error fetching customer info:', error);
+        throw error; // Handle the error accordingly
+    }
+});
+
+ipcMain.handle('updateCustomerInfo', async (event, customerID, formData) => {
+    try {
+        const response = await axios.put(`http://localhost:3001/customers/${customerID}`, formData); // Assuming customerID is part of customerData
+        console.log("response.updatedCustomer: ", response.updatedCustomer);
+        return response.updatedCustomer;
+    } catch (error) {
+        console.error('Error updating customer info:', error);
+        throw error; // Handle the error accordingly
+    }
+});
+
+// *****************************************************
 app.whenReady().then(() => createWindow(1)); // Default scale factor is 1
 
 app.on('window-all-closed', () => {

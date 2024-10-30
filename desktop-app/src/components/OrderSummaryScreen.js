@@ -38,64 +38,43 @@ const OrderSummaryScreen = () => {
     useEffect(() => {
         const fetchTempOrderByNumber = async (orderNumberToFetch) => {
             try {
-                const response = await fetch(`http://localhost:3001/tempOrders/${orderNumberToFetch}`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                });
-                const result = await response.json();
+                const result = await window.api.fetchTempOrder(orderNumberToFetch);
+                const { customerID, ...orderData } = result;
     
-                if (response.ok) {
-                    const { customerID, ...orderData } = result;
-                    setOrderDetails(orderData);
-                    
-                    const orderCreatedDate = new Date(orderData.createdAt);
-                    setOrderCreatedDate(orderCreatedDate);
-                    const hours = String(orderCreatedDate.getHours()).padStart(2, '0');
-                    const minutes = String(orderCreatedDate.getMinutes()).padStart(2, '0');
-                    setOrderCreatedAtTime(`${hours}:${minutes}`);
-                    
-                    if (customerID) {
-                        await fetchCustomerDetails(customerID); // Ensure this is awaited
-                    }
-                } else {
-                    console.error('Temporary order not found');
+                setOrderDetails(orderData);
+    
+                const orderCreatedDate = new Date(orderData.createdAt);
+                setOrderCreatedDate(orderCreatedDate);
+                const hours = String(orderCreatedDate.getHours()).padStart(2, '0');
+                const minutes = String(orderCreatedDate.getMinutes()).padStart(2, '0');
+                setOrderCreatedAtTime(`${hours}:${minutes}`);
+    
+                if (customerID) {
+                    await fetchCustomerDetails(customerID); // Ensure this is awaited
                 }
             } catch (error) {
                 console.error('Error fetching order:', error);
             }
         };
     
-        const fetchCustomerDetails = async (customerID) => { // Marked as async
+        const fetchCustomerDetails = async (customerID) => {
             try {
-                const customerResponse = await fetch(`http://localhost:3001/customers/${customerID}`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                });
-                const customerResult = await customerResponse.json();
+                const customerResult = await window.api.fetchCustomerInfo(customerID);
     
-                if (customerResponse.ok) {
-                    setFormData({
-                        name: customerResult.name || '',
-                        phone: customerResult.phone || '',
-                        postcode: customerResult.postcode || '',
-                        address: customerResult.address || '',
-                        notes: customerResult.notes || '',
-                    });
-                } else {
-                    console.error('Customer not found');
-                }
+                setFormData({
+                    name: customerResult.name || '',
+                    phone: customerResult.phone || '',
+                    postcode: customerResult.postcode || '',
+                    address: customerResult.address || '',
+                    notes: customerResult.notes || '',
+                });
             } catch (error) {
                 console.error('Error fetching customer details:', error);
             }
         };
     
         fetchTempOrderByNumber(orderNumber);
-    }, [orderNumber]); // Ensure orderNumber is a dependency if it changes
-    
+    }, [orderNumber]); // Ensure orderNumber is a dependency if it changes    
         
     const handleEditOrderClick = () => {
         navigate('/OrderScreen', { state: { existingOrderNoToEdit: orderNumber} });
