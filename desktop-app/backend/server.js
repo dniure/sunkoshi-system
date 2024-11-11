@@ -8,7 +8,7 @@ const {
     getCustomer,
     updateTempOrder,
     updateCustomer
-} = require('./databaseFunctions'); // Import functions from databaseFunctions.js
+} = require('./databaseFunctions');
 
 const app = express();
 app.use(cors());
@@ -20,13 +20,14 @@ app.use(express.json());
 // Create a new temporary order
 app.post('/tempOrders', async (req, res) => {  
     try {
-        const inputData = req.body; // Get order details from request body
-        const { order, customerID } = await createTempOrder(inputData); // Call the createTempOrder function
+        const {orderDetails, customerDetails} = req.body;
+
+        const { order, customerID } = await createTempOrder(orderDetails, customerDetails); // Call the createTempOrder function
 
         // Fetch customer info after order creation
-        const customerInfo = await getCustomer(customerID);
+        const fetchedCustomerInfo = await getCustomer(customerID);
         
-        res.status(201).json({ order, customerInfo });
+        res.status(201).json({ order, customerInfo: fetchedCustomerInfo });
     } catch (error) {
         console.error("Error details:", error);
         if (error.name === 'SequelizeValidationError') {
@@ -50,10 +51,7 @@ app.post('/tempOrders', async (req, res) => {
 app.get('/tempOrders/:orderNumber', async (req, res) => {
     try {
         const { orderNumber } = req.params;
-        console.log('Incoming request for order number:', orderNumber);
-
-        const tempOrder = await getTempOrder(orderNumber); // Use the function from databaseFunctions.js
-        console.log('Fetched tempOrder from database:', tempOrder);
+        const tempOrder = await getTempOrder(orderNumber);
 
         if (!tempOrder) {
             return res.status(404).json({ message: 'Temporary order not found' });
@@ -70,12 +68,7 @@ app.get('/tempOrders/:orderNumber', async (req, res) => {
 app.get('/customers/:customerID', async (req, res) => {
     try {
         const { customerID } = req.params;
-        console.log('Fetching customer with ID:', customerID); // Log the incoming customerID
-
         const fetchedCustomer = await getCustomer(customerID); // Use the function from databaseFunctions.js
-        
-        // Log the fetched customer details or null if not found
-        console.log('Fetched customer:', fetchedCustomer ? fetchedCustomer : 'No customer found');
 
         if (!fetchedCustomer) return res.status(404).json({ message: 'Customer not found' });
         
@@ -98,11 +91,7 @@ app.put('/tempOrders/:orderNumber', async (req, res) => {
 
         const updatedTempOrder = await updateTempOrder(orderNumber, orderDetails);
 
-        console.log("updatedTempOrder: ", updatedTempOrder);
-        res.status(200).json({ 
-            message: 'Temporary order updated successfully', 
-            updatedTempOrder 
-        });
+        res.status(200).json(updatedTempOrder.orderNumber);
     } catch (error) {
         console.error('Error updating temporary order:', error);
         res.status(500).json({ message: 'Error updating temporary order', error: error.message });
@@ -113,10 +102,10 @@ app.put('/tempOrders/:orderNumber', async (req, res) => {
 app.put('/customers/:customerID', async (req, res) => {
     try {
         const { customerID } = req.params;
-        const formData = req.body;
-        const updatedCustomer = await updateCustomer(customerID, formData); // Use the function from databaseFunctions.js
+        const newCustomerDetails = req.body;
+        const updatedCustomer = await updateCustomer(customerID, newCustomerDetails);
 
-        res.status(200).json({ message: 'Customer updated successfully', updatedCustomer });
+        res.status(200).json(updatedCustomer);
     } catch (error) {
         console.error('Error updating customer:', error);
         res.status(500).json({ message: 'Error updating customer', error: error.message });

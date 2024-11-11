@@ -26,7 +26,7 @@ const OrderScreen = () => {
         finalCost: null,
         paymentMethod: 'Unknown'
     });    
-    const [formData, setFormData] = useState({
+    const [customerDetails, setCustomerDetails] = useState({
         name: '',
         phone: '',
         postcode: '',
@@ -40,14 +40,13 @@ const OrderScreen = () => {
             try {
                 // Use window.api for fetching order details
                 const result = await window.api.fetchTempOrder(orderNumberToFetch);
-
                 if (result) {
-                    const { customerID, ...orderData } = result;
+                    const { customerID: fetchedCustomerID, ...orderData } = result;
                     setOrderDetails(orderData);
 
-                    if (customerID !== null) {
-                        setCustomerID(customerID);
-                        await fetchCustomerDetails(customerID); // Update this as well
+                    if (fetchedCustomerID !== null) {
+                        setCustomerID(fetchedCustomerID);
+                        await fetchCustomerDetails(fetchedCustomerID);
                     }
                 } else {
                     console.error('Temporary order not found');
@@ -57,13 +56,12 @@ const OrderScreen = () => {
             }
         };
         // Fetch Existing Customer Info
-        const fetchCustomerDetails = async (customerID) => {
+        const fetchCustomerDetails = async (customerIDInput) => {
             try {
-                // Use window.api for fetching customer details
-                const customerResult = await window.api.fetchCustomerInfo(customerID);
+                const customerResult = await window.api.fetchCustomerInfo(customerIDInput);
 
                 if (customerResult) {
-                    setFormData({
+                    setCustomerDetails({
                         name: customerResult.name || '',
                         phone: customerResult.phone || '',
                         postcode: customerResult.postcode || '',
@@ -83,7 +81,9 @@ const OrderScreen = () => {
         } else {
             setOrderDetails(prev => ({
                 ...prev,
-                orderTimeInMinutes: 25,
+                orderTimeInMinutes: (orderDetails.orderType === 'delivery' ? 45 :
+                    orderDetails.orderType === 'takeaway' ? 25 :
+                    orderDetails.orderType === 'collection' ? 25 : prev.orderTimeInMinutes),
             }));
         }
     }, [existingOrderNoToEdit]);
@@ -150,7 +150,6 @@ const OrderScreen = () => {
                 return; // Do nothing
             }
             else if (rightSectionOverlayRef.current && rightSectionOverlayRef.current.contains(event.target)){
-                console.log("clicking here");
                 setIsAmendingItem(false);
             } else {
                 setOrderedItemSelected(null);
@@ -194,20 +193,34 @@ const OrderScreen = () => {
 
     const handleSaveOrder = async () => {
         try {
+            // If new order
             if (existingOrderNoToEdit == null) {
-                // Use window.api for creating a new order
-                const result = await window.api.createTempOrder({ ...orderDetails, formData });
+                const result = await window.api.createTempOrder({ orderDetails, customerDetails });
+
                 if (result) {
                     navigate('/OrderSummaryScreen', { state: { orderNumber: result.order.orderNumber } });
                 } else {
                     console.error('Error creating order');
                 }
+            // otherwise update existing order
             } else {
-                // Use window.api for updating an existing order
-                const result = await window.api.updateTempOrder({orderDetails});
-                if (result) {
-                    const result = await window.api.updateCustomerInfo({customerID, formData});
-                    if (result) {navigate('/OrderSummaryScreen', { state: { orderNumber: existingOrderNoToEdit } });}
+                const orderUpdateResult = await window.api.updateTempOrder({orderDetails});
+                if (orderUpdateResult) {
+                    
+                    if (customerID === 0 && Object.values(customerDetails).every(detail => detail === '')) {
+                        navigate('/OrderSummaryScreen', { state: { orderNumber: existingOrderNoToEdit } });
+                    } else {
+                        try {
+                            const customerUpdateResult = await window.api.updateCustomerInfo(customerID === 0 ? -1 : customerID, customerDetails);
+                            if (customerUpdateResult) {
+                                navigate('/OrderSummaryScreen', { state: { orderNumber: existingOrderNoToEdit } });
+                            } else {
+                                console.error('Error updating customer info');
+                            }
+                        } catch (error) {
+                            console.error('Error updating customer info:', error);
+                        }
+                    }
                 } else {
                     console.error('Error updating order');
                 }
@@ -262,7 +275,7 @@ const OrderScreen = () => {
                         <OrderInfoSection
                             orderDetails={orderDetails}
                             setOrderDetails={setOrderDetails}
-                            formData={formData}
+                            customerDetails={customerDetails}
                             modifyTimePopupRef={modifyTimePopupRef}
                             setIsCustomerPopupVisible={setIsCustomerPopupVisible}
                             isModifyingTime={isModifyingTime}
@@ -276,10 +289,10 @@ const OrderScreen = () => {
                 {isCustomerPopupVisible && (
                     <ManageOrderDetails 
                         setIsCustomerPopupVisible={setIsCustomerPopupVisible}
-                        formData={formData}
-                        updateFormData={(newFormData) => setFormData(newFormData)}
+                        customerDetails={customerDetails}
+                        updateCustomerDetails={(newFormData) => setCustomerDetails(newFormData)}
                         orderDetails={orderDetails}
-                        updateOrderType={(newOrderType) => setOrderDetails(prev => ({ ...prev, orderType: newOrderType}))}
+                        setOrderDetails={setOrderDetails}
                         />
                 )}
 

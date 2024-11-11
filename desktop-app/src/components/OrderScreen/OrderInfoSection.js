@@ -5,7 +5,7 @@ import '../../css/OrderScreen/orderInfoSection.scss';
 const OrderInfoSection = ({
     orderDetails,
     setOrderDetails,
-    formData,
+    customerDetails,
     modifyTimePopupRef,
     setIsCustomerPopupVisible,
     isModifyingTime,
@@ -25,7 +25,10 @@ const OrderInfoSection = ({
     useEffect(() => {
         setOrderDetails(prev => ({
             ...prev,
-            prepareOrderFor: (orderDetails.orderTimeInMinutes === 25 ? 'ASAP' : getTimeInHHMM())
+            prepareOrderFor: (orderDetails.orderTimeInMinutes === 45 && orderDetails.orderType === 'delivery') || 
+                (orderDetails.orderTimeInMinutes === 25 && (orderDetails.orderType === 'takeaway' || orderDetails.orderType === 'collection')) 
+                ? 'ASAP' 
+                : getTimeInHHMM(orderDetails.orderTimeInMinutes)
         }));        
         
     }, [orderDetails.orderTimeInMinutes]);
@@ -44,7 +47,12 @@ const OrderInfoSection = ({
     const adjustOrderTime = (adjustType, modifyOn) => {
         // Reset the order time to the default value
         if (adjustType === "reset") {
-            setOrderTimeInMinutes(25);
+            if (orderDetails.orderType == 'takeaway' || orderDetails.orderType == 'collection'){
+                setOrderTimeInMinutes(25);
+            }
+            else if (orderDetails.orderType == 'delivery') {
+                setOrderTimeInMinutes(45);
+            }
             return;
         }
 
@@ -96,7 +104,6 @@ const OrderInfoSection = ({
     const handleOrderInfoClick = (event) => {
         // If the user is not modifying time and clicks outside the modify time button
         if (!isModifyingTime && !modifyTimeButtonRef.current.contains(event.target)) {
-            console.log("clicked here");
             setIsCustomerPopupVisible(true); // Show customer info popup
         }
 
@@ -118,12 +125,12 @@ const OrderInfoSection = ({
             </div>
 
             {/* Customer Info Display */}
-            {(formData.name || formData.phone || formData.postcode || formData.address) ? (
+            {(customerDetails.name || customerDetails.phone || customerDetails.postcode || customerDetails.address) ? (
                 <div className="info-text">
-                    {formData.name && <span>{formData.name}</span>}
-                    {formData.phone && <span>{formData.phone}</span>}
-                    {formData.address && <span>{formData.address}</span>}
-                    {formData.postcode && <span>{formData.postcode}</span>}
+                    {customerDetails.name && <span>{customerDetails.name}</span>}
+                    {customerDetails.phone && <span>{customerDetails.phone}</span>}
+                    {customerDetails.address && <span>{customerDetails.address}</span>}
+                    {customerDetails.postcode && <span>{customerDetails.postcode}</span>}
                 </div>
             ) : null}
 
@@ -151,7 +158,11 @@ const OrderInfoSection = ({
                     <div className="asap-section">
                         {/* ASAP Button */}
                         <button
-                            className={`asap-button ${orderDetails.orderTimeInMinutes === 25 ? 'selected' : ''}`}
+                            className={`asap-button ${
+                                (orderDetails.orderType === 'delivery' && orderDetails.orderTimeInMinutes === 45) ||
+                                ((orderDetails.orderType === 'takeaway' || orderDetails.orderType === 'collection') && orderDetails.orderTimeInMinutes === 25)
+                                ? 'selected' : ''
+                            }`}
                             onClick={() => adjustOrderTime("reset")}
                         >
                             ASAP

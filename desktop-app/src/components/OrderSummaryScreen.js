@@ -71,8 +71,7 @@ const OrderSummaryScreen = () => {
             } catch (error) {
                 console.error('Error fetching customer details:', error);
             }
-        };
-    
+        };    
         fetchTempOrderByNumber(orderNumber);
     }, [orderNumber]); // Ensure orderNumber is a dependency if it changes    
         
@@ -252,71 +251,7 @@ const OrderSummaryScreen = () => {
         const intervalId = setInterval(updateTime, 1000); // Update every second
 
         return () => clearInterval(intervalId); // Cleanup interval on component unmount
-    }, [orderCreatedDate]);    
-
-    const addItemFunction = () => {
-        setOrderDetails(prevOrderDetails => ({
-            ...prevOrderDetails,
-            orderedItems: [
-                ...prevOrderDetails.orderedItems,
-                {
-                    name: "ITEM",
-                    quantity: 1,
-                    price: 4.99,
-                    amendments: []
-                }
-            ]
-        }));
-    };
-    
-
-    const addAmendmentFunction = () => {
-        setOrderDetails(prevOrderDetails => {
-            if (prevOrderDetails.orderedItems.length > 0) {
-                const updatedItems = [...prevOrderDetails.orderedItems];
-                const lastItem = updatedItems[updatedItems.length - 1];
-    
-                // Update the last item with the new amendment
-                const updatedLastItem = {
-                    ...lastItem,
-                    amendments: [...lastItem.amendments, 'amendment'] // Add new amendment
-                };
-    
-                // Replace the last item in the array with the updated item
-                updatedItems[updatedItems.length - 1] = updatedLastItem;
-    
-                // Return the updated orderDetails with modified orderedItems
-                return {
-                    ...prevOrderDetails,
-                    orderedItems: updatedItems
-                };
-            }
-            return prevOrderDetails; // Return the unchanged orderDetails if no items exist
-        });
-    };
-    
-
-    const removeLastItem = () => {
-        setOrderDetails(prevOrderDetails => {
-            const prevItems = prevOrderDetails.orderedItems;
-    
-            if (prevItems.length === 0) {
-                return prevOrderDetails; // Return unchanged if no items
-            }
-    
-            return {
-                ...prevOrderDetails,
-                orderedItems: prevItems.slice(0, -1) // Remove the last item
-            };
-        });
-    };    
-
-    const clearOrderedItems = () => {
-        setOrderDetails(prevOrderDetails => ({
-            ...prevOrderDetails,
-            orderedItems: []
-        }));
-    };
+    }, [orderCreatedDate]);
 
     // ////////////////////////////////////////////////
     // MAIN HTML
@@ -422,10 +357,6 @@ const OrderSummaryScreen = () => {
                     <button className="cancel" onClick={() => navigate('/')}>exit</button>
                     <button className="printReceipt" onClick={() => navigate('/')}>print receipt</button>
                     <button className="save" onClick={() => navigate('/')}>save</button>
-                    <button className="addItemTest" onClick={addItemFunction}>ADD ITEM</button>
-                    <button className="removeLastItem" onClick={removeLastItem}>REMOVE</button>
-                    <button className="addAmendmentTest" onClick={addAmendmentFunction}>ADD AMENDMENT</button>
-                    <button className="clearContentTest" onClick={clearOrderedItems}>CLEAR CONTENT</button>
                 </div>                
             </div>
         </div>

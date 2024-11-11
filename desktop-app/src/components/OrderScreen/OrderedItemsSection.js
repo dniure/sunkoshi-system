@@ -241,7 +241,7 @@ const OrderedItemsSection = ({
                 
                 {/* Total Price Display */}                
                 <span className="total">TOTAL</span>
-                <span className="price-sum">£{orderDetails.priceSum}</span>
+                <span className="price-sum">£{orderDetails.totalPrice}</span>
                 <span className="final-price">£{orderDetails.finalCost}</span>
             </div>
 

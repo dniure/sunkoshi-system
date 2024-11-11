@@ -3,17 +3,8 @@ const { Customer, TempOrder, Order } = require('./models'); // Import your model
 // *************************************************************************
 // CREATE TEMPORARY ORDER FUNCTION
 
-async function createTempOrder(inputData) {
+async function createTempOrder(orderDetails, customerDetails) {
     try {
-        const { 
-            orderType,
-            orderTimeInMinutes,
-            prepareOrderFor,
-            orderedItems,
-            paymentMethod,
-            formData 
-        } = inputData;
-
         // Format date as YYYY-MM-DD
         const orderDate = new Date().toISOString().split('T')[0];
         
@@ -23,7 +14,9 @@ async function createTempOrder(inputData) {
         let attemptCount = 0;
 
         while (orderExists) {
+            // Find out the total number of orders today
             const tempOrderCount = await TempOrder.count({ where: { orderDate } });
+            // Try creating new order no. tempOrderCount+ 1, if that fails increment one each time (attemptCount)
             tempOrderNumber = (tempOrderCount + 1 + attemptCount).toString().padStart(2, '0');
 
             // Check if the generated order number already exists
@@ -36,7 +29,7 @@ async function createTempOrder(inputData) {
         let customerID;
 
         // If the order is a takeaway with all fields empty
-        if (orderType === 'takeaway' && (!formData.name && !formData.phone && !formData.postcode && !formData.address)) {
+        if (orderDetails.orderType === 'takeaway' && (!customerDetails.name && !customerDetails.phone && !customerDetails.postcode && !customerDetails.address)) {
             customerID = 0;
 
             // Check if customer with ID 0 exists, if not create it
@@ -52,28 +45,30 @@ async function createTempOrder(inputData) {
                 });
             }
         } else {
-            // Create a new customer with provided formData
+            // Create a new customer with provided customerDetails
             const customer = await Customer.create({
-                name: formData.name || null,
-                phone: formData.phone || null,
-                postcode: formData.postcode || null,
-                address: formData.address || null,
-                notes: formData.notes || null,
+                name: customerDetails.name || null,
+                phone: customerDetails.phone || null,
+                postcode: customerDetails.postcode || null,
+                address: customerDetails.address || null,
+                notes: customerDetails.notes || null,
             });
             customerID = customer.customerID;
         }
         
         // Create the new temporary order with a unique orderNumber
         const newTempOrder = await TempOrder.create({
-            orderDate,
-            orderNumber: tempOrderNumber,
-            orderType,
-            prepareOrderFor,
-            orderTimeInMinutes,         
-            orderedItems,
-            paymentMethod,
+            orderDate,            
+            orderNumber: tempOrderNumber || null,
+
+            orderType: orderDetails.orderType || null,
+            prepareOrderFor: orderDetails.prepareOrderFor || null,
+            orderTimeInMinutes: orderDetails.orderTimeInMinutes || null,         
+            orderedItems: orderDetails.orderedItems || null,
+            paymentMethod: orderDetails.paymentMethod || null,
+
             customerID,
-            orderNotes: formData.notes || null,
+            orderNotes: customerDetails.notes || null,
         });
 
         return { order: newTempOrder, customerID };
@@ -135,18 +130,27 @@ async function updateTempOrder(orderNumber, orderDetails) {
 // *************************************************************************
 // UPDATE CUSTOMER FUNCTION
 
-async function updateCustomer(customerID, formData) {
-    try {
-        const customer = await Customer.findOne({ where: { customerID } });
-        if (!customer) {
-            throw new Error('Customer not found');
-        }
+async function updateCustomer(customerID, newCustomerDetails) {
 
-        // Update customer details
-        Object.assign(customer, formData); // Update properties from customerDetails
-        await customer.save();
-        
-        return customer;
+    try {
+        if (customerID === '-1') {
+            const newCustomer = await Customer.create({
+                name: newCustomerDetails.name || null,
+                phone: newCustomerDetails.phone || null,
+                postcode: newCustomerDetails.postcode || null,
+                address: newCustomerDetails.address || null,
+                notes: newCustomerDetails.notes || null,
+            });
+            return newCustomer;         
+        } else {
+            const customer = await Customer.findOne({ where: { customerID } });
+            if (!customer) {
+                throw new Error('Customer not found');
+            }
+            Object.assign(customer, newCustomerDetails);
+            await customer.save();
+            return customer;
+        }
     } catch (error) {
         console.error("Error updating customer:", error);
         throw error; // Rethrow the error to be handled by the calling function

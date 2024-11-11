@@ -1,6 +1,6 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
-const databaseFunctions = require('./backend/databaseFunctions.js'); // Assume you have a file with your DB functions
+const axios = require('axios');
 
 let isDev;
 
@@ -66,37 +66,32 @@ async function createWindow() {
   });
 }
 
-
-
-
 // ***************************************************************
-
-const axios = require('axios');
-
-ipcMain.handle('createTempOrder', async (event, data) => {
+ipcMain.handle('createTempOrder', async (event, dataInput) => {
     try {
-        const response = await axios.post('http://localhost:3001/tempOrders', data);
-        return response.data;
+      const response = await axios.post('http://localhost:3001/tempOrders', dataInput);      
+      return response.data;
     } catch (error) {
-        console.error('Error creating temp order:', error);
-        throw error; // Handle the error accordingly
+      console.error('Error creating temp order:', error);     // Log the error details
+      throw error;
     }
 });
 
+
 ipcMain.handle('fetchTempOrder', async (event, orderNumber) => {
     try {
-        const response = await axios.get(`http://localhost:3001/tempOrders/${orderNumber}`);
-        return response.tempOrder;
+      const response = await axios.get(`http://localhost:3001/tempOrders/${orderNumber}`);
+      return response.data;
     } catch (error) {
-        console.error('Error fetching temp order:', error);
-        throw error; // Handle the error accordingly
+      console.error('Error fetching temp order:', error);
+      throw error; // Handle the error accordingly
     }
 });
 
 ipcMain.handle('updateTempOrder', async (event, data) => {
   try {
       const response = await axios.put(`http://localhost:3001/tempOrders/${data.orderDetails.orderNumber}`, data);      
-      return response.updatedTempOrder; // Return the response data from the server
+      return response.data;
   } catch (error) {
       console.error('Error updating temp order:', error);
       throw error; // Handle the error accordingly
@@ -106,18 +101,17 @@ ipcMain.handle('updateTempOrder', async (event, data) => {
 ipcMain.handle('fetchCustomerInfo', async (event, customerID) => {
     try {
         const response = await axios.get(`http://localhost:3001/customers/${customerID}`);
-        return response.fetchedCustomer;
+        return response.data;
     } catch (error) {
         console.error('Error fetching customer info:', error);
         throw error; // Handle the error accordingly
     }
 });
 
-ipcMain.handle('updateCustomerInfo', async (event, customerID, formData) => {
+ipcMain.handle('updateCustomerInfo', async (event, customerID, customerDetails) => {
     try {
-        const response = await axios.put(`http://localhost:3001/customers/${customerID}`, formData); // Assuming customerID is part of customerData
-        console.log("response.updatedCustomer: ", response.updatedCustomer);
-        return response.updatedCustomer;
+        const response = await axios.put(`http://localhost:3001/customers/${customerID}`, customerDetails); // Assuming customerID is part of customerData
+        return response.data;
     } catch (error) {
         console.error('Error updating customer info:', error);
         throw error; // Handle the error accordingly
