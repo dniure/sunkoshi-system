@@ -20,11 +20,11 @@ const OrderScreen = () => {
         prepareOrderFor: 'Unknown',
         orderTimeInMinutes: null,
         orderedItems: [],
-        priceSum: null,
         discounts:[],
         fees: [],
+        totalPrice: null,
         finalCost: null,
-        paymentMethod: 'Unknown'
+        paymentMethod: 'notPaid'
     });    
     const [customerDetails, setCustomerDetails] = useState({
         name: '',
@@ -191,14 +191,18 @@ const OrderScreen = () => {
         setOrderedItemSelected(orderDetails.orderedItems.length);
     };
 
-    const handleSaveOrder = async () => {
+    const handleSaveOrder = async (saveAndExit) => {
         try {
             // If new order
             if (existingOrderNoToEdit == null) {
                 const result = await window.api.createTempOrder({ orderDetails, customerDetails });
 
                 if (result) {
-                    navigate('/OrderSummaryScreen', { state: { orderNumber: result.order.orderNumber } });
+                    if (saveAndExit) {
+                        navigate('/');
+                    } else{
+                        navigate('/OrderSummaryScreen', { state: { orderNumber: result.order.orderNumber } });
+                    }
                 } else {
                     console.error('Error creating order');
                 }
@@ -206,16 +210,31 @@ const OrderScreen = () => {
             } else {
                 const orderUpdateResult = await window.api.updateTempOrder({orderDetails});
                 if (orderUpdateResult) {
-                    
+                    let customerIDToUse = customerID;
+
                     if (customerID === 0 && Object.values(customerDetails).every(detail => detail === '')) {
-                        navigate('/OrderSummaryScreen', { state: { orderNumber: existingOrderNoToEdit } });
+                        if (saveAndExit) {
+                            navigate('/');
+                        } else{
+                            navigate('/OrderSummaryScreen', { state: { orderNumber: existingOrderNoToEdit } });
+                        }                        
                     } else {
                         try {
                             const customerUpdateResult = await window.api.updateCustomerInfo(customerID === 0 ? -1 : customerID, customerDetails);
-                            if (customerUpdateResult) {
+                            if (customerUpdateResult && customerID === 0) {
+                                customerIDToUse = customerUpdateResult.customerID;
+                                const newOrderDetails = { ...orderDetails, customerID: customerIDToUse };
+                                const updatedOrderDetails = await window.api.updateTempOrder({orderDetails: newOrderDetails});
+                                
+                                if (updatedOrderDetails == null) {
+                                    console.error('Error updating order');
+                                }
+                            }
+
+                            if (saveAndExit) {
+                                navigate('/');
+                            } else{
                                 navigate('/OrderSummaryScreen', { state: { orderNumber: existingOrderNoToEdit } });
-                            } else {
-                                console.error('Error updating customer info');
                             }
                         } catch (error) {
                             console.error('Error updating customer info:', error);
@@ -309,8 +328,22 @@ const OrderScreen = () => {
 
                     {/* Save and Cancel */}
                     <button className="bottom-btn orderScreen-cancel" onClick={() => navigate('/')}>cancel</button>
-                    <button className="bottom-btn orderScreen-save" onClick={handleSaveOrder}>save</button>
-                    <button className="bottom-btn orderScreen-next" onClick={handleSaveOrder}>next</button>
+
+                    <button 
+                        className="bottom-btn orderScreen-save" 
+                        onClick={() => handleSaveOrder(true)}
+                        disabled={!orderDetails.orderedItems || orderDetails.orderedItems.length === 0}
+                    >
+                        save
+                    </button>
+                    <button 
+                        className="bottom-btn orderScreen-next" 
+                        onClick={() => handleSaveOrder(false)}
+                        disabled={!orderDetails.orderedItems || orderDetails.orderedItems.length === 0}
+                    >
+                        next
+                    </button>    
+
                 </div>
             </div>
         </div>

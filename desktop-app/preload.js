@@ -13,7 +13,9 @@ contextBridge.exposeInMainWorld('api', {
 
     fetchCustomerInfo: async (customerID) => {
         return ipcRenderer.invoke('fetchCustomerInfo', customerID)},
-
-    updateCustomerInfo: (customerID, customerDetails) => {
-        return ipcRenderer.invoke('updateCustomerInfo', customerID, customerDetails)},
+ 
+    updateCustomerInfo: async (customerID, customerDetails) => {
+        const output = await ipcRenderer.invoke('updateCustomerInfo', customerID, customerDetails);
+        return output;
+    }
 });

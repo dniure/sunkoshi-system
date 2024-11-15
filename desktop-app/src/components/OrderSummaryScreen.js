@@ -15,12 +15,12 @@ const OrderSummaryScreen = () => {
         prepareOrderFor: 'Unknown',
         orderTimeInMinutes: null,
         orderedItems: [],
-        priceSum: null,
         discounts:[],
         fees: [],
-        finalSum: null,        
-        paymentMethod: 'SELECT',
-    });
+        totalPrice: null,
+        finalCost: null,
+        paymentMethod: 'notPaid'
+    });     
 
     const [formData, setFormData] = useState({
         name: '',
@@ -35,12 +35,13 @@ const OrderSummaryScreen = () => {
     const [orderCreatedAtTime, setOrderCreatedAtTime] = useState('');
     const [minutesSinceOrder, setMinutesSinceOrder] = useState('')
 
+    // Fetching Orders and Customer Details
     useEffect(() => {
         const fetchTempOrderByNumber = async (orderNumberToFetch) => {
             try {
                 const result = await window.api.fetchTempOrder(orderNumberToFetch);
                 const { customerID, ...orderData } = result;
-    
+                
                 setOrderDetails(orderData);
     
                 const orderCreatedDate = new Date(orderData.createdAt);
@@ -78,8 +79,31 @@ const OrderSummaryScreen = () => {
     const handleEditOrderClick = () => {
         navigate('/OrderScreen', { state: { existingOrderNoToEdit: orderNumber} });
     }
+    
     customerDisplayName = formData.name || orderDetails.orderType
 
+    // Function to cycle through payment methods
+    const handlePaymentMethodClick = () => {
+        const paymentMethods = ['notPaid', 'Cash', 'Card'];
+        const currentIndex = paymentMethods.indexOf(orderDetails.paymentMethod);
+        const nextIndex = (currentIndex + 1) % paymentMethods.length;
+        setOrderDetails(prevDetails => ({
+            ...prevDetails,
+            paymentMethod: paymentMethods[nextIndex],
+        }));
+    };
+
+    const handleDiscountClick = () => {
+        const discountValues = [null, '10%', '20%', '30%'];
+        const currentDiscountIndex = discountValues.indexOf(orderDetails.discount);
+        const nextDiscountIndex = (currentDiscountIndex + 1) % discountValues.length;
+        setOrderDetails(prevDetails => ({
+            ...prevDetails,
+            discount: discountValues[nextDiscountIndex],
+        }));
+    };
+    
+    
     // ***********************************************************************
 
     const itemsContainerRef = useRef(null);
@@ -286,11 +310,28 @@ const OrderSummaryScreen = () => {
                         <div className="orderNo">No. {orderDetails.orderNumber}</div>
                         <span className="separator"/>
                         <div className="customerName">{customerDisplayName}</div>
-                        <div className="orderedTime">{orderCreatedAtTime}</div>
+                        <div className="orderedTime"
+                             style={{textTransform: 'none'}}
+                             >Ordered At: {orderCreatedAtTime}
+                        </div>
                         <div className="payment-section">
-                            <div className="amountToPay">£34.35</div>
-                            <div className="paymentMethod">TO PAY: {orderDetails.paymentMethod}</div> 
-                            <div className="discountToggle">Discount</div> 
+                            <div className="amountToPay">£{orderDetails.finalCost}</div>
+                            <div className={`paymentMethod ${
+                                (orderDetails.paymentMethod?.toLowerCase() === 'notpaid') ? 'notPaid' : 'paid'
+                                }`}
+                                onClick={handlePaymentMethodClick}
+                            >
+                                {orderDetails.paymentMethod?.toLowerCase() === 'notpaid'
+                                ? 'Not Paid'
+                                : `Paid: ${orderDetails.paymentMethod}`}
+                            </div>                            
+
+                            <div className="discountToggle">
+                                <span className="discountLabel">Discount:</span>
+                                <span className={`discountValue ${
+                                    orderDetails.discount ? 'discounted': ''}
+                                }`} onClick={handleDiscountClick}>{orderDetails.discount || 'None'}</span>
+                            </div>
                         </div>
                         <div className="notesSection">
                             <div className="notes">Notes {formData.notes}</div>
@@ -343,8 +384,8 @@ const OrderSummaryScreen = () => {
                         <div className="footer">                            
                             {/* Total Price Display */}                
                             <span className="total">TOTAL</span>
-                            <span className="price-sum">£34.40</span>
-                            <span className="final-price">£34.40</span>
+                            <span className="price-sum">£{orderDetails.totalPrice}</span>
+                            <span className="final-price">£{orderDetails.finalCost}</span>
                         </div>
                     </div>
                     <div className="editOrderClass">

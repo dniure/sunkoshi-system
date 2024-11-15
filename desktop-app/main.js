@@ -1,7 +1,6 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, globalShortcut  } = require('electron');
 const path = require('path');
 const axios = require('axios');
-
 let isDev;
 
 async function loadIsDev() {
@@ -119,7 +118,16 @@ ipcMain.handle('updateCustomerInfo', async (event, customerID, customerDetails) 
 });
 
 // *****************************************************
-app.whenReady().then(() => createWindow(1)); // Default scale factor is 1
+app.whenReady().then(() => {
+  createWindow(1); // Default scale factor is 1
+
+  // Register a global shortcut to manually refresh the window
+  globalShortcut.register('CmdOrCtrl+R', () => {
+    if (win) {
+      win.reload();
+    }
+  });
+});
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
@@ -132,3 +140,5 @@ app.on('activate', () => {
     createWindow(1);
   }
 });
+
+

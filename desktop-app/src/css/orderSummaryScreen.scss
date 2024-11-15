@@ -189,7 +189,6 @@
                     font-size: 18px;
                     font-weight: 500;
                     color: #ffffff;
-                    background-color: #615AB2;
                     width: 90%;
                     border-radius: 5px;
                     height: 40px;
@@ -199,26 +198,51 @@
                     align-items: center;
                     justify-content: center;
                     overflow: hidden;
+
+                    cursor: pointer;
                     
                     padding: 2px 0;
-                }
-    
-                .discountToggle {
-                    font-size: 18px;
-                    font-weight: 500;
-                    color: #ffffff;
-                    background-color: #8F8E9D;
-                    width: 90%;
-                    border-radius: 5px;
-                    height: 40px;
-    
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    justify-content: center;
-                    overflow: hidden;
-    
-                    padding: 2px 0;
+
+                    &.notPaid {
+                        background-color: #A53E40;
+                    }
+
+                    &.paid {
+                        background-color: #61A61B;
+                    }
+                }                
+            }
+            
+            .discountToggle {
+                display: flex;
+                justify-content: space-between; /* Distributes elements with space in between */
+                align-items: center; /* Aligns items vertically */
+                width: 88%; /* Ensure it spans its container */
+                padding: 5px; /* Optional padding */
+              }
+              
+              .discountLabel {
+                font-weight: 700;
+                text-transform: none;
+                font-size: 20px;
+                padding-top: 1px;
+                margin-right: 10px; /* Adds space between label and value */
+              }
+              
+            .discountValue {
+                width: 150px;
+                height: 35px;
+                font-size: 17px;
+                color: #ffffff;
+                background-color: #8f8e9d69;
+                border-radius: 7px;
+                cursor: pointer;
+                display: flex;
+                justify-content: center; /* Center contents horizontally */
+                align-items: center; /* Center contents vertically */
+                
+                &.discounted{
+                    background-color: #6938e6;
                 }
             }
     

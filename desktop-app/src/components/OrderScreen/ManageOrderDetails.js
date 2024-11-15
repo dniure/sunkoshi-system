@@ -31,17 +31,14 @@ const ManageOrderDetails = ({ setIsCustomerPopupVisible, customerDetails, update
 
     useEffect(() => {
         // Check if the previous order type was takeaway/collection and has changed to delivery
-        console.log(prevOrderType, "-->", tempOrderType, "(", orderDetails.orderTimeInMinutes, "-->", tempOrderTimeInMinutes, ")");
 
         if ((prevOrderType === 'takeaway' || prevOrderType === 'collection') &&
             (tempOrderType === 'delivery' && tempOrderTimeInMinutes === 25)) {
-            console.log("ASAP collection/takeaway --> delivery");
             setPrevOrderType('delivery')
             setTempOrderTimeInMinutes(45);
         }
         else if((prevOrderType === 'delivery') && 
             (tempOrderType === 'takeaway' || tempOrderType === 'collection')) {
-            console.log("ASAP delivery -> collection/takeaway");
             setPrevOrderType('takeaway')
             setTempOrderTimeInMinutes(25);
         }

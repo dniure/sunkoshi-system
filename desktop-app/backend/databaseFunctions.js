@@ -66,7 +66,9 @@ async function createTempOrder(orderDetails, customerDetails) {
             orderTimeInMinutes: orderDetails.orderTimeInMinutes || null,         
             orderedItems: orderDetails.orderedItems || null,
             paymentMethod: orderDetails.paymentMethod || null,
-
+            totalPrice: orderDetails.totalPrice || null,
+            finalCost: orderDetails.finalCost || null,
+            
             customerID,
             orderNotes: customerDetails.notes || null,
         });
