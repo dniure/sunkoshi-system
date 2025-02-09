@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const { Customer, TempOrder, Order } = require('./models'); // Import models from index.js
+const { Customer, TempOrder, Order } = require('./models');
 
 const {
     createTempOrder,
@@ -119,7 +119,7 @@ const syncModels = async () => {
     try {
         await Customer.sync({ alter: true });
         await Order.sync({ alter: true });
-        await TempOrder.sync({ alter: true }); // Ensure TempOrder is synced
+        await TempOrder.sync({ alter: true });
         console.log('Database synchronized');
         app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
     } catch (err) {

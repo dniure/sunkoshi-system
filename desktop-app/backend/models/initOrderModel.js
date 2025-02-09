@@ -9,7 +9,7 @@ const initOrderModel = (sequelize) => {
         },
         orderNumber: {
             type: DataTypes.STRING(4),
-            autoIncrement: true, // Ensure this is set to true
+            // autoIncrement: true,
             allowNull: false,
             primaryKey: true,
         },
@@ -56,12 +56,12 @@ const initOrderModel = (sequelize) => {
         createdAt: {
             type: DataTypes.DATE,
             allowNull: false,
-            defaultValue: DataTypes.NOW,
+            defaultValue: sequelize.literal("CURRENT_TIME"),
         },
         updatedAt: {
             type: DataTypes.DATE,
             allowNull: false,
-            defaultValue: DataTypes.NOW,
+            defaultValue: sequelize.literal("CURRENT_TIME"),
         },
     };
 };
